@@ -14,6 +14,13 @@
 		CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E55261A039F00FD02F5 /* GameViewController.swift */; };
 		CEA71E59261A039F00FD02F5 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEA71E57261A039F00FD02F5 /* Main.storyboard */; };
 		CEA71E5B261A03A000FD02F5 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CEA71E5A261A03A000FD02F5 /* Assets.xcassets */; };
+		CEA71E64261A06D300FD02F5 /* Launch Screen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CEA71E63261A06D300FD02F5 /* Launch Screen.storyboard */; };
+		CEA71E68261A36AF00FD02F5 /* ChessLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E67261A36AF00FD02F5 /* ChessLogic.swift */; };
+		CEAD174D261C495500F91647 /* ChessPiecePlace.wav in Resources */ = {isa = PBXBuildFile; fileRef = CEAD174C261C495500F91647 /* ChessPiecePlace.wav */; };
+		CEAD1752261C4C1100F91647 /* CheckSound1.wav in Resources */ = {isa = PBXBuildFile; fileRef = CEAD1751261C4C1100F91647 /* CheckSound1.wav */; };
+		CEAD1755261C4DD400F91647 /* CheckSound2.wav in Resources */ = {isa = PBXBuildFile; fileRef = CEAD1754261C4DD400F91647 /* CheckSound2.wav */; };
+		CEAD1758261C4DD900F91647 /* CheckSound3.wav in Resources */ = {isa = PBXBuildFile; fileRef = CEAD1757261C4DD900F91647 /* CheckSound3.wav */; };
+		CEAD175D261C7B7200F91647 /* knight.png in Resources */ = {isa = PBXBuildFile; fileRef = CEAD175C261C7B7200F91647 /* knight.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +33,13 @@
 		CEA71E58261A039F00FD02F5 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		CEA71E5A261A03A000FD02F5 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		CEA71E5C261A03A000FD02F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CEA71E63261A06D300FD02F5 /* Launch Screen.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "Launch Screen.storyboard"; sourceTree = "<group>"; };
+		CEA71E67261A36AF00FD02F5 /* ChessLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessLogic.swift; sourceTree = "<group>"; };
+		CEAD174C261C495500F91647 /* ChessPiecePlace.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ChessPiecePlace.wav; sourceTree = "<group>"; };
+		CEAD1751261C4C1100F91647 /* CheckSound1.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = CheckSound1.wav; sourceTree = "<group>"; };
+		CEAD1754261C4DD400F91647 /* CheckSound2.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = CheckSound2.wav; sourceTree = "<group>"; };
+		CEAD1757261C4DD900F91647 /* CheckSound3.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = CheckSound3.wav; sourceTree = "<group>"; };
+		CEAD175C261C7B7200F91647 /* knight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = knight.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,16 +72,31 @@
 		CEA71E4C261A039E00FD02F5 /* Chess */ = {
 			isa = PBXGroup;
 			children = (
+				CEAD175C261C7B7200F91647 /* knight.png */,
+				CEAD174F261C495800F91647 /* SFX */,
 				CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */,
 				CEA71E4F261A039F00FD02F5 /* GameScene.sks */,
 				CEA71E51261A039F00FD02F5 /* Actions.sks */,
 				CEA71E53261A039F00FD02F5 /* GameScene.swift */,
+				CEA71E67261A36AF00FD02F5 /* ChessLogic.swift */,
 				CEA71E55261A039F00FD02F5 /* GameViewController.swift */,
 				CEA71E57261A039F00FD02F5 /* Main.storyboard */,
+				CEA71E63261A06D300FD02F5 /* Launch Screen.storyboard */,
 				CEA71E5A261A03A000FD02F5 /* Assets.xcassets */,
 				CEA71E5C261A03A000FD02F5 /* Info.plist */,
 			);
 			path = Chess;
+			sourceTree = "<group>";
+		};
+		CEAD174F261C495800F91647 /* SFX */ = {
+			isa = PBXGroup;
+			children = (
+				CEAD174C261C495500F91647 /* ChessPiecePlace.wav */,
+				CEAD1751261C4C1100F91647 /* CheckSound1.wav */,
+				CEAD1754261C4DD400F91647 /* CheckSound2.wav */,
+				CEAD1757261C4DD900F91647 /* CheckSound3.wav */,
+			);
+			path = SFX;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -128,8 +157,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEA71E59261A039F00FD02F5 /* Main.storyboard in Resources */,
+				CEAD1752261C4C1100F91647 /* CheckSound1.wav in Resources */,
+				CEAD175D261C7B7200F91647 /* knight.png in Resources */,
 				CEA71E50261A039F00FD02F5 /* GameScene.sks in Resources */,
 				CEA71E5B261A03A000FD02F5 /* Assets.xcassets in Resources */,
+				CEAD1755261C4DD400F91647 /* CheckSound2.wav in Resources */,
+				CEA71E64261A06D300FD02F5 /* Launch Screen.storyboard in Resources */,
+				CEAD174D261C495500F91647 /* ChessPiecePlace.wav in Resources */,
+				CEAD1758261C4DD900F91647 /* CheckSound3.wav in Resources */,
 				CEA71E52261A039F00FD02F5 /* Actions.sks in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -144,6 +179,7 @@
 				CEA71E54261A039F00FD02F5 /* GameScene.swift in Sources */,
 				CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */,
 				CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */,
+				CEA71E68261A36AF00FD02F5 /* ChessLogic.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -285,6 +321,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -292,7 +329,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Debug;
 		};
@@ -304,6 +341,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -311,7 +349,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 2;
 			};
 			name = Release;
 		};

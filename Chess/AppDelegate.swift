@@ -38,3 +38,20 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 }
 
+extension Sequence  {
+    func contains<T, U>(_ tuple: (T, U)) -> Bool where T: Equatable, U: Equatable, Element == (T,U) {
+        contains { $0 == tuple }
+    }
+    func contains<T, U, V>(_ tuple: (T, U, V)) -> Bool where T: Equatable, U: Equatable, V: Equatable, Element == (T,U,V) {
+        contains { $0 == tuple }
+    }
+    func contains<T, U, V, W>(_ tuple: (T, U, V, W)) -> Bool where T: Equatable, U: Equatable, V: Equatable, W: Equatable,Element == (T, U, V, W) {
+        contains { $0 == tuple }
+    }
+    func contains<T, U, V, W, X>(_ tuple: (T, U, V, W, X)) -> Bool where T: Equatable, U: Equatable, V: Equatable, W: Equatable, X: Equatable, Element == (T, U, V, W, X) {
+        contains { $0 == tuple }
+    }
+    func contains<T, U, V, W, X, Y>(_ tuple: (T, U, V, W, X, Y)) -> Bool where T: Equatable, U: Equatable, V: Equatable, W: Equatable, X: Equatable, Y: Equatable, Element == (T, U, V, W, X, Y) {
+        contains { $0 == tuple }
+    }
+}
