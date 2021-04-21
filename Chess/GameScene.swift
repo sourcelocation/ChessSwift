@@ -195,40 +195,24 @@ class GameScene: SKScene {
         
         // Hardcoding all positions
         if piece?.pieceType == .king {  // MARK: Castling
-            if piece?.pieceColor == .white {
+            if piece?.pieceColor == .white { // Can not castle after move
                 chessLogic.whiteCanCastle = false
-                if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
-                    if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
-                        if self.selectedCell!.1 == 4 {
-                            guard let rook = boardPieces[7][7] else { return }
-                            
-                            chessLogic.whiteCanCastle = false
-                            castling = true
-                            
-                            rook.run(.move(to: positionInBoard(x: 5, y: 7), duration: 0.2))
-                            rook.run(.sequence([.wait(forDuration: 0.2),.run {
-                                self.movePiece(x1: 7, y1: 7, x2: 5, y2: 7, turnTo: nil, isCastling: false)
-                                self.afterMoveHandling(forPiece: piece!)
-                            }]))
-                        }
-                    }
-                }
-            } else if piece?.pieceColor == .black {
+            } else {
                 chessLogic.blackCanCastle = false
-                if x == 6, y == 0 {
-                    if self.selectedCell!.0 == 0 {
-                        if self.selectedCell!.1 == 4 {
-                            guard let rook = boardPieces[0][7] else { return }
-                            
-                            chessLogic.blackCanCastle = false
-                            castling = true
-                            
-                            rook.run(.move(to: positionInBoard(x: 5, y: 0), duration: 0.2))
-                            rook.run(.sequence([.wait(forDuration: 0.2),.run {
-                                self.movePiece(x1: 7, y1: 0, x2: 5, y2: 0, turnTo: nil, isCastling: false)
-                                self.afterMoveHandling(forPiece: piece!)
-                            }]))
-                        }
+            }
+            if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
+                if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
+                    if self.selectedCell!.1 == 4 {
+                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][7] else { return }
+                        
+                        castling = true
+                        
+                        let positionToMoveTo = positionInBoard(x: 5, y: (piece?.pieceColor == .white ? 7 : 0))
+                        rook.run(.move(to: positionToMoveTo, duration: 0.2))
+                        rook.run(.sequence([.wait(forDuration: 0.2),.run {
+                            self.movePiece(x1: 7, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 5, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false)
+                            self.afterMoveHandling(forPiece: piece!)
+                        }]))
                     }
                 }
             }
