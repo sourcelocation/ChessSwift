@@ -197,8 +197,8 @@ class GameScene: SKScene {
         if piece?.pieceType == .king {  // MARK: Castling
             if piece?.pieceColor == .white {
                 chessLogic.whiteCanCastle = false
-                if x == 6, y == 7 {
-                    if self.selectedCell!.0 == 7 {
+                if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
+                    if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
                         if self.selectedCell!.1 == 4 {
                             guard let rook = boardPieces[7][7] else { return }
                             
@@ -208,6 +208,7 @@ class GameScene: SKScene {
                             rook.run(.move(to: positionInBoard(x: 5, y: 7), duration: 0.2))
                             rook.run(.sequence([.wait(forDuration: 0.2),.run {
                                 self.movePiece(x1: 7, y1: 7, x2: 5, y2: 7, turnTo: nil, isCastling: false)
+                                self.afterMoveHandling(forPiece: piece!)
                             }]))
                         }
                     }
@@ -225,6 +226,7 @@ class GameScene: SKScene {
                             rook.run(.move(to: positionInBoard(x: 5, y: 0), duration: 0.2))
                             rook.run(.sequence([.wait(forDuration: 0.2),.run {
                                 self.movePiece(x1: 7, y1: 0, x2: 5, y2: 0, turnTo: nil, isCastling: false)
+                                self.afterMoveHandling(forPiece: piece!)
                             }]))
                         }
                     }
