@@ -77,16 +77,27 @@ class ChessLogic {
             }
             // MARK: King castling
             if color == .white, whiteCanCastle, !isWhiteInCheck {
-                if x == 4, board[7][7] != nil, board[7][7]!.pieceType == .rook {
+                if board[7][7] != nil, board[7][7]!.pieceType == .rook {
                     if board[7][6] == nil, board[7][5] == nil {
+                        // TODO: Битое поле
                         moves.append((7,6))
+                    }
+                }
+                if board[7][0] != nil, board[7][0]!.pieceType == .rook {
+                    if board[7][1] == nil, board[7][2] == nil, board[7][3] == nil {
+                        moves.append((7,2))
                     }
                 }
             }
             if color == .black, blackCanCastle, !isBlackInCheck {
-                if x == 4, board[0][7] != nil, board[0][7]!.pieceType == .rook {
+                if board[0][7] != nil, board[0][7]!.pieceType == .rook {
                     if board[0][6] == nil, board[0][5] == nil {
                         moves.append((0,6))
+                    }
+                }
+                if board[0][0] != nil, board[0][0]!.pieceType == .rook {
+                    if board[0][1] == nil, board[0][2] == nil, board[0][3] == nil {
+                        moves.append((0,2))
                     }
                 }
             }

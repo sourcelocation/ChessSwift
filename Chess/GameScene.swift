@@ -7,7 +7,7 @@
 
 import SpriteKit
 import GameplayKit
-
+import StoreKit
 
 class GameScene: SKScene {
     
@@ -192,25 +192,36 @@ class GameScene: SKScene {
             self.isMovingPiece = false
         }]))
         
-        
-        // Hardcoding all positions
         if piece?.pieceType == .king {  // MARK: Castling
             if piece?.pieceColor == .white { // Can not castle after move
                 chessLogic.whiteCanCastle = false
             } else {
                 chessLogic.blackCanCastle = false
             }
-            if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
-                if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
-                    if self.selectedCell!.1 == 4 {
+            
+            if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
+                if self.selectedCell!.1 == 4 {
+                    if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
                         guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][7] else { return }
                         
                         castling = true
                         
                         let positionToMoveTo = positionInBoard(x: 5, y: (piece?.pieceColor == .white ? 7 : 0))
-                        rook.run(.move(to: positionToMoveTo, duration: 0.2))
-                        rook.run(.sequence([.wait(forDuration: 0.2),.run {
+                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
+                        rook.run(.sequence([.wait(forDuration: 0.21),.run {
                             self.movePiece(x1: 7, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 5, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false)
+                            self.afterMoveHandling(forPiece: piece!)
+                        }]))
+                    }
+                    if x == 2, y == (piece?.pieceColor == .white ? 7 : 0) {
+                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][0] else { return }
+                        
+                        castling = true
+                        
+                        let positionToMoveTo = positionInBoard(x: 3, y: (piece?.pieceColor == .white ? 7 : 0))
+                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
+                        rook.run(.sequence([.wait(forDuration: 0.24),.run {
+                            self.movePiece(x1: 0, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 3, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false)
                             self.afterMoveHandling(forPiece: piece!)
                         }]))
                     }
@@ -615,7 +626,12 @@ class GameScene: SKScene {
     func showCheckmateAlert(for color: ChessPieceColor) {
         let tie = color == .white ? !chessLogic.isWhiteInCheck : !chessLogic.isBlackInCheck
         let alert = UIAlertController(title: tie ? "Tie! (No moves)" : ((color == .white) ? "Black wins! (Checkmate)" : "White wins! (Checkmate)"), message: "", preferredStyle: .alert)
-        alert.addAction(.init(title: "Close", style: .cancel))
+        alert.addAction(.init(title: "Close", style: .cancel, handler: { _ in
+            if !UserDefaults.standard.bool(forKey: "reviewed") {
+                SKStoreReviewController.requestReview()
+                UserDefaults.standard.setValue(true, forKey: "reviewed")
+            }
+        }))
         self.view?.window?.rootViewController?.present(alert, animated: true)
     }
     
@@ -646,10 +662,10 @@ class GameScene: SKScene {
         button2.name = "resetButton"
         button2.zPosition = 11
         addChild(button2)
-        let image2 = UIImage(systemName: "arrow.clockwise", withConfiguration: UIImage.SymbolConfiguration(pointSize: 100,weight: .semibold))!.withTintColor(brown, renderingMode: .automatic)
+        let image2 = UIImage(systemName: "arrow.2.squarepath", withConfiguration: UIImage.SymbolConfiguration(pointSize: 100,weight: .semibold))!.withTintColor(brown, renderingMode: .automatic)
         let texture2 = SKTexture(image: UIImage(data:image2.pngData()!)!)
         
-        let button2Image = SKSpriteNode(texture: texture2, size: CGSize(width: button2.frame.width - 49, height: button2.frame.height - 45))
+        let button2Image = SKSpriteNode(texture: texture2, size: CGSize(width: button2.frame.width - 33, height: button2.frame.height - 49))
         button2.addChild(button2Image)
         let twoSpacings = spacing * 2
         let oneAndAHalfSizes = sizeOfButton * 1.5
@@ -659,7 +675,7 @@ class GameScene: SKScene {
     }
     // Reset button clicked
     func showResetAlert() {
-        let alert = UIAlertController(title: "Start a new game", message: "Are you sure you want to start a new game?", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Start a new game?", message: "Are you sure you want to start a new game?", preferredStyle: .alert)
         alert.addAction(.init(title: "Cancel", style: .cancel))
         alert.addAction(.init(title: "Yes", style: .default, handler: { _ in
             self.resetBoard()
