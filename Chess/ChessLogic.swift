@@ -17,7 +17,7 @@ class ChessLogic {
     
     
     // MARK: Get moves for x and y without checking for "Check"
-    func movesFor(x:Int,y:Int,with board: [[ChessPiece?]]) -> [(Int,Int)] {
+    func movesFor(x:Int,y:Int, lastMove:Move?, with board: [[ChessPiece?]]) -> [(Int,Int)] {
         guard let piece = board[y][x] else { return [] }
         let color = piece.pieceColor
         let type = piece.pieceType
@@ -37,13 +37,17 @@ class ChessLogic {
                     }
                 }
                 // Diagonal
-                if x > 0 {
+                if x > 0 { // Left
                     if board[y - dir][x - 1] != nil, board[y - dir][x - 1]?.pieceColor != color {
+                        moves.append((y - dir, x - 1))
+                    } else if lastMove?.doublePawnMove ?? false, lastMove?.toY == y, lastMove?.toX == x - 1 {
                         moves.append((y - dir, x - 1))
                     }
                 }
-                if x < 7 {
+                if x < 7 { // Right
                     if board[y - dir][x + 1] != nil, board[y - dir][x + 1]?.pieceColor != color {
+                        moves.append((y - dir, x + 1))
+                    } else if lastMove?.doublePawnMove ?? false, lastMove?.toY == y, lastMove?.toX == x + 1 {
                         moves.append((y - dir, x + 1))
                     }
                 }
@@ -79,25 +83,37 @@ class ChessLogic {
             if color == .white, whiteCanCastle, !isWhiteInCheck {
                 if board[7][7] != nil, board[7][7]!.pieceType == .rook {
                     if board[7][6] == nil, board[7][5] == nil {
-                        // TODO: Битое поле
-                        moves.append((7,6))
+                        // MARK: Битое поле
+                        if !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (7,5), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (7,6), board: board) {
+                            moves.append((7,6))
+                        }
+                        
                     }
                 }
                 if board[7][0] != nil, board[7][0]!.pieceType == .rook {
                     if board[7][1] == nil, board[7][2] == nil, board[7][3] == nil {
-                        moves.append((7,2))
+                        // Битое поле
+                        if !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (7,3), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (7,2), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (7,1), board: board) {
+                            moves.append((7,2))
+                        }
                     }
                 }
             }
             if color == .black, blackCanCastle, !isBlackInCheck {
                 if board[0][7] != nil, board[0][7]!.pieceType == .rook {
                     if board[0][6] == nil, board[0][5] == nil {
-                        moves.append((0,6))
+                        // Битое поле
+                        if !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (0,5), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (0,6), board: board) {
+                            moves.append((0,6))
+                        }
                     }
                 }
                 if board[0][0] != nil, board[0][0]!.pieceType == .rook {
                     if board[0][1] == nil, board[0][2] == nil, board[0][3] == nil {
-                        moves.append((0,2))
+                        // Битое поле
+                        if !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (0,3), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (0,2), board: board), !checkCheckIfChessPiece(willMoveFrom: (y,x), to: (0,1), board: board) {
+                            moves.append((0,2))
+                        }
                     }
                 }
             }
@@ -237,9 +253,9 @@ class ChessLogic {
         } else if type == .queen { // MARK: - Queen -
             // Combination of rook and bishop
             board[y][x]!.pieceType = .rook
-            moves += movesFor(x: x, y: y, with: board)
+            moves += movesFor(x: x, y: y, lastMove: lastMove, with: board)
             board[y][x]!.pieceType = .bishop
-            moves += movesFor(x: x, y: y, with: board)
+            moves += movesFor(x: x, y: y, lastMove: lastMove, with: board)
             // Change back to queen
             board[y][x]!.pieceType = .queen
         }
@@ -257,9 +273,9 @@ class ChessLogic {
     }
     
     // MARK: Moves with checking for "Checks"
-    func getMoves(x:Int,y:Int,with board: [[ChessPiece?]]) -> [(Int,Int)] {
+    func getMoves(x:Int,y:Int,lastMove:Move?,with board: [[ChessPiece?]]) -> [(Int,Int)] {
         checkCheck(board: board)
-        let nonCheckedMoves = movesFor(x: x, y: y, with: board)
+        let nonCheckedMoves = movesFor(x: x, y: y, lastMove: lastMove, with: board)
         var moves:[(Int,Int)] = []
         for move in nonCheckedMoves {
             var testBoard = board
@@ -296,9 +312,11 @@ class ChessLogic {
         }
         for (y,row) in board.enumerated() {
             for (x,_) in row.enumerated() {
-                let moves = movesFor(x: x, y: y, with: board)
-                if moves.contains(kingPos!) {
-                    return true
+                if board[y][x]?.pieceColor != color {
+                    let moves = movesFor(x: x, y: y, lastMove: nil, with: board)
+                    if moves.contains(kingPos!) {
+                        return true
+                    }
                 }
             }
         }
@@ -306,11 +324,11 @@ class ChessLogic {
         return false
     }
     // MARK:Checkmate check
-    func checkCheckmate(for color: ChessPieceColor, board: [[ChessPiece?]]) -> Bool {
+    func checkCheckmate(for color: ChessPieceColor, lastMove: Move?, board: [[ChessPiece?]]) -> Bool {
         for (y,row) in board.enumerated() {
             for (x,_) in row.enumerated() {
                 if board[y][x]?.pieceColor == color {
-                    let moves = getMoves(x: x, y: y, with: board)
+                    let moves = getMoves(x: x, y: y, lastMove: lastMove, with: board)
                     if moves.count > 0 {
                         return false
                     }
@@ -318,5 +336,14 @@ class ChessLogic {
             }
         }
         return true
+    }
+    func checkCheckIfChessPiece(willMoveFrom pos1: (Int,Int), to pos2: (Int,Int), board: [[ChessPiece?]]) -> Bool {
+        var testBoard = board
+        let piece = testBoard[pos1.0][pos1.1]
+        testBoard[pos1.0][pos1.1] = nil
+        testBoard[pos2.0][pos2.1] = nil
+        testBoard[pos2.0][pos2.1] = piece
+        
+        return checkCheck(for: piece!.pieceColor, board: testBoard)
     }
 }

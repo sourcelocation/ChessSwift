@@ -39,7 +39,12 @@ class GameScene: SKScene {
             chessLogic.isWhiteInCheck = UserDefaults.standard.bool(forKey: "isWhiteInCheck")
             chessLogic.isBlackInCheck = UserDefaults.standard.bool(forKey: "isBlackInCheck")
             
-            history = try! JSONDecoder().decode([Move].self, from: historyData)
+            // TODO: - Load from an old game -
+            do {
+                history = try JSONDecoder().decode([Move].self, from: historyData)
+            } catch {
+                print("Old game!")
+            }
             turnOf = (history.count - (chessLogic.whiteCanCastle ? 0 : 1) - (chessLogic.blackCanCastle ? 0 : 1)) % 2 == 0 ? .white : .black
             jumpToMove(history.count - 1)
         }
@@ -79,7 +84,7 @@ class GameScene: SKScene {
         resetCellColors()
         
         if !freeMode {
-            movesForSelectedCell = chessLogic.getMoves(x: x, y: y, with: boardPieces)
+            movesForSelectedCell = chessLogic.getMoves(x: x, y: y, lastMove: history.last, with: boardPieces)
             // Creating gray dots
             let spacing = (board.frame.width - 60) / 8
             for move in movesForSelectedCell! {
@@ -115,19 +120,41 @@ class GameScene: SKScene {
         }
     }
     
+    // MARK: Move piece visually
     fileprivate func moveSelectedPieceToPosition(_ y: Int, _ x: Int) {
         // Move piece
         let piece = boardPieces[selectedCell!.0][selectedCell!.1]
-        if boardPieces[y][x]?.pieceType == .king {
+        if boardPieces[y][x]?.pieceType == .king { // Idk, will never happen, unless there is a bug
             self.selectedCell = nil
             self.movesForSelectedCell = nil
             return
         }
         var destPos = positionInBoard(x: x, y: y)
         
-        // Image offset for decoration
+        // Image offset for pawn
         if piece?.pieceType == .pawn {
             destPos.y += (piece!.pieceColor == .white) ? 5 : -5
+        }
+        
+        var isPawnDoubleMove = false
+        
+        // Check for double move
+        if piece?.pieceType == .pawn {
+            if abs(selectedCell!.0 - y) == 2 {
+                isPawnDoubleMove = true
+            }
+        }
+        
+        if history.last?.doublePawnMove ?? false, history.last?.toX == x, history.last?.toY == y + ((piece!.pieceColor == .white) ? 1 : -1)  {
+            // Delete pawn
+            let pawnY = y + (piece?.pieceColor == .white ? 1 : -1)
+            let pawnToDelete = boardPieces[pawnY][x]
+            pawnToDelete!.run(.sequence([.wait(forDuration: 0.23),.run {
+                let deletionMove = Move(fromX: x, fromY: pawnY, toX: x, toY: pawnY,dissapearingMove: true)
+                self.history.append(deletionMove)
+                self.boardPieces[y + (piece?.pieceColor == .white ? 1 : -1)][x] = nil
+                pawnToDelete?.removeFromParent()
+            }]))
         }
         
         isMovingPiece = true
@@ -136,9 +163,47 @@ class GameScene: SKScene {
         
         var castling = false
         
+        if piece?.pieceType == .king {  // MARK: Castling
+            if piece?.pieceColor == .white { // Can not castle after move
+                chessLogic.whiteCanCastle = false
+            } else {
+                chessLogic.blackCanCastle = false
+            }
+            
+            if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
+                if self.selectedCell!.1 == 4 {
+                    if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
+                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][7] else { return }
+                        
+                        castling = true
+                        
+                        let positionToMoveTo = positionInBoard(x: 5, y: (piece?.pieceColor == .white ? 7 : 0))
+                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
+                        rook.run(.sequence([.wait(forDuration: 0.21),.run {
+                            self.movePiece(x1: 7, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 5, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false, isPawnDoubleMove: isPawnDoubleMove)
+                            self.afterMoveHandling(forPiece: piece!)
+                        }]))
+                    }
+                    if x == 2, y == (piece?.pieceColor == .white ? 7 : 0) {
+                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][0] else { return }
+                        
+                        castling = true
+                        
+                        let positionToMoveTo = positionInBoard(x: 3, y: (piece?.pieceColor == .white ? 7 : 0))
+                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
+                        rook.run(.sequence([.wait(forDuration: 0.24),.run {
+                            self.movePiece(x1: 0, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 3, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false, isPawnDoubleMove: isPawnDoubleMove)
+                            self.afterMoveHandling(forPiece: piece!)
+                        }]))
+                    }
+                }
+            }
+        }
+        
+        // MARK: UI Piece move
         piece?.run(.move(to: destPos, duration: 0.2))
         piece?.run(.sequence([.wait(forDuration: 0.2),.run {
-            self.movePiece(x1: self.selectedCell!.1, y1: self.selectedCell!.0, x2: x, y2: y, turnTo: nil, isCastling: castling)
+            self.movePiece(x1: self.selectedCell!.1, y1: self.selectedCell!.0, x2: x, y2: y, turnTo: nil, isCastling: castling, isPawnDoubleMove: isPawnDoubleMove)
             
             self.selectedCell = nil
             self.movesForSelectedCell = nil
@@ -191,45 +256,9 @@ class GameScene: SKScene {
             
             self.isMovingPiece = false
         }]))
-        
-        if piece?.pieceType == .king {  // MARK: Castling
-            if piece?.pieceColor == .white { // Can not castle after move
-                chessLogic.whiteCanCastle = false
-            } else {
-                chessLogic.blackCanCastle = false
-            }
-            
-            if self.selectedCell!.0 == (piece?.pieceColor == .white ? 7 : 0) {
-                if self.selectedCell!.1 == 4 {
-                    if x == 6, y == (piece?.pieceColor == .white ? 7 : 0) {
-                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][7] else { return }
-                        
-                        castling = true
-                        
-                        let positionToMoveTo = positionInBoard(x: 5, y: (piece?.pieceColor == .white ? 7 : 0))
-                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
-                        rook.run(.sequence([.wait(forDuration: 0.21),.run {
-                            self.movePiece(x1: 7, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 5, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false)
-                            self.afterMoveHandling(forPiece: piece!)
-                        }]))
-                    }
-                    if x == 2, y == (piece?.pieceColor == .white ? 7 : 0) {
-                        guard let rook = boardPieces[(piece?.pieceColor == .white ? 7 : 0)][0] else { return }
-                        
-                        castling = true
-                        
-                        let positionToMoveTo = positionInBoard(x: 3, y: (piece?.pieceColor == .white ? 7 : 0))
-                        rook.run(.move(to: positionToMoveTo, duration: 0.21))
-                        rook.run(.sequence([.wait(forDuration: 0.24),.run {
-                            self.movePiece(x1: 0, y1: (piece?.pieceColor == .white ? 7 : 0), x2: 3, y2: (piece?.pieceColor == .white ? 7 : 0), turnTo: nil, isCastling: false)
-                            self.afterMoveHandling(forPiece: piece!)
-                        }]))
-                    }
-                }
-            }
-        }
     }
     
+    //MARK: Touch up
     func touchUp(atPoint pos : CGPoint) {
         let node = atPoint(pos)
         
@@ -261,7 +290,11 @@ class GameScene: SKScene {
             }
             if selectedCell == nil || !movesContains((x,y)) {
                 // MARK: Select piece
-                if piece.pieceColor != turnOf, !freeMode { resetCellColors(); return }
+                if piece.pieceColor != turnOf, !freeMode {
+                    resetCellColors()
+                    resetSelectedCell()
+                    return
+                }
                 selectedCell = (y,x)
                 
                 selectCell(x, y)
@@ -269,7 +302,6 @@ class GameScene: SKScene {
             }
         }
         
-        // MARK: "Move to selected cell"
         let cell = atPoint(pos)
         let piece = atPoint(pos) as? ChessPiece
         if piece == nil, cell.name != "cell", cell.name != "circle" {
@@ -298,7 +330,6 @@ class GameScene: SKScene {
         } else {
             (x,y) = positionInBoardAtPos(cell.position)
         }
-        
         if selectedCell != nil {
             resetCellColors(removeCheckmateCell: true)
             if freeMode || movesContains((x,y)) {
@@ -337,7 +368,7 @@ class GameScene: SKScene {
     
     func afterMoveHandling(forPiece piece: ChessPiece) {
         // MARK: Checkmate check
-        let isCheckmate = self.chessLogic.checkCheckmate(for: self.turnOf, board: self.boardPieces)
+        let isCheckmate = self.chessLogic.checkCheckmate(for: self.turnOf, lastMove: history.last, board: self.boardPieces)
         if isCheckmate {
             piece.run(self.checkmateSound)
             self.showCheckmateAlert(for: self.turnOf)
@@ -491,7 +522,8 @@ class GameScene: SKScene {
             return x1 == pos.1 && y1 == pos.0
         })
     }
-    func movePiece(x1:Int,y1:Int,x2:Int,y2:Int,turnTo:ChessPieceType?, addToHistory:Bool = true, isCastling: Bool) {
+    //MARK: Move piece
+    func movePiece(x1:Int,y1:Int,x2:Int,y2:Int,turnTo:ChessPieceType?, addToHistory:Bool = true, isCastling: Bool, isPawnDoubleMove: Bool) {
         movePiece(x1: x1, y1: y1, x2: x2, y2: y2,addToHistory: addToHistory)
         
         if turnTo != nil {
@@ -501,14 +533,12 @@ class GameScene: SKScene {
         if addToHistory {
             var move = Move(fromX: x1, fromY: y1, toX: x2, toY: y2, turnedTo: turnTo)
             move.isCastling = isCastling
+            move.doublePawnMove = isPawnDoubleMove
             history.append(move)
             saveHistory()
         }
         // Change turn
-        turnOf = (turnOf == .white) ? .black : .white
-        if isCastling {
-            turnOf = (turnOf == .white) ? .black : .white
-        }
+        turnOf = moveOf()
     }
     func movePiece(x1:Int,y1:Int,x2:Int,y2:Int, addToHistory:Bool = true) {
         let piece = boardPieces[y1][x1]
@@ -517,6 +547,8 @@ class GameScene: SKScene {
         self.boardPieces[y1][x1] = nil
         self.boardPieces[y2][x2] = piece
     }
+    
+    
     // MARK: Jump to move
     func jumpToMove(_ i:Int) {
         turnOf = .white
@@ -526,12 +558,15 @@ class GameScene: SKScene {
         var isLastMoveCastlingKingPos: (Int,Int)? = nil
         
         if i != -1 {
-            history = Array(history[0...i])
+            if !history.last!.dissapearingMove {
+                history = Array(history[0...i])
+            } else {
+                history = Array(history[0...i - 1])
+            }
             
             if history.last!.isCastling {
                 isLastMoveCastlingKingPos = (history.last!.fromX,history.last!.fromY)
                 history = Array(history[0...i - 1])
-                
             }
             
             for move in history {
@@ -543,7 +578,21 @@ class GameScene: SKScene {
                         chessLogic.blackCanCastle = false
                     }
                 }
-                movePiece(x1: move.fromX, y1: move.fromY, x2: move.toX, y2: move.toY, turnTo: move.turnedTo, addToHistory: false, isCastling: false)
+                let piece = boardPieces[move.fromY][move.fromX]
+                var isPawnDoubleMove = false
+                // Check for double move
+                if piece?.pieceType == .pawn {
+                    if abs(move.fromY - move.toY) == 2 {
+                        isPawnDoubleMove = true
+                    }
+                }
+                if !move.dissapearingMove {
+                    movePiece(x1: move.fromX, y1: move.fromY, x2: move.toX, y2: move.toY, turnTo: move.turnedTo, addToHistory: false, isCastling: false, isPawnDoubleMove: isPawnDoubleMove)
+                } else {
+                    boardPieces[move.fromY][move.fromX] = nil
+                }
+                
+                
                 if isLastMoveCastlingKingPos != nil {
                     let king = boardPieces[isLastMoveCastlingKingPos!.1][isLastMoveCastlingKingPos!.0]
                     if king?.pieceColor == .white {
@@ -566,7 +615,7 @@ class GameScene: SKScene {
             run(self.checkSound)
         }
         createPieces()
-        turnOf = (history.count - (chessLogic.whiteCanCastle ? 0 : 1) - (chessLogic.blackCanCastle ? 0 : 1)) % 2 == 0 ? .white : .black
+        turnOf = moveOf()
     }
     
     func resetCellColors(removeCheckmateCell: Bool = false) {
@@ -635,6 +684,16 @@ class GameScene: SKScene {
         self.view?.window?.rootViewController?.present(alert, animated: true)
     }
     
+    func moveOf() -> ChessPieceColor {
+        var color = ChessPieceColor.white
+        for move in history {
+            if !move.isCastling, !move.dissapearingMove {
+                color = color == .white ? .black : .white
+            }
+        }
+        return color
+    }
+    
     // Create buttons in bottom-right corner
     func createButtons() {
         let brown = UIColor(red: 99 / 255, green: 70 / 255, blue: 49 / 255, alpha: 1.0)
@@ -662,10 +721,12 @@ class GameScene: SKScene {
         button2.name = "resetButton"
         button2.zPosition = 11
         addChild(button2)
+        
+        
         let image2 = UIImage(systemName: "arrow.2.squarepath", withConfiguration: UIImage.SymbolConfiguration(pointSize: 100,weight: .semibold))!.withTintColor(brown, renderingMode: .automatic)
         let texture2 = SKTexture(image: UIImage(data:image2.pngData()!)!)
         
-        let button2Image = SKSpriteNode(texture: texture2, size: CGSize(width: button2.frame.width - 33, height: button2.frame.height - 49))
+        let button2Image = SKSpriteNode(texture: texture2, size: CGSize(width: button2.frame.width - 32.5, height: button2.frame.height - 45))
         button2.addChild(button2Image)
         let twoSpacings = spacing * 2
         let oneAndAHalfSizes = sizeOfButton * 1.5
@@ -758,8 +819,12 @@ struct Move: Codable {
     var fromY: Int
     var toX: Int
     var toY: Int
+    
     var turnedTo: ChessPieceType?
+    
     var isCastling = false
+    var doublePawnMove = false
+    var dissapearingMove = false
 }
 
 enum ChessPieceType: String, Codable {
