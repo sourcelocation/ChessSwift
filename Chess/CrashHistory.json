@@ -1,0 +1,365 @@
+[
+  {
+    "fromPos" : {
+      "x" : 6,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 5,
+      "y" : 5
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 6,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 5,
+      "y" : 2
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 6
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 4
+    },
+    "doublePawnMove" : true
+  },
+  {
+    "fromPos" : {
+      "x" : 1,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 2
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 4
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 2,
+      "y" : 2
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 5,
+      "y" : 5
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 5,
+      "y" : 2
+    },
+    "toPos" : {
+      "x" : 6,
+      "y" : 0
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 5,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 4
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 6,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 7,
+      "y" : 2
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 1,
+      "y" : 6
+    },
+    "toPos" : {
+      "x" : 1,
+      "y" : 4
+    },
+    "doublePawnMove" : true
+  },
+  {
+    "fromPos" : {
+      "x" : 7,
+      "y" : 2
+    },
+    "toPos" : {
+      "x" : 5,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 2,
+      "y" : 4
+    },
+    "toPos" : {
+      "x" : 1,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 1
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 2
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 2,
+      "y" : 6
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 4
+    },
+    "doublePawnMove" : true
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 1
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 6
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 4
+    },
+    "doublePawnMove" : true
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 1
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 2
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 3
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 1
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 2
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 1
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 6
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 1
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 2,
+      "y" : 4
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 1
+    },
+    "toPos" : {
+      "x" : 1,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 1,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 0,
+      "y" : 5
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 1,
+      "y" : 3
+    },
+    "toPos" : {
+      "x" : 1,
+      "y" : 4
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 5,
+      "y" : 6
+    },
+    "toPos" : {
+      "x" : 5,
+      "y" : 5
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 1,
+      "y" : 4
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 6
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 3,
+      "y" : 6
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 4,
+      "y" : 1
+    },
+    "toPos" : {
+      "x" : 4,
+      "y" : 0
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 2,
+      "y" : 7
+    },
+    "toPos" : {
+      "x" : 1,
+      "y" : 6
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 5,
+      "y" : 0
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  },
+  {
+    "fromPos" : {
+      "x" : 3,
+      "y" : 4
+    },
+    "toPos" : {
+      "x" : 2,
+      "y" : 3
+    },
+    "doublePawnMove" : false
+  }
+]
