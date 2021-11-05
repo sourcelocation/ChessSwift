@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 13.0.0, *)
 struct FeatureListItem: View {
     var title: String
     var image: String
@@ -27,6 +28,7 @@ struct FeatureListItem: View {
     }
 }
 
+@available(iOS 13.0.0, *)
 struct FeatureListItem_Previews: PreviewProvider {
     static var previews: some View {
         FeatureListItem(title: "Puzzle configurator", image: "puzzlepiece")

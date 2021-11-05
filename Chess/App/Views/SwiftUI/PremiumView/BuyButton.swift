@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 13.0, *)
 struct BuyButton: View {
     @ObservedObject var storeManager: StoreManager
     
@@ -29,6 +30,7 @@ struct BuyButton: View {
     }
 }
 
+@available(iOS 13.0.0, *)
 struct BuyButton_Previews: PreviewProvider {
     static var previews: some View {
         BuyButton(storeManager: StoreManager())

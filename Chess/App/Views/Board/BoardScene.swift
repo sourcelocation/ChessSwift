@@ -32,6 +32,7 @@ class BoardScene: SKScene {
             return game.piece(at: selectedPiecePos)
         }
     }
+    var selectedPieceMoves: [NormalMove] = []
     var selectedPiecePos: Pos?
     var draggedPieceFromEditor: ChessPiece?
     
@@ -93,9 +94,8 @@ class BoardScene: SKScene {
             // Touched a cell
             let cellPos = positionInBoard(at: loc)
             
-            if let selectedPiecePos = selectedPiecePos {
-                let moves = game.moves(for: selectedPiecePos)
-                if !moves.contains(where: { $0.toPos == cellPos }) {
+            if selectedPiecePos != nil {
+                if !selectedPieceMoves.contains(where: { $0.toPos == cellPos }) {
                     // Cannot move to dragged cell
                     bringSelectedPieceBack()
                 }
@@ -160,7 +160,7 @@ class BoardScene: SKScene {
             if game.piece(at: pos)?.pieceColor != selectedPiece.pieceColor {
                 // Empty cell
                 if let selectedPiecePos = selectedPiecePos {
-                    if let move = game.moves(for: selectedPiecePos).first(where: { $0.toPos == pos }) {
+                    if let move = selectedPieceMoves.first(where: { $0.toPos == pos }) {
                         if selectedPiece.pieceColor == game.turnOf || noRules {
                             perform(move: move)
                         }
@@ -196,18 +196,18 @@ class BoardScene: SKScene {
     }
     func selectPiece(at pos: Pos) {
         guard game.piece(at: pos) != nil else { return }
-        let moves = game.moves(for: pos)
+        selectedPieceMoves = game.moves(for: pos)
         
         resetMoveHints()
         if showHints {
-            for move in moves {
+            for move in selectedPieceMoves {
                 addMoveCircle(at: move.toPos)
             }
         } else {
             addMoveCircle(at: pos)
         }
         
-        if moves.isEmpty {
+        if selectedPieceMoves.isEmpty {
             addRedCell(at: pos, check: false)
         }
         selectedPiecePos = pos
@@ -288,7 +288,7 @@ class BoardScene: SKScene {
         createPieces()
         saveGame()
         
-        if (UIApplication.shared.delegate as! AppDelegate).startTime.distance(to: Date()) > 600 {
+        if (UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date()) > 600 {
             AppDelegate.review()
         }
     }
@@ -397,7 +397,7 @@ extension BoardScene: ChessGameDelegate {
         piece?.position = positionInBoard(at: fromPos)
         piece?.run(.move(to: positionInBoard(at: toPos), duration: 0.2))
         if !noSounds {
-            run(.sequence([.wait(forDuration: 0.2),piecePlaceSound]))
+            run(.sequence([.wait(forDuration: 0.2),/*piecePlaceSound*/]))
         }
         resetMoveHints()
     }

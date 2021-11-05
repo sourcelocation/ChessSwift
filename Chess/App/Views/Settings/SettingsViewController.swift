@@ -41,7 +41,7 @@ class SettingsViewController: UITableViewController, UIPickerViewDelegate, UIPic
         }
     }
     @IBAction func clockSwitch(_ sender: UISwitch) {
-        if UIApplication.shared.windows[0].windowScene!.interfaceOrientation.isPortrait, sender.isOn {
+        if isInPortrait, sender.isOn {
             let alert = UIAlertController(title: "Please rotate your device", message: "Clock can only work in Landscape device orientation", preferredStyle: .alert)
             alert.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { _ in
                 sender.setOn(false, animated: true)
@@ -149,5 +149,13 @@ class SettingsViewController: UITableViewController, UIPickerViewDelegate, UIPic
     }
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
         return clockTimeValues.count
+    }
+}
+
+var isInPortrait: Bool {
+    if #available(iOS 13.0, *) {
+        return UIApplication.shared.windows[0].windowScene!.interfaceOrientation.isPortrait
+    } else {
+        return UIApplication.shared.statusBarOrientation.isPortrait
     }
 }

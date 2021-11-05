@@ -266,6 +266,7 @@ class ChessLogic {
             board[y][x]!.pieceType = .queen
         }
         
+        
         return moves
     }
     
@@ -289,7 +290,7 @@ class ChessLogic {
             let piece = testBoard[pos.y][pos.x]
             let color = piece?.pieceColor
             
-            print("Moving \(piece!.pieceType)")
+//            print("Moving \(piece!.pieceType)")
             testBoard[move.toPos!.y][move.toPos!.x] = nil
             testBoard[pos.y][pos.x] = nil
             testBoard[move.toPos!.y][move.toPos!.x] = piece
@@ -318,7 +319,7 @@ class ChessLogic {
                 }
                 // Fixes hundreds of crashes
                 if let piece = board[y][x], piece.pieceColor != color {
-                    print(y,x,piece.pieceColor,piece.pieceType)
+//                    print(y,x,piece.pieceColor,piece.pieceType)
                     let moves = movesFor(pos: Pos(x: x, y: y), lastMove: nil, with: board)
                     if moves.contains(where: { pos1 in
                         return pos1.toPos?.x == kingPos.x && pos1.toPos?.y == kingPos.y

@@ -98,19 +98,24 @@ class GameViewController: UIViewController, GameUIDelegate {
         showProVersionVC()
     }
     @IBAction func restartButtonPressed(_ sender: UIButton) {
-        let alert = UIAlertController(title: "Start a new game?", message: "Are you sure you want to start a new game?", preferredStyle: .actionSheet)
-        alert.addAction(.init(title: "Cancel", style: .cancel))
-        alert.addAction(.init(title: "Restart", style: .default, handler: { _ in
-            self.board!.restart()
-            self.undos = 0
-            self.resetClockValues()
-            self.board?.saveGame()
-        }))
-        alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
-        if let popoverController = alert.popoverPresentationController {
-            popoverController.sourceView = sender
+        DispatchQueue.main.async {
+            let alert = UIAlertController(title: "Start a new game?", message: "Are you sure you want to start a new game?", preferredStyle: .actionSheet)
+            alert.addAction(.init(title: "Cancel", style: .cancel))
+            alert.addAction(.init(title: "Restart", style: .default, handler: { _ in
+                self.board!.restart()
+                self.undos = 0
+                self.resetClockValues()
+                self.board?.saveGame()
+            }))
+            alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
+            if let popoverController = alert.popoverPresentationController {
+                popoverController.sourceView = sender
+            }
+            self.present(alert, animated: true)
         }
-        self.view?.window?.rootViewController?.present(alert, animated: true)
+    }
+    @IBAction func backButtonTapped(_ sender: UIButton) {
+        navigationController?.popViewController(animated: true)
     }
     
     override func viewDidLoad() {
@@ -129,8 +134,13 @@ class GameViewController: UIViewController, GameUIDelegate {
         
         clockLabelBlack.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2)
         clockLabelWhite.transform = CGAffineTransform(rotationAngle: CGFloat.pi / 2)
-        clockLabelWhite.font = UIFont(descriptor: clockLabelWhite.font.fontDescriptor.withDesign(.rounded)!, size: 24)
-        clockLabelBlack.font = UIFont(descriptor: clockLabelBlack.font.fontDescriptor.withDesign(.rounded)!, size: 24)
+        if #available(iOS 13.0, *) {
+            clockLabelWhite.font = UIFont(descriptor: clockLabelWhite.font.fontDescriptor.withDesign(.rounded)!, size: 24)
+            clockLabelBlack.font = UIFont(descriptor: clockLabelBlack.font.fontDescriptor.withDesign(.rounded)!, size: 24)
+        } else {
+            clockLabelWhite.font = UIFont.systemFont(ofSize: 24)
+            clockLabelBlack.font = UIFont.systemFont(ofSize: 24)
+        }
         clockWhite = UserDefaults.standard.double(forKey: "clockWhite") == 0 ? self.clockTime : UserDefaults.standard.double(forKey: "clockWhite")
         clockBlack = UserDefaults.standard.double(forKey: "clockBlack") == 0 ? self.clockTime : UserDefaults.standard.double(forKey: "clockBlack")
         clockLabelWhite.text = formatTimeToString(clockWhite)
@@ -146,7 +156,13 @@ class GameViewController: UIViewController, GameUIDelegate {
         })
         
         clockSwitchPlayer = try! AVAudioPlayer(contentsOf: Bundle.main.url(forResource: "ClockSwitched", withExtension: "wav")!)
-        toggleClock(on: UIApplication.shared.windows[0].windowScene!.interfaceOrientation.isLandscape && clockEnabled)
+        toggleClock(on: !isInPortrait && clockEnabled)
+        
+        if #available(iOS 13.0, *) { } else {
+            self.undos = 9999999
+            self.board?.proVersion = true
+            UserDefaults.standard.set(true,forKey: "pro")
+        }
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -185,27 +201,29 @@ class GameViewController: UIViewController, GameUIDelegate {
     }
     
     func loadBoard() {
-            board = BoardScene(size: boardView.frame.size)
-            board!.vc = self
-            board!.vcDelegate = self
-            board!.scaleMode = .aspectFill
-            board!.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-            if let view = self.boardView as! SKView? {
-                view.presentScene(board)
-                view.ignoresSiblingOrder = true
-                view.showsFPS = false
-                view.showsNodeCount = false
-            }
-            
-            landscapeOrientation = UIApplication.shared.windows[0].windowScene!.interfaceOrientation.isLandscape
-            toggleClock(on: UIApplication.shared.windows[0].windowScene!.interfaceOrientation.isLandscape && clockEnabled)
-            
-            isLoadingVC = false
+        board = BoardScene(size: boardView.frame.size)
+        board!.vc = self
+        board!.vcDelegate = self
+        board!.scaleMode = .aspectFill
+        board!.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        if let view = self.boardView as! SKView? {
+            view.presentScene(board)
+            view.ignoresSiblingOrder = true
+            view.showsFPS = false
+            view.showsNodeCount = false
+        }
+        
+        landscapeOrientation = !isInPortrait
+        toggleClock(on: !isInPortrait && clockEnabled)
+        
+        isLoadingVC = false
     }
     
     func showProVersionVC() {
-        let vc = UIHostingController(rootView: PremiumView(dismissAction: {self.dismiss( animated: true, completion: nil )}))
-        present(vc, animated: true)
+        if #available(iOS 13.0.0, *) {
+            let vc = UIHostingController(rootView: PremiumView(dismissAction: {self.dismiss( animated: true, completion: nil )}))
+            present(vc, animated: true)
+        }
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
@@ -407,12 +425,11 @@ class GameViewController: UIViewController, GameUIDelegate {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1, execute: {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.175, execute: {
             self.landscapeOrientation = UIDevice.current.orientation.isLandscape
             self.toggleClock(on: UIDevice.current.orientation.isLandscape && self.clockEnabled)
             self.loadBoard()
         })
-        
     }
 }
 
@@ -429,11 +446,3 @@ extension UIView{
         return self.superview?.convert(self.frame, to: nil)
     }
 }
-
-#if DEBUG
-func printTime() {
-    let df = DateFormatter()
-    df.dateFormat = "HH:m:ss.SSSS"
-    print(df.string(from: Date()))
-}
-#endif

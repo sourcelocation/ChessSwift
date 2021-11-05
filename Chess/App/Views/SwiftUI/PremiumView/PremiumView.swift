@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+@available(iOS 13.0.0, *)
 struct PremiumView: View {
     @StateObject var storeManager = StoreManager()
     @Environment(\.verticalSizeClass) var verticalSizeClass
@@ -83,6 +84,7 @@ struct PremiumView: View {
     }
 }
 
+@available(iOS 13.0, *)
 struct Header: View {
     var body: some View {
         VStack {
@@ -102,6 +104,7 @@ struct Header: View {
     }
 }
 
+@available(iOS 13.0.0, *)
 struct PremiumList: View {
     var items: [Feature] = [
         Feature(title: "No undo limits", image: "arrow.uturn.left"),
@@ -131,6 +134,7 @@ struct PremiumList: View {
     }
 }
 
+@available(iOS 13.0.0, *)
 struct PremiumView_Previews: PreviewProvider {
     static var previews: some View {
         PremiumView(dismissAction: {})

@@ -122,6 +122,7 @@ class ChessGame {
     
     func undo(noRulesEnabled: Bool) {
         guard let moveToUndo = history.popLast() else { return }
+        print("popped")
         delegate?.removePieces()
         resetBoard(empty: noRulesEnabled)
         for move in history {

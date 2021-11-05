@@ -57,12 +57,16 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
     static func review() {
         if !UserDefaults.standard.bool(forKey: "reviewed") {
-            if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-                if #available(iOS 14.0, *) {
-                    SKStoreReviewController.requestReview(in: scene)
-                } else {
-                    SKStoreReviewController.requestReview()
+            if #available(iOS 13.0, *) {
+                if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
+                    if #available(iOS 14.0, *) {
+                        SKStoreReviewController.requestReview(in: scene)
+                    } else {
+                        SKStoreReviewController.requestReview()
+                    }
                 }
+            } else {
+                SKStoreReviewController.requestReview()
             }
             UserDefaults.standard.setValue(true, forKey: "reviewed")
         }

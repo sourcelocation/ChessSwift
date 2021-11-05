@@ -44,9 +44,18 @@ class Move: Codable {
         self.additionalMove = additionalMove
     }
 }
-struct Pos: Codable, Equatable {
+class Pos: Codable, Equatable {
+    static func == (lhs: Pos, rhs: Pos) -> Bool {
+        return lhs.x == rhs.x && lhs.y == rhs.y
+    }
+    
     var x: Int
     var y: Int
+    
+    init(x: Int, y: Int) {
+        self.x = x
+        self.y = y
+    }
 }
 class NormalMove: Move {
     var fromPos: Pos!
