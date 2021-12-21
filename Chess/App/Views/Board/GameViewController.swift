@@ -8,13 +8,18 @@
 import UIKit
 import SpriteKit
 import StoreKit
-import GameplayKit
-import SwiftUI
+import SnackBar
+import SwiftMessages
 import AVFoundation
+import SwiftUI
 
 class GameViewController: UIViewController, GameUIDelegate {
 
     var board: BoardScene?
+    
+    var isOnline: Bool = false
+    var onlineWebsocket: ChessWebsocket?
+    
     var undos: Int { // For free users
         get { UserDefaults.standard.integer(forKey: "undos") }
         set { UserDefaults.standard.set(newValue, forKey: "undos") }
@@ -64,6 +69,11 @@ class GameViewController: UIViewController, GameUIDelegate {
     @IBOutlet weak var clockLabelBlack: UILabel!
     @IBOutlet weak var clock: UIStackView!
     
+    @IBOutlet weak var backButton: UIButton!
+    @IBOutlet weak var proButton: UIButton!
+    @IBOutlet weak var editButtonsStack: UIStackView!
+    
+    
     @IBOutlet var noRulesEditorPieces: [UIImageView]!
     
     @IBAction func whiteClockTapped(_ sender: UIButton) {
@@ -98,24 +108,40 @@ class GameViewController: UIViewController, GameUIDelegate {
         showProVersionVC()
     }
     @IBAction func restartButtonPressed(_ sender: UIButton) {
-        DispatchQueue.main.async {
-            let alert = UIAlertController(title: "Start a new game?", message: "Are you sure you want to start a new game?", preferredStyle: .actionSheet)
+        if !isOnline {
+            DispatchQueue.main.async {
+                let alert = UIAlertController(title: "Start a new game?", message: "Are you sure you want to start a new game?", preferredStyle: .actionSheet)
+                alert.addAction(.init(title: "Cancel", style: .cancel))
+                alert.addAction(.init(title: "Restart", style: .default, handler: { _ in
+                    self.board!.restart()
+                    if abs((UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date())) > 10 {
+                        self.showRatingView()
+//                        AppDelegate.review()
+                    }
+                    self.undos = 0
+                    self.resetClockValues()
+                    self.board?.saveGame()
+                }))
+                alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
+                if let popoverController = alert.popoverPresentationController {
+                    popoverController.sourceView = sender
+                }
+                self.present(alert, animated: true)
+            }
+        } else {
+            let alert = UIAlertController(title: "Surrender?", message: "Are you sure you want to surrender and leave this game?", preferredStyle: .alert)
             alert.addAction(.init(title: "Cancel", style: .cancel))
-            alert.addAction(.init(title: "Restart", style: .default, handler: { _ in
-                self.board!.restart()
-                self.undos = 0
-                self.resetClockValues()
-                self.board?.saveGame()
+            alert.addAction(.init(title: "Surrender", style: .destructive, handler: { _ in
+                self.navigationController?.popToRootViewController(animated: true)
             }))
             alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
-            if let popoverController = alert.popoverPresentationController {
-                popoverController.sourceView = sender
-            }
-            self.present(alert, animated: true)
+            present(alert, animated: true)
         }
     }
     @IBAction func backButtonTapped(_ sender: UIButton) {
-        navigationController?.popViewController(animated: true)
+        if isOnline {
+        }
+        navigationController?.popToRootViewController(animated: true)
     }
     
     override func viewDidLoad() {
@@ -127,6 +153,15 @@ class GameViewController: UIViewController, GameUIDelegate {
             }
         }
         toggleEditor(on: noRules)
+        
+        
+        if isOnline {
+            backButton.setImage(UIImage(systemName: "flag")!, for: [])
+            editButtonsStack.isHidden = true
+            proButton.isHidden = true
+        }
+        
+        navigationController?.setNavigationBarHidden(true, animated: false)
     }
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
@@ -163,6 +198,10 @@ class GameViewController: UIViewController, GameUIDelegate {
             self.board?.proVersion = true
             UserDefaults.standard.set(true,forKey: "pro")
         }
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: false)
     }
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
@@ -213,6 +252,15 @@ class GameViewController: UIViewController, GameUIDelegate {
             view.showsNodeCount = false
         }
         
+        board?.setup()
+        if !isOnline {
+            board?.loadGame()
+        } else {
+//            onlineManager?.game = board?.game
+//            board?.loadGame(history: onlineManager?.serverGame?.moves)
+//            board?.allowMovesOnlyFromColor = (onlineManager?.serverGame!.whitePlayeriD == ChessAPI.login?.id) ? .white : .black
+//            board?.view?.transform =  CGAffineTransform(rotationAngle: board!.allowMovesOnlyFromColor == .white ? 0 : .pi)
+        }
         landscapeOrientation = !isInPortrait
         toggleClock(on: !isInPortrait && clockEnabled)
         
@@ -232,7 +280,7 @@ class GameViewController: UIViewController, GameUIDelegate {
         settings.vc = self
     }
     
-    func movedPiece(color: ChessPieceColor) {
+    func movedPiece(color: ChessPieceColor, move: NormalMove) {
         if clockEnabled {
             if color == .white {
                 whiteDidMove = true
@@ -256,7 +304,22 @@ class GameViewController: UIViewController, GameUIDelegate {
                 board!.canMove = false
             }
         }
+        
+        // Online
+        if isOnline {
+//            onlineManager?.move(fromPos: move.fromPos, toPos: move.toPos)
+        }
     }
+    
+    
+    func toggleEditor(on: Bool) {
+        noRulesEditorPieces.forEach { image in
+            image.isHidden = !on
+        }
+    }
+    
+    
+    // MARK: - Clock -
     fileprivate func startWhiteTimer() {
         clockButtonWhite.layer.borderWidth = clockBorderWidth
         if !(timerWhite?.isValid ?? false) {
@@ -269,7 +332,6 @@ class GameViewController: UIViewController, GameUIDelegate {
             timerBlack = Timer.scheduledTimer(timeInterval: 0.1, target: self, selector: #selector(fireBlackTimer), userInfo: nil, repeats: true)
         }
     }
-    
     @objc func fireWhiteTimer() {
         clockWhite -= 0.1
         clockLabelWhite.text = formatTimeToString(clockWhite)
@@ -335,12 +397,6 @@ class GameViewController: UIViewController, GameUIDelegate {
         clock.alpha = 0
         self.board!.canMove = true
     }
-    func toggleEditor(on: Bool) {
-        noRulesEditorPieces.forEach { image in
-            image.isHidden = !on
-        }
-    }
-    
     func stopTimers() {
         self.timerWhite?.invalidate()
         self.timerBlack?.invalidate()
@@ -384,7 +440,9 @@ class GameViewController: UIViewController, GameUIDelegate {
             clockSwitchPlayer!.play()
         }
     }
-    
+}
+// MARK: - Other -
+extension GameViewController {
     func checkForCrash() {
         #if DEBUG
         print("Cannot send a crash report in the DEBUG environment")
@@ -425,16 +483,29 @@ class GameViewController: UIViewController, GameUIDelegate {
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 0.175, execute: {
-            self.landscapeOrientation = UIDevice.current.orientation.isLandscape
-            self.toggleClock(on: UIDevice.current.orientation.isLandscape && self.clockEnabled)
-            self.loadBoard()
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05, execute: {
+        self.landscapeOrientation = size.width > self.view.frame.size.width// UIApplication.shared.windows.first?.windowScene?.interfaceOrientation == .landscapeLeft || UIApplication.shared.windows.first?.windowScene?.interfaceOrientation == .landscapeRight// size.width > size.height //UIDevice.current.orientation.isLandscape
+        self.toggleClock(on: UIDevice.current.orientation.isLandscape && self.clockEnabled)
+        self.loadBoard()
         })
+    }
+    func showRatingView() {
+        if !UserDefaults.standard.bool(forKey: "reviewed") {
+            let view: EnjoymentView = try! SwiftMessages.viewFromNib()
+            view.yesAction = { AppDelegate.review(); SwiftMessages.hide() }
+            view.noAction = { SwiftMessages.hide(); UserDefaults.standard.set(true, forKey: "reviewed") }
+            var config = SwiftMessages.defaultConfig
+            config.presentationContext = .window(windowLevel: UIWindow.Level.statusBar)
+            config.duration = .forever
+            config.presentationStyle = .bottom
+            config.dimMode = .gray(interactive: true)
+            SwiftMessages.show(config: config, view: view)
+        }
     }
 }
 
 protocol GameUIDelegate {
-    func movedPiece(color: ChessPieceColor)
+    func movedPiece(color: ChessPieceColor, move: NormalMove)
     func bounceTimer()
 }
 

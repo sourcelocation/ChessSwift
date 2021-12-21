@@ -16,10 +16,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
 //        if let windowScene = scene as? UIWindowScene {
 //            let window = UIWindow(windowScene: windowScene)
-        window?.overrideUserInterfaceStyle = .light
+//            window.backgroundColor = #colorLiteral(red: 0.8861198425, green: 0.8416082263, blue: 0.8121766448, alpha: 1)
+//            window.overrideUserInterfaceStyle = .light
 //            window.rootViewController = UIHostingController(rootView: MenuView())
+//            window.rootViewController?.view.backgroundColor = #colorLiteral(red: 0.8861198425, green: 0.8416082263, blue: 0.8121766448, alpha: 1)
 //            self.window = window
 //            window.makeKeyAndVisible()
+//
+//            UIView.appearance(whenContainedInInstancesOf: [UIAlertController.self]).tintColor = UIColor(Color.AccentColor)
 //        }
     }
     
@@ -36,5 +40,39 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 struct AppPreview: PreviewProvider {
     static var previews: some View {
         MenuView()
+    }
+}
+
+extension Color {
+    public static let AccentColor = Color("AccentColor")
+}
+extension UIView {
+
+    @IBInspectable var cornerRadius: CGFloat {
+        get {
+            return layer.cornerRadius
+        }
+        set {
+            layer.cornerRadius = newValue
+            layer.masksToBounds = newValue > 0
+        }
+    }
+
+    @IBInspectable var borderWidth: CGFloat {
+        get {
+            return layer.borderWidth
+        }
+        set {
+            layer.borderWidth = newValue
+        }
+    }
+
+    @IBInspectable var borderColor: UIColor? {
+        get {
+            return UIColor(cgColor: layer.borderColor!)
+        }
+        set {
+            layer.borderColor = newValue?.cgColor
+        }
     }
 }

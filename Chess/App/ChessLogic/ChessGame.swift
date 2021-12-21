@@ -27,7 +27,7 @@ class ChessGame {
         return logic.getMoves(pos: pos, lastMove: history.last, board: board)
     }
     
-    func perform(move: Move, addToHistory: Bool, uiMove: Bool) {
+    func perform(move: Move, addToHistory: Bool, uiMove: Bool, noRules: Bool) {
         if let move = move as? NormalMove, move.toPos != move.fromPos {
             let piece = piece(at: move.fromPos)
             delegate?.removePiece(self.piece(at: move.toPos))
@@ -79,7 +79,7 @@ class ChessGame {
                     logic.blackCanCastle = false
                 }
             }
-            perform(move: additionalMove, addToHistory: false, uiMove: uiMove)
+            perform(move: additionalMove, addToHistory: false, uiMove: uiMove, noRules: noRules)
         } else {
             logic.isWhiteInCheck = false
             logic.isBlackInCheck = false
@@ -88,7 +88,7 @@ class ChessGame {
             if uiMove {
                 let pieceColor = self.piece(at: move.toPos)!.pieceColor
                 let check = checkCheck(forPieceColor: pieceColor.inverted, ui: uiMove)
-                let _ = checkCheck(forPieceColor: pieceColor, ui: uiMove) // No Rules mode
+//                if noRules { let _ = checkCheck(forPieceColor: pieceColor, ui: uiMove) } // No Rules mode
                 delegate?.uiMove(piece: self.piece(at: move.toPos)!, to: move.toPos, withSound: !check)
             }
         }
@@ -120,13 +120,14 @@ class ChessGame {
         let _ = self.checkCheck(forPieceColor: .black, ui: ui)
     }
     
+    
     func undo(noRulesEnabled: Bool) {
         guard let moveToUndo = history.popLast() else { return }
         print("popped")
         delegate?.removePieces()
         resetBoard(empty: noRulesEnabled)
         for move in history {
-            perform(move: move, addToHistory: false, uiMove: false)
+            perform(move: move, addToHistory: false, uiMove: false, noRules: noRulesEnabled)
         }
         delegate?.createPieces()
         delegate?.uiUndoMove(fromPos: moveToUndo.toPos, toPos: moveToUndo.fromPos)

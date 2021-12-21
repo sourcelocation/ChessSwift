@@ -6,21 +6,22 @@
 //
 
 import SpriteKit
-import StoreKit
-import GameplayKit
-import GameKit
+import SwiftUI
 
 class BoardScene: SKScene {
     
-    var vc: GameViewController!
+    var online: Bool = false
+    
     var game = ChessGame()
     var vcDelegate: GameUIDelegate?
+    var vc: GameViewController!
     
     // Sizes
     var boardSize: CGFloat!
     var borderWidth: CGFloat!
     var cellSize: CGFloat!
     var pieceSize: CGSize!
+    
     var boardFrame: CGRect {
         return CGRect(x: -boardSize / 2, y: -boardSize / 2, width: boardSize, height: boardSize)
     }
@@ -34,6 +35,8 @@ class BoardScene: SKScene {
     }
     var selectedPieceMoves: [NormalMove] = []
     var selectedPiecePos: Pos?
+    var isDraggingPiece = false
+    
     var draggedPieceFromEditor: ChessPiece?
     
     var didSelectPieceWithTap = false
@@ -43,6 +46,7 @@ class BoardScene: SKScene {
     var moveTouchPos: CGPoint?
     
     var canMove = true // Non-auto timer
+    var allowMovesOnlyFromColor: ChessPieceColor?
     
     // Settings
     var showHints: Bool {
@@ -59,25 +63,31 @@ class BoardScene: SKScene {
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
+//        view.allowsTransparency = true
         
+        if boardSize == nil {
+//            setup()
+        }
+    }
+    
+    func setup() {
         game.delegate = self
         
+        setUpSizes()
         createBoardImage()
         game.resetBoard(empty: noRules)
-        setUpSizes()
         
-        loadGame()
-        
-        run(.sequence([.run {
+        run(.repeatForever(.sequence([.run {
             self.proVersion = UserDefaults.standard.bool(forKey: "pro")
-        },.wait(forDuration: 2)]))
+        },.wait(forDuration: 2)])))
         
         game.logic.game = game
     }
     
     func setUpSizes() {
-        boardSize = 0.93 * size.height
-        borderWidth = 0.035 * size.height
+        let len = size.height < size.width ? size.height : size.width
+        boardSize = 0.93 * len
+        borderWidth = 0.035 * len
         cellSize = boardSize / 8
         pieceSize = CGSize(width: cellSize * 0.85, height: cellSize * 0.85)
     }
@@ -117,13 +127,17 @@ class BoardScene: SKScene {
         if positionInBoard(at: loc) != selectedPiecePos {
             deselectPiece()
         }
+        isDraggingPiece = false
         moveTouchPos = nil
     }
     func touchMoved(toPoint loc: CGPoint) {
         self.touchPos = loc
         self.moveTouchPos = loc
         if proVersion {
-            selectedPiece?.position = loc
+            if isDraggingPiece || (selectedPiecePos != nil && positionInBoard(at: selectedPiecePos!).distance(to: loc) < cellSize / 2) {
+                selectedPiece?.position = loc
+                isDraggingPiece = true
+            }
         }
         draggedPieceFromEditor?.position = loc
     }
@@ -183,9 +197,9 @@ class BoardScene: SKScene {
         if game.piece(at: move.toPos)?.pieceType != .king {
             removeRedCells(includingCheck: true)
             resetMoveHints()
-            game.perform(move: move, addToHistory: true, uiMove: true)
+            game.perform(move: move, addToHistory: true, uiMove: true, noRules: noRules)
             saveGame()
-            vcDelegate?.movedPiece(color: game.piece(at: move.toPos)?.pieceColor ?? .white)
+            vcDelegate?.movedPiece(color: game.piece(at: move.toPos)?.pieceColor ?? .white, move: move)
         } else {
             deselectPiece()
         }
@@ -195,7 +209,13 @@ class BoardScene: SKScene {
         
     }
     func selectPiece(at pos: Pos) {
-        guard game.piece(at: pos) != nil else { return }
+        guard let piece = game.piece(at: pos) else { return }
+        if allowMovesOnlyFromColor != nil {
+            if piece.pieceColor != allowMovesOnlyFromColor { return }
+        }
+        if allowMovesOnlyFromColor != nil { // Online
+            
+        }
         selectedPieceMoves = game.moves(for: pos)
         
         resetMoveHints()
@@ -254,7 +274,7 @@ class BoardScene: SKScene {
         let cellPosition = positionInBoard(at: pos)
         let redCell = SKShapeNode(rect: CGRect(x: cellPosition.x - cellSize / 2, y: cellPosition.y - cellSize / 2, width: cellSize, height: cellSize))
         redCell.fillColor = .init(red: 1, green: 0.5058, blue: 0.4823, alpha: 1)
-        redCell.zPosition = 1
+        redCell.zPosition = 0.9
         redCell.lineWidth = 0
         redCell.name = "Red\(check ? "Check" : "")Cell"
         redCell.alpha = 0
@@ -265,9 +285,9 @@ class BoardScene: SKScene {
         let isEmptyCell = game.piece(at: pos) == nil
         let circle = SKShapeNode(circleOfRadius: isEmptyCell ? cellSize / 6 : cellSize * 0.45)
         circle.position = positionInBoard(at: pos)
-        circle.lineWidth = isEmptyCell ? 0 : cellSize * 0.1
+        circle.lineWidth = isEmptyCell ? 0 : cellSize * 0.075
         circle.fillColor = .init(white: 0.4, alpha: isEmptyCell ? 0.15 : 0)
-        circle.strokeColor = .init(white: 0.4, alpha: 0.15)
+        circle.strokeColor = .init(white: 0.4, alpha: 0.2)
         circle.zPosition = 3
         circle.name = "MoveCircle"
         addChild(circle)
@@ -275,21 +295,19 @@ class BoardScene: SKScene {
     
     func createBoardImage() {
         boardImage?.removeFromParent()
-        boardImage = SKSpriteNode(texture: SKTexture(imageNamed: "Board"), size: CGSize(width: size.height, height: size.height))
+        let width = size.height <  size.width ? size.height :  size.width
+        boardImage = SKSpriteNode(texture: SKTexture(imageNamed: "Board"), size: CGSize(width: width, height: width))
         addChild(boardImage!)
-        setUpSizes()
     }
     
-    func restart() {
+    func restart(overrideSave: Bool = true) {
         resetMoveHints()
         game.history = []
         removePieces()
         game.resetBoard(empty: noRules)
         createPieces()
-        saveGame()
-        
-        if (UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date()) > 600 {
-            AppDelegate.review()
+        if overrideSave {
+            saveGame()
         }
     }
     
@@ -342,10 +360,17 @@ extension BoardScene: ChessGameDelegate {
         alert.addAction(.init(title: "Close", style: .cancel, handler: { _ in
             AppDelegate.review()
         }))
-        alert.addAction(.init(title: "Start a new game", style: .default, handler: { _ in
-            self.restart()
-            AppDelegate.review()
-        }))
+        if !online {
+            alert.addAction(.init(title: "Start a new game", style: .default, handler: { _ in
+                self.restart()
+                if abs((UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date())) > 10 {
+                    self.vc.showRatingView()
+                }
+            }))
+        } else {
+//            vc.onlineGameCheckmate = true
+//            vc.backButton.setImage(UIImage(systemName: "chevron.left"), for: [])
+        }
         alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
         if !noRules {
             self.view?.window?.rootViewController?.present(alert, animated: true)
@@ -457,26 +482,27 @@ extension BoardScene {
 // MARK: Save game
 extension BoardScene {
     func saveGame() {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        let data = try! encoder.encode(game.history)
-        UserDefaults.standard.set(data, forKey: "History")
+        if !online {
+            let encoder = JSONEncoder()
+            encoder.outputFormatting = .prettyPrinted
+            let data = try! encoder.encode(game.history)
+            UserDefaults.standard.set(data, forKey: "History")
+        }
     }
     
-    func loadGame() {
+    func loadGame(history: [NormalMove]? = nil) {
         if let data = UserDefaults.standard.data(forKey: "History") {
             let jsonDecoder = JSONDecoder()
             do {
-                let history = try jsonDecoder.decode(History.self, from: data)
-                let moves = history.moves
+                let moves = history == nil ? (try jsonDecoder.decode(History.self, from: data)).moves : history!
                 game.history = moves
                 removePieces()
                 for move in moves.dropLast() {
-                    game.perform(move: move, addToHistory: false, uiMove: false)
+                    game.perform(move: move, addToHistory: false, uiMove: false, noRules: noRules)
                 }
                 if let lastMove = moves.last {
                     run(.sequence([.wait(forDuration: 0.2), .run {
-                        self.game.perform(move: lastMove, addToHistory: false, uiMove: true)
+                        self.game.perform(move: lastMove, addToHistory: false, uiMove: true, noRules: self.noRules)
                         self.game.checkChecks(ui: true)
                     }]))
                 }
@@ -506,5 +532,11 @@ class ChessPiece: SKSpriteNode {
     }
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
+    }
+}
+
+extension CGPoint {
+    func distance(to point: CGPoint) -> CGFloat {
+        return sqrt(pow(x - point.x, 2) + pow(y - point.y, 2))
     }
 }

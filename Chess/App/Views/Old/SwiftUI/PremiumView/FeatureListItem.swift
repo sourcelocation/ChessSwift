@@ -17,12 +17,12 @@ struct FeatureListItem: View {
             Image(systemName:image)
                 .resizable()
                 .aspectRatio(contentMode: .fit)
-                .frame(width: image == "puzzlepiece" ? 40 : 32, height: 32)
+                .frame(width: image == "puzzlepiece" ? 38 : 28, height: 28)
                 .foregroundColor(.accentColor)
                 .padding(.leading,image == "puzzlepiece" ? -8 : 0)
             Text(title)
-                .font(.system(size: 20))
-                .bold()
+                .font(.system(size: 18))
+                .fontWeight(.medium)
                 .padding(.leading, 6)
         }
     }

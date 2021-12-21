@@ -13,12 +13,24 @@
 		CE13C6D52710A1FA00DA888A /* RoomTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13C6D42710A1FA00DA888A /* RoomTableViewCell.swift */; };
 		CE13C6D82710A6F600DA888A /* SnackBar in Frameworks */ = {isa = PBXBuildFile; productRef = CE13C6D72710A6F600DA888A /* SnackBar */; };
 		CE13C6DB2710A71A00DA888A /* SnackBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13C6DA2710A71A00DA888A /* SnackBar.swift */; };
+		CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1BE5532765232000E0BE9C /* SettingsView.swift */; };
+		CE3042CE27708ED90068EBC0 /* StartOnlineGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042CD27708ED90068EBC0 /* StartOnlineGameViewController.swift */; };
+		CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */; };
+		CE3042D32770E0420068EBC0 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = CE3042D22770E0420068EBC0 /* Starscream */; };
+		CE3042D52770F8970068EBC0 /* KeyboardLayoutConstraint.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042D42770F8960068EBC0 /* KeyboardLayoutConstraint.swift */; };
+		CE3042DE27720CE00068EBC0 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = CE3042DD27720CE00068EBC0 /* SwiftMessages */; };
+		CE3042E027720D620068EBC0 /* EnjoymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042DF27720D620068EBC0 /* EnjoymentView.swift */; };
+		CE3042E227720E7E0068EBC0 /* EnjoymentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE3042E127720E7E0068EBC0 /* EnjoymentView.xib */; };
 		CE30D8CA269F8E170005B343 /* BoardScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE30D8C9269F8E170005B343 /* BoardScene.swift */; };
 		CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F627073E4C00385F73 /* ChessAPIModels.swift */; };
 		CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F827073E8400385F73 /* ChessAPI.swift */; };
 		CE5F186126C5787300983603 /* PGNParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5F186026C5787300983603 /* PGNParser.swift */; };
+		CE60B5F3276650BB00D719C8 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F2276650BB00D719C8 /* BoardView.swift */; };
+		CE60B5F52766518F00D719C8 /* BoardControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F42766518F00D719C8 /* BoardControlsView.swift */; };
+		CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F6276749B500D719C8 /* Extensions.swift */; };
 		CE61EE8E26B0544200531FBF /* BuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE61EE8D26B0544200531FBF /* BuyButton.swift */; };
 		CE77AD2527117AF500511326 /* WaitingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE77AD2427117AF500511326 /* WaitingViewController.swift */; };
+		CE966AA4276255DE00965991 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE966AA3276255DE00965991 /* GameView.swift */; };
 		CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */; };
 		CEA71E50261A039F00FD02F5 /* BoardScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = CEA71E4F261A039F00FD02F5 /* BoardScene.sks */; };
 		CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E55261A039F00FD02F5 /* GameViewController.swift */; };
@@ -49,12 +61,22 @@
 		CE10E02A2704984300F5BF52 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		CE13C6D42710A1FA00DA888A /* RoomTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RoomTableViewCell.swift; sourceTree = "<group>"; };
 		CE13C6DA2710A71A00DA888A /* SnackBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SnackBar.swift; sourceTree = "<group>"; };
+		CE1BE5532765232000E0BE9C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
+		CE3042CD27708ED90068EBC0 /* StartOnlineGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StartOnlineGameViewController.swift; sourceTree = "<group>"; };
+		CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessWebsocket.swift; sourceTree = "<group>"; };
+		CE3042D42770F8960068EBC0 /* KeyboardLayoutConstraint.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = KeyboardLayoutConstraint.swift; sourceTree = "<group>"; };
+		CE3042DF27720D620068EBC0 /* EnjoymentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnjoymentView.swift; sourceTree = "<group>"; };
+		CE3042E127720E7E0068EBC0 /* EnjoymentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EnjoymentView.xib; sourceTree = "<group>"; };
 		CE30D8C9269F8E170005B343 /* BoardScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardScene.swift; sourceTree = "<group>"; wrapsLines = 1; };
 		CE5831F627073E4C00385F73 /* ChessAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPIModels.swift; sourceTree = "<group>"; };
 		CE5831F827073E8400385F73 /* ChessAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPI.swift; sourceTree = "<group>"; };
 		CE5F186026C5787300983603 /* PGNParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGNParser.swift; sourceTree = "<group>"; };
+		CE60B5F2276650BB00D719C8 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
+		CE60B5F42766518F00D719C8 /* BoardControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardControlsView.swift; sourceTree = "<group>"; };
+		CE60B5F6276749B500D719C8 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		CE61EE8D26B0544200531FBF /* BuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyButton.swift; sourceTree = "<group>"; };
 		CE77AD2427117AF500511326 /* WaitingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingViewController.swift; sourceTree = "<group>"; };
+		CE966AA3276255DE00965991 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
 		CEA71E4A261A039E00FD02F5 /* Chess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEA71E4F261A039F00FD02F5 /* BoardScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BoardScene.sks; sourceTree = "<group>"; };
@@ -88,6 +110,8 @@
 				CEBD758426B06C200027FB09 /* SwiftyStoreKit in Frameworks */,
 				CEBD758926B0843F0027FB09 /* StoreKit.framework in Frameworks */,
 				CE13C6D82710A6F600DA888A /* SnackBar in Frameworks */,
+				CE3042D32770E0420068EBC0 /* Starscream in Frameworks */,
+				CE3042DE27720CE00068EBC0 /* SwiftMessages in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -130,11 +154,38 @@
 			path = SnackBar;
 			sourceTree = "<group>";
 		};
+		CE1BE552276522E100E0BE9C /* Settings Screen */ = {
+			isa = PBXGroup;
+			children = (
+				CE1BE5532765232000E0BE9C /* SettingsView.swift */,
+			);
+			path = "Settings Screen";
+			sourceTree = "<group>";
+		};
+		CE3042CB27708EAD0068EBC0 /* Old */ = {
+			isa = PBXGroup;
+			children = (
+				CE13C6D32710A1E000DA888A /* Rooms */,
+				CEACA045270ADF4600364074 /* SwiftUI */,
+			);
+			path = Old;
+			sourceTree = "<group>";
+		};
+		CE3042CC27708EB50068EBC0 /* Online Game Type */ = {
+			isa = PBXGroup;
+			children = (
+				CE3042CD27708ED90068EBC0 /* StartOnlineGameViewController.swift */,
+				CE3042D42770F8960068EBC0 /* KeyboardLayoutConstraint.swift */,
+			);
+			path = "Online Game Type";
+			sourceTree = "<group>";
+		};
 		CE5831F527073E3D00385F73 /* ChessAPI */ = {
 			isa = PBXGroup;
 			children = (
 				CE5831F627073E4C00385F73 /* ChessAPIModels.swift */,
 				CE5831F827073E8400385F73 /* ChessAPI.swift */,
+				CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */,
 			);
 			path = ChessAPI;
 			sourceTree = "<group>";
@@ -164,6 +215,16 @@
 			path = Waiting;
 			sourceTree = "<group>";
 		};
+		CE966AA2276255CA00965991 /* Board Screen */ = {
+			isa = PBXGroup;
+			children = (
+				CE966AA3276255DE00965991 /* GameView.swift */,
+				CE60B5F42766518F00D719C8 /* BoardControlsView.swift */,
+				CE60B5F2276650BB00D719C8 /* BoardView.swift */,
+			);
+			path = "Board Screen";
+			sourceTree = "<group>";
+		};
 		CEA71E41261A039E00FD02F5 = {
 			isa = PBXGroup;
 			children = (
@@ -188,6 +249,7 @@
 				CEAD174F261C495800F91647 /* SFX */,
 				CEEFF169269DF9D30011A674 /* App */,
 				CEA71E57261A039F00FD02F5 /* Main.storyboard */,
+				CE3042E127720E7E0068EBC0 /* EnjoymentView.xib */,
 				CEA71E63261A06D300FD02F5 /* Launch Screen.storyboard */,
 				CEA71E5A261A03A000FD02F5 /* Assets.xcassets */,
 				CEA71E5C261A03A000FD02F5 /* Info.plist */,
@@ -199,8 +261,11 @@
 		CEACA045270ADF4600364074 /* SwiftUI */ = {
 			isa = PBXGroup;
 			children = (
+				CE1BE552276522E100E0BE9C /* Settings Screen */,
+				CE966AA2276255CA00965991 /* Board Screen */,
 				CE10E0292704982700F5BF52 /* Menu Screen */,
 				CE103A9826AF0A7900064D42 /* PremiumView */,
+				CE60B5F6276749B500D719C8 /* Extensions.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -246,12 +311,13 @@
 		CEEFF168269DF9CC0011A674 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				CE3042DF27720D620068EBC0 /* EnjoymentView.swift */,
+				CE3042CC27708EB50068EBC0 /* Online Game Type */,
 				CE77AD2327117ABD00511326 /* Waiting */,
 				CE13C6D92710A71000DA888A /* SnackBar */,
-				CEACA045270ADF4600364074 /* SwiftUI */,
 				CEEFF16A269DF9E60011A674 /* Board */,
 				CE5831FA27073F0D00385F73 /* Settings */,
-				CE13C6D32710A1E000DA888A /* Rooms */,
+				CE3042CB27708EAD0068EBC0 /* Old */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -297,6 +363,8 @@
 			packageProductDependencies = (
 				CEBD758326B06C200027FB09 /* SwiftyStoreKit */,
 				CE13C6D72710A6F600DA888A /* SnackBar */,
+				CE3042D22770E0420068EBC0 /* Starscream */,
+				CE3042DD27720CE00068EBC0 /* SwiftMessages */,
 			);
 			productName = Chess;
 			productReference = CEA71E4A261A039E00FD02F5 /* Chess.app */;
@@ -328,6 +396,8 @@
 			packageReferences = (
 				CEBD758226B06C200027FB09 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
 				CE13C6D62710A6F600DA888A /* XCRemoteSwiftPackageReference "SnackBar" */,
+				CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */,
+				CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
 			);
 			productRefGroup = CEA71E4B261A039E00FD02F5 /* Products */;
 			projectDirPath = "";
@@ -352,6 +422,7 @@
 				CEA71E64261A06D300FD02F5 /* Launch Screen.storyboard in Resources */,
 				CEF02BE826DFE68000D86D11 /* CrashHistory.json in Resources */,
 				CEAD174D261C495500F91647 /* ChessPiecePlace.wav in Resources */,
+				CE3042E227720E7E0068EBC0 /* EnjoymentView.xib in Resources */,
 				CEAD1758261C4DD900F91647 /* CheckSound3.wav in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -364,21 +435,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				CEBD758E26B0DA180027FB09 /* FeatureListItem.swift in Sources */,
+				CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */,
+				CE3042CE27708ED90068EBC0 /* StartOnlineGameViewController.swift in Sources */,
 				CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */,
+				CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */,
+				CE966AA4276255DE00965991 /* GameView.swift in Sources */,
 				CE13C6DB2710A71A00DA888A /* SnackBar.swift in Sources */,
 				CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */,
+				CE60B5F52766518F00D719C8 /* BoardControlsView.swift in Sources */,
 				CED29C162705E032000F4518 /* MenuButton.swift in Sources */,
 				CEEFF16E269F14600011A674 /* ChessGame.swift in Sources */,
+				CE60B5F3276650BB00D719C8 /* BoardView.swift in Sources */,
 				CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */,
 				CE09D48C2697544400EEBF01 /* SettingsViewController.swift in Sources */,
+				CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */,
 				CE30D8CA269F8E170005B343 /* BoardScene.swift in Sources */,
 				CE103A9726AF038D00064D42 /* PremiumView.swift in Sources */,
 				CE10E02B2704984300F5BF52 /* MenuView.swift in Sources */,
+				CE3042E027720D620068EBC0 /* EnjoymentView.swift in Sources */,
 				CE5F186126C5787300983603 /* PGNParser.swift in Sources */,
 				CEBD758C26B0849A0027FB09 /* StoreManager.swift in Sources */,
 				CEFA6EA126AB338300DD6549 /* ChessLogicModels.swift in Sources */,
 				CEACA048270ADF8600364074 /* RoomsViewController.swift in Sources */,
 				CEA71E68261A36AF00FD02F5 /* ChessLogic.swift in Sources */,
+				CE3042D52770F8970068EBC0 /* KeyboardLayoutConstraint.swift in Sources */,
 				CE13C6D52710A1FA00DA888A /* RoomTableViewCell.swift in Sources */,
 				CE77AD2527117AF500511326 /* WaitingViewController.swift in Sources */,
 				CE61EE8E26B0544200531FBF /* BuyButton.swift in Sources */,
@@ -523,15 +603,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.1;
+				MARKETING_VERSION = 2.4;
 				OTHER_SWIFT_FLAGS = "-Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -546,15 +626,15 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 11;
+				CURRENT_PROJECT_VERSION = 12;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 2.3.1;
+				MARKETING_VERSION = 2.4;
 				OTHER_SWIFT_FLAGS = "-Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -595,6 +675,22 @@
 				minimumVersion = 0.1.1;
 			};
 		};
+		CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/daltoniam/Starscream";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 4.0.0;
+			};
+		};
+		CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SwiftKickMobile/SwiftMessages";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 9.0.0;
+			};
+		};
 		CEBD758226B06C200027FB09 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bizz84/SwiftyStoreKit.git";
@@ -610,6 +706,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CE13C6D62710A6F600DA888A /* XCRemoteSwiftPackageReference "SnackBar" */;
 			productName = SnackBar;
+		};
+		CE3042D22770E0420068EBC0 /* Starscream */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */;
+			productName = Starscream;
+		};
+		CE3042DD27720CE00068EBC0 /* SwiftMessages */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */;
+			productName = SwiftMessages;
 		};
 		CEBD758326B06C200027FB09 /* SwiftyStoreKit */ = {
 			isa = XCSwiftPackageProductDependency;

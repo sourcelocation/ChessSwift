@@ -23,7 +23,6 @@ class StoreManager: NSObject, ObservableObject {
         #if DEBUG
         UserDefaults.standard.set(true, forKey: "pro")
         self.transactionState = .purchased
-        (UIApplication.shared.windows[0].rootViewController as! GameViewController).board?.proVersion = true
         #endif
         SwiftyStoreKit.purchaseProduct("io.github.exerhythm.Chess.Pro", quantity: 1, atomically: true) { result in
             switch result {
@@ -31,7 +30,6 @@ class StoreManager: NSObject, ObservableObject {
                 print("Purchase Success: \(purchase.productId)")
                 UserDefaults.standard.set(true, forKey: "pro")
                 self.transactionState = .purchased
-                (UIApplication.shared.windows[0].rootViewController as! GameViewController).board?.proVersion = true
             case .error(let error):
                 switch error.code {
                 case .unknown:

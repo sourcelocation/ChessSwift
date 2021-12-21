@@ -9,46 +9,59 @@ import Foundation
 
 extension ChessAPI {
     
-    enum Difficulty: String, Codable {
-        case beginner, intermediate, advanced
+    struct WaitingPlayer: Codable {
+        var playerID: UUID
+        var gameID: String
+    }
+    
+    
+    struct ServerGame: Codable {
+        var id: String
+        var players: [Player]
+        var whiteID: String?
+        var chessGame: Game?
+        var difficulty: Difficulty
         
-        func localized() -> String {
-            switch self {
-            case .beginner:
-                return "Beginner"
-            case .intermediate:
-                return "Intermediate"
-            case .advanced:
-                return "Advanced"
+        enum Difficulty: String, Codable {
+            case beginner, intermediate, advanced
+            
+            func localized() -> String {
+                switch self {
+                case .beginner:
+                    return "Beginner"
+                case .intermediate:
+                    return "Intermediate"
+                case .advanced:
+                    return "Advanced"
+                }
             }
         }
-    }
-    
-    enum State: String, Codable {
-        case waiting = "waiting"
-        case running = "running"
-    }
-    
-    struct PublicGame: Codable {
-        var id: UUID?
-        var state: State
-        var difficulty: Difficulty
-        var time: Int
-    }
-    
-    struct Game: Codable {
-        var id: UUID?
-        var state: State
-        var difficulty: Difficulty
-        var time: Int
-        var whitePlayeriD: UUID?
+        struct Player: Codable {
+            var id: UUID
+            var username: String
+        }
         
-        var lastMove: NormalMove?
+        class Game: Codable {
+            var board: [[ChessPiece?]]
+            var history: [NormalMove]
+            
+            class ChessPiece: Codable {
+                var pieceColor: ChessPieceColor = .white
+                var pieceType: ChessPieceType = .pawn
+                
+                init(pieceColor: ChessPieceColor, pieceType: ChessPieceType) {
+                    self.pieceColor = pieceColor
+                    self.pieceType = pieceType
+                }
+            }
+
+        }
+
     }
     
     struct Login: Codable {
         var id: UUID
         var username: String
-        var key: String
+        var passwordHash: String
     }
 }

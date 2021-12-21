@@ -12,8 +12,8 @@ import StoreKit
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
+    var timer: Timer!
     let startTime = Date()
-    var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         SwiftyStoreKit.completeTransactions(atomically: true) { purchases in
@@ -31,6 +31,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         UIApplication.shared.isIdleTimerDisabled = true
+        
         return true
     }
 

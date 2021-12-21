@@ -290,7 +290,7 @@ class ChessLogic {
             let piece = testBoard[pos.y][pos.x]
             let color = piece?.pieceColor
             
-//            print("Moving \(piece!.pieceType)")
+//            print("Moving \(piece!.pieceT ype)")
             testBoard[move.toPos!.y][move.toPos!.x] = nil
             testBoard[pos.y][pos.x] = nil
             testBoard[move.toPos!.y][move.toPos!.x] = piece
@@ -332,7 +332,7 @@ class ChessLogic {
         
         return false
     }
-    // MARK:Checkmate check
+    // MARK: Checkmate check
     func checkCheckmate(for color: ChessPieceColor, lastMove: NormalMove?, board: [[ChessPiece?]]) -> Bool {
         for (y,row) in board.enumerated() {
             for (x,_) in row.enumerated() {

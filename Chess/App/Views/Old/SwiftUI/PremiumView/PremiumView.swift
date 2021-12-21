@@ -11,7 +11,8 @@ import SwiftUI
 struct PremiumView: View {
     @StateObject var storeManager = StoreManager()
     @Environment(\.verticalSizeClass) var verticalSizeClass
-    var dismissAction: (() -> Void)
+//    @Binding var showModal: Bool
+    var dismissAction: () -> ()
     
     var body: some View {
         ZStack {
@@ -19,7 +20,9 @@ struct PremiumView: View {
                 .edgesIgnoringSafeArea(.all)
             HStack {
                 VStack {
-                    Button(action: dismissAction) {
+                    Button(action: {
+                        dismissAction()
+                    }) {
                         Image(systemName: "xmark.circle.fill")
                             .resizable()
                             .frame(width: 24, height: 24, alignment: .center)
@@ -137,6 +140,6 @@ struct PremiumList: View {
 @available(iOS 13.0.0, *)
 struct PremiumView_Previews: PreviewProvider {
     static var previews: some View {
-        PremiumView(dismissAction: {})
+        PremiumView(dismissAction:{})
     }
 }
