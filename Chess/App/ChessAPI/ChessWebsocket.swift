@@ -11,7 +11,7 @@ import Starscream
 class ChessWebsocket: WebSocketDelegate {
     var socket: WebSocket!
     var isConnected: Bool = false
-    var delegate: OnlineGameDelegate?
+    weak var delegate: OnlineGameDelegate?
     
     func connect(to code: String, difficulty: ChessAPI.ServerGame.Difficulty?) {
         var url = URLComponents(url: ChessAPI.serverAddress.appendingPathComponent("channel"), resolvingAgainstBaseURL: false)
@@ -38,17 +38,23 @@ class ChessWebsocket: WebSocketDelegate {
         case .disconnected(let reason, let code):
             isConnected = false
             print("websocket is disconnected: \(reason) with code: \(code)")
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1, execute: { [weak self] in
+                self?.socket.connect()
+            })
         case .text(let string):
-            struct PlayerJoinedMessage: Codable {
-                var playerJoinedMessage: String
-                var username: String
-            }
             print("Received text: \(string)")
             
             if let serverGame = try? JSONDecoder().decode(ChessAPI.ServerGame.self, from: string.data(using: .utf8)!) {
-                delegate?.onlineGameReceivedServerGame(serverGame: serverGame)
-            } else if let playerJoinedMessage = try? JSONDecoder().decode(PlayerJoinedMessage.self, from: string.data(using: .utf8)!) {
-                delegate?.onlineGameUserJoined(username: playerJoinedMessage.username)
+                delegate?.onlineGameUpdated(newGame: serverGame)
+            } else if let msg = try? JSONDecoder().decode(PlayerJoinedMessage.self, from: string.data(using: .utf8)!) {
+                if let id = msg.whiteID {
+                    delegate?.onlineGameUserReceivedWhiteID(id)
+                }
+                delegate?.onlineGameUserJoined(username: msg.username)
+            } else if let msg = try? JSONDecoder().decode(PlayerLeftMessage.self, from: string.data(using: .utf8)!) {
+                delegate?.onlineGameUserLeft(username: msg.username)
+            } else if let msg = try? JSONDecoder().decode(MoveMessage.self, from: string.data(using: .utf8)!) {
+                delegate?.onlineGameUserMovedPiece(move: msg.move)
             }
             
             
@@ -64,6 +70,7 @@ class ChessWebsocket: WebSocketDelegate {
             break
         case .cancelled:
             isConnected = false
+            break
         case .error(let error):
             isConnected = false
             if let error = error {
@@ -71,12 +78,39 @@ class ChessWebsocket: WebSocketDelegate {
             }
         }
     }
+    func sendMove(_ move: NormalMove) {
+        guard let data = try? JSONEncoder().encode(["move":move]) else { return }
+        guard let text = String(data: data, encoding: .utf8) else { return }
+        socket.write(string: text, completion: {
+            print("Sent")
+        })
+    }
+    func leave() {
+        disconnect()
+    }
+    
+    struct PlayerJoinedMessage: Codable {
+        var playerJoinedMessage = true
+        var username: String
+        var whiteID: String?
+    }
+    struct PlayerLeftMessage: Codable {
+        var playerLeftMessage = true
+        var username: String
+    }
+    struct MoveMessage: Codable {
+        var move: NormalMove
+    }
+    deinit {
+        print("Deallocating websocket")
+    }
 }
 
-protocol OnlineGameDelegate {
+protocol OnlineGameDelegate: AnyObject {
     func onlineGameHandleError(_ error: Error)
     func onlineGameUserJoined(username: String)
     func onlineGameUserLeft(username: String)
     func onlineGameUserMovedPiece(move: NormalMove)
-    func onlineGameReceivedServerGame(serverGame: ChessAPI.ServerGame)
+    func onlineGameUserReceivedWhiteID(_ id: String)
+    func onlineGameUpdated(newGame: ChessAPI.ServerGame)
 }

@@ -17,7 +17,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 //        if let windowScene = scene as? UIWindowScene {
 //            let window = UIWindow(windowScene: windowScene)
 //            window.backgroundColor = #colorLiteral(red: 0.8861198425, green: 0.8416082263, blue: 0.8121766448, alpha: 1)
-//            window.overrideUserInterfaceStyle = .light
+            window?.overrideUserInterfaceStyle = .light
 //            window.rootViewController = UIHostingController(rootView: MenuView())
 //            window.rootViewController?.view.backgroundColor = #colorLiteral(red: 0.8861198425, green: 0.8416082263, blue: 0.8121766448, alpha: 1)
 //            self.window = window
@@ -36,12 +36,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 }
 
-@available(iOS 13.0.0, *)
-struct AppPreview: PreviewProvider {
-    static var previews: some View {
-        MenuView()
-    }
-}
 
 extension Color {
     public static let AccentColor = Color("AccentColor")

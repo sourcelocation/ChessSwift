@@ -9,7 +9,7 @@ import UIKit
 
 class SettingsViewController: UITableViewController, UIPickerViewDelegate, UIPickerViewDataSource {
 
-    var vc: GameViewController!
+    weak var vc: GameViewController!
     
     @IBOutlet weak var soundsSwitch: UISwitch!
     @IBOutlet weak var checkSoundSwitch: UISwitch!

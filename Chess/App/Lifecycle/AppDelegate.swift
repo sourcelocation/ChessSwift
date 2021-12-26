@@ -72,6 +72,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             UserDefaults.standard.setValue(true, forKey: "reviewed")
         }
     }
+    
 }
 
 extension Sequence  {

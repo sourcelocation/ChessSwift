@@ -15,8 +15,8 @@ class StoreManager: NSObject, ObservableObject {
     @Published var transactionState: SKPaymentTransactionState?
     
     func getProVersion() {
-        SwiftyStoreKit.retrieveProductsInfo(["io.github.exerhythm.Chess.Pro"]) { result in
-            self.proVersionProduct = result.retrievedProducts.first
+        SwiftyStoreKit.retrieveProductsInfo(["io.github.exerhythm.Chess.Pro"]) { [weak self] result in
+            self?.proVersionProduct = result.retrievedProducts.first
         }
     }
     func purchaseProVersion() {
@@ -24,12 +24,12 @@ class StoreManager: NSObject, ObservableObject {
         UserDefaults.standard.set(true, forKey: "pro")
         self.transactionState = .purchased
         #endif
-        SwiftyStoreKit.purchaseProduct("io.github.exerhythm.Chess.Pro", quantity: 1, atomically: true) { result in
+        SwiftyStoreKit.purchaseProduct("io.github.exerhythm.Chess.Pro", quantity: 1, atomically: true) { [weak self] result in
             switch result {
             case .success(let purchase):
                 print("Purchase Success: \(purchase.productId)")
                 UserDefaults.standard.set(true, forKey: "pro")
-                self.transactionState = .purchased
+                self?.transactionState = .purchased
             case .error(let error):
                 switch error.code {
                 case .unknown:

@@ -14,6 +14,7 @@
 		CE13C6D82710A6F600DA888A /* SnackBar in Frameworks */ = {isa = PBXBuildFile; productRef = CE13C6D72710A6F600DA888A /* SnackBar */; };
 		CE13C6DB2710A71A00DA888A /* SnackBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE13C6DA2710A71A00DA888A /* SnackBar.swift */; };
 		CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1BE5532765232000E0BE9C /* SettingsView.swift */; };
+		CE21310927764F2000DDE588 /* MHLoadingButton in Frameworks */ = {isa = PBXBuildFile; productRef = CE21310827764F2000DDE588 /* MHLoadingButton */; };
 		CE3042CE27708ED90068EBC0 /* StartOnlineGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042CD27708ED90068EBC0 /* StartOnlineGameViewController.swift */; };
 		CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */; };
 		CE3042D32770E0420068EBC0 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = CE3042D22770E0420068EBC0 /* Starscream */; };
@@ -22,6 +23,7 @@
 		CE3042E027720D620068EBC0 /* EnjoymentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042DF27720D620068EBC0 /* EnjoymentView.swift */; };
 		CE3042E227720E7E0068EBC0 /* EnjoymentView.xib in Resources */ = {isa = PBXBuildFile; fileRef = CE3042E127720E7E0068EBC0 /* EnjoymentView.xib */; };
 		CE30D8CA269F8E170005B343 /* BoardScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE30D8C9269F8E170005B343 /* BoardScene.swift */; };
+		CE34AE2D2776FF5A0073AC92 /* RootViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE34AE2C2776FF5A0073AC92 /* RootViewController.swift */; };
 		CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F627073E4C00385F73 /* ChessAPIModels.swift */; };
 		CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F827073E8400385F73 /* ChessAPI.swift */; };
 		CE5F186126C5787300983603 /* PGNParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5F186026C5787300983603 /* PGNParser.swift */; };
@@ -68,6 +70,7 @@
 		CE3042DF27720D620068EBC0 /* EnjoymentView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = EnjoymentView.swift; sourceTree = "<group>"; };
 		CE3042E127720E7E0068EBC0 /* EnjoymentView.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = EnjoymentView.xib; sourceTree = "<group>"; };
 		CE30D8C9269F8E170005B343 /* BoardScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardScene.swift; sourceTree = "<group>"; wrapsLines = 1; };
+		CE34AE2C2776FF5A0073AC92 /* RootViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootViewController.swift; sourceTree = "<group>"; };
 		CE5831F627073E4C00385F73 /* ChessAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPIModels.swift; sourceTree = "<group>"; };
 		CE5831F827073E8400385F73 /* ChessAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPI.swift; sourceTree = "<group>"; };
 		CE5F186026C5787300983603 /* PGNParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGNParser.swift; sourceTree = "<group>"; };
@@ -107,6 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CE21310927764F2000DDE588 /* MHLoadingButton in Frameworks */,
 				CEBD758426B06C200027FB09 /* SwiftyStoreKit in Frameworks */,
 				CEBD758926B0843F0027FB09 /* StoreKit.framework in Frameworks */,
 				CE13C6D82710A6F600DA888A /* SnackBar in Frameworks */,
@@ -171,13 +175,21 @@
 			path = Old;
 			sourceTree = "<group>";
 		};
-		CE3042CC27708EB50068EBC0 /* Online Game Type */ = {
+		CE3042CC27708EB50068EBC0 /* StartOnlineGame */ = {
 			isa = PBXGroup;
 			children = (
 				CE3042CD27708ED90068EBC0 /* StartOnlineGameViewController.swift */,
 				CE3042D42770F8960068EBC0 /* KeyboardLayoutConstraint.swift */,
 			);
-			path = "Online Game Type";
+			path = StartOnlineGame;
+			sourceTree = "<group>";
+		};
+		CE34AE2B2776FF440073AC92 /* Root */ = {
+			isa = PBXGroup;
+			children = (
+				CE34AE2C2776FF5A0073AC92 /* RootViewController.swift */,
+			);
+			path = Root;
 			sourceTree = "<group>";
 		};
 		CE5831F527073E3D00385F73 /* ChessAPI */ = {
@@ -311,8 +323,8 @@
 		CEEFF168269DF9CC0011A674 /* Views */ = {
 			isa = PBXGroup;
 			children = (
-				CE3042DF27720D620068EBC0 /* EnjoymentView.swift */,
-				CE3042CC27708EB50068EBC0 /* Online Game Type */,
+				CE34AE2B2776FF440073AC92 /* Root */,
+				CE3042CC27708EB50068EBC0 /* StartOnlineGame */,
 				CE77AD2327117ABD00511326 /* Waiting */,
 				CE13C6D92710A71000DA888A /* SnackBar */,
 				CEEFF16A269DF9E60011A674 /* Board */,
@@ -337,6 +349,7 @@
 		CEEFF16A269DF9E60011A674 /* Board */ = {
 			isa = PBXGroup;
 			children = (
+				CE3042DF27720D620068EBC0 /* EnjoymentView.swift */,
 				CEA71E55261A039F00FD02F5 /* GameViewController.swift */,
 				CEA71E4F261A039F00FD02F5 /* BoardScene.sks */,
 				CE30D8C9269F8E170005B343 /* BoardScene.swift */,
@@ -365,6 +378,7 @@
 				CE13C6D72710A6F600DA888A /* SnackBar */,
 				CE3042D22770E0420068EBC0 /* Starscream */,
 				CE3042DD27720CE00068EBC0 /* SwiftMessages */,
+				CE21310827764F2000DDE588 /* MHLoadingButton */,
 			);
 			productName = Chess;
 			productReference = CEA71E4A261A039E00FD02F5 /* Chess.app */;
@@ -398,6 +412,7 @@
 				CE13C6D62710A6F600DA888A /* XCRemoteSwiftPackageReference "SnackBar" */,
 				CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */,
 				CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
+				CE21310727764F2000DDE588 /* XCRemoteSwiftPackageReference "loading-buttons-ios" */,
 			);
 			productRefGroup = CEA71E4B261A039E00FD02F5 /* Products */;
 			projectDirPath = "";
@@ -454,6 +469,7 @@
 				CE10E02B2704984300F5BF52 /* MenuView.swift in Sources */,
 				CE3042E027720D620068EBC0 /* EnjoymentView.swift in Sources */,
 				CE5F186126C5787300983603 /* PGNParser.swift in Sources */,
+				CE34AE2D2776FF5A0073AC92 /* RootViewController.swift in Sources */,
 				CEBD758C26B0849A0027FB09 /* StoreManager.swift in Sources */,
 				CEFA6EA126AB338300DD6549 /* ChessLogicModels.swift in Sources */,
 				CEACA048270ADF8600364074 /* RoomsViewController.swift in Sources */,
@@ -675,6 +691,14 @@
 				minimumVersion = 0.1.1;
 			};
 		};
+		CE21310727764F2000DDE588 /* XCRemoteSwiftPackageReference "loading-buttons-ios" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/twho/loading-buttons-ios.git";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 		CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/daltoniam/Starscream";
@@ -706,6 +730,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = CE13C6D62710A6F600DA888A /* XCRemoteSwiftPackageReference "SnackBar" */;
 			productName = SnackBar;
+		};
+		CE21310827764F2000DDE588 /* MHLoadingButton */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = CE21310727764F2000DDE588 /* XCRemoteSwiftPackageReference "loading-buttons-ios" */;
+			productName = MHLoadingButton;
 		};
 		CE3042D22770E0420068EBC0 /* Starscream */ = {
 			isa = XCSwiftPackageProductDependency;

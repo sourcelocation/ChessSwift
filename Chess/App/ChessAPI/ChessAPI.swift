@@ -14,7 +14,7 @@ class ChessAPI {
         case unauthorized
     }
 
-    static let serverAddress = URL(string: "http://localhost:5432")!
+    static let serverAddress = URL(string: "http://192.168.1.151:5432")!
 
     enum HTTPMethod: String {
         case get = "GET"

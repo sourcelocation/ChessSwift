@@ -14,6 +14,10 @@ class StartOnlineGameViewController: UIViewController {
     @IBOutlet weak var codeTextField: UITextField!
     @IBOutlet weak var picker: UIPickerView!
     
+    @IBOutlet weak var findPlayerButton: UIButton!
+    @IBOutlet weak var joinButton: UIButton!
+    @IBOutlet weak var createButton: UIButton!
+    
     @IBAction func findButtonTapped(_ sender: UIButton) {
         if ChessAPI.login == nil {
             let alert = UIAlertController(title: "Please type in your username", message: nil, preferredStyle: .alert)
@@ -26,8 +30,8 @@ class StartOnlineGameViewController: UIViewController {
             alert.addAction(UIAlertAction(title: "Register", style: .default, handler: { _ in
                 if let text = alert.textFields![0].text, !text.isEmpty {
                     ChessAPI.register(username: text, completion: { result in
-                        DispatchQueue.main.async {
-                            self.findGame()
+                        DispatchQueue.main.async { [weak self] in
+                            self?.findGame()
                         }
                     })
                 }
@@ -49,17 +53,27 @@ class StartOnlineGameViewController: UIViewController {
         view.addGestureRecognizer(tap)
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        navigationController?.setNavigationBarHidden(false, animated: animated)
+        self.navigationController?.navigationBar.setBackgroundImage(UIImage(), for:.default)
+        self.navigationController?.navigationBar.shadowImage = UIImage()
+        self.navigationController?.navigationBar.layoutIfNeeded()
+    }
+    
     func findGame() {
+        findPlayerButton.isEnabled = false
         let difficulty = difficulties[picker.selectedRow(inComponent: 0)]
         ChessAPI.findGame(difficulty: difficulty) { res in
-            switch res {
-            case .success(let code):
-                print(code)
-                DispatchQueue.main.async {
-                    self.join(code: code, difficulty: difficulty)
+            DispatchQueue.main.async { [weak self] in
+                switch res {
+                case .success(let code):
+                    print(code)
+                    self?.join(code: code, difficulty: difficulty)
+                case .failure(let error):
+                    print(error)
                 }
-            case .failure(let error):
-                print(error)
+                self?.findPlayerButton.isEnabled = true
             }
         }
     }

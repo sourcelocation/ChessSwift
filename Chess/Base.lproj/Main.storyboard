@@ -10,10 +10,10 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--View Controller-->
+        <!--Root View Controller-->
         <scene sceneID="2El-nN-XUv">
             <objects>
-                <viewController id="GTV-Zj-Ecy" sceneMemberID="viewController">
+                <viewController id="GTV-Zj-Ecy" customClass="RootViewController" customModule="Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="qjt-vg-G70">
                         <rect key="frame" x="0.0" y="0.0" width="390" height="844"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -44,10 +44,10 @@
                                                             <constraint firstAttribute="width" constant="350" id="kHx-mX-r7u"/>
                                                         </constraints>
                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="19"/>
-                                                        <color key="tintColor" systemColor="labelColor"/>
+                                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                         <state key="normal" title="  Play" image="ipad" catalog="system">
-                                                            <color key="titleColor" systemColor="labelColor"/>
+                                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="18" weight="bold"/>
                                                         </state>
                                                         <userDefinedRuntimeAttributes>
@@ -68,10 +68,10 @@
                                                             </constraint>
                                                         </constraints>
                                                         <fontDescription key="fontDescription" type="system" weight="medium" pointSize="18"/>
-                                                        <color key="tintColor" systemColor="labelColor"/>
+                                                        <color key="tintColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                         <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                         <state key="normal" title="  Online game" image="globe" catalog="system">
-                                                            <color key="titleColor" systemColor="labelColor"/>
+                                                            <color key="titleColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                                             <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="18" scale="default" weight="bold"/>
                                                         </state>
                                                         <userDefinedRuntimeAttributes>
@@ -876,7 +876,7 @@
                                 <rect key="frame" x="20" y="157.33333333333331" width="350" height="529.66666666666674"/>
                                 <subviews>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="How do you want to play?" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="qxD-F5-Hjf">
-                                        <rect key="frame" x="68.333333333333314" y="0.0" width="213.66666666666669" height="21.666666666666668"/>
+                                        <rect key="frame" x="68.333333333333329" y="0.0" width="213.66666666666669" height="21.666666666666668"/>
                                         <fontDescription key="fontDescription" type="system" weight="semibold" pointSize="18"/>
                                         <nil key="textColor"/>
                                         <nil key="highlightedColor"/>
@@ -1072,6 +1072,7 @@
                     <navigationItem key="navigationItem" largeTitleDisplayMode="never" id="AMF-3m-EuE"/>
                     <connections>
                         <outlet property="codeTextField" destination="Jxj-4f-AyC" id="JN5-dH-9c2"/>
+                        <outlet property="findPlayerButton" destination="uMY-vB-67D" id="t7J-Iv-JBB"/>
                         <outlet property="picker" destination="nP5-4I-sQY" id="Ys5-cF-4fl"/>
                         <segue destination="VBd-SJ-42k" kind="show" identifier="WaitingSegue" id="DQd-Y8-kGx"/>
                     </connections>
@@ -1104,7 +1105,7 @@
                                             <nil key="highlightedColor"/>
                                         </label>
                                         <stackView opaque="NO" contentMode="scaleToFill" axis="vertical" distribution="fillEqually" alignment="bottom" spacing="2" translatesAutoresizingMaskIntoConstraints="NO" id="eha-ai-ei1">
-                                            <rect key="frame" x="242.66666666666663" y="8" width="91.333333333333343" height="36"/>
+                                            <rect key="frame" x="242.66666666666666" y="8" width="91.333333333333343" height="36"/>
                                             <subviews>
                                                 <stackView opaque="NO" contentMode="scaleToFill" spacing="5" translatesAutoresizingMaskIntoConstraints="NO" id="zWI-98-bhg">
                                                     <rect key="frame" x="0.0" y="0.0" width="91.333333333333329" height="36"/>
@@ -1204,7 +1205,7 @@
         </scene>
     </scenes>
     <inferredMetricsTieBreakers>
-        <segue reference="i5G-HI-dgt"/>
+        <segue reference="Wpj-fI-5hV"/>
     </inferredMetricsTieBreakers>
     <color key="tintColor" red="0.58039218187332153" green="0.44705885648727417" blue="0.31764706969261169" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
     <resources>
@@ -1227,9 +1228,6 @@
         <image name="queen-white" width="150" height="150"/>
         <image name="rook-black" width="150" height="150"/>
         <image name="rook-white" width="150" height="150"/>
-        <systemColor name="labelColor">
-            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
         <systemColor name="secondaryLabelColor">
             <color red="0.23529411764705882" green="0.23529411764705882" blue="0.2627450980392157" alpha="0.59999999999999998" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

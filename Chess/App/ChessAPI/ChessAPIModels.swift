@@ -42,16 +42,29 @@ extension ChessAPI {
         }
         
         class Game: Codable {
-            var board: [[ChessPiece?]]
+            var board: [[ServerChessPiece?]]
             var history: [NormalMove]
             
-            class ChessPiece: Codable {
+            class ServerChessPiece: Codable {
                 var pieceColor: ChessPieceColor = .white
                 var pieceType: ChessPieceType = .pawn
                 
                 init(pieceColor: ChessPieceColor, pieceType: ChessPieceType) {
                     self.pieceColor = pieceColor
                     self.pieceType = pieceType
+                }
+                
+                func asNormal() -> ChessPiece {
+                    ChessPiece(pieceColor: pieceColor, pieceType: pieceType)
+                }
+            }
+            
+            
+            func normalBoard() -> [[ChessPiece?]] {
+                board.map {
+                    $0.map {
+                        $0?.asNormal()
+                    } as [ChessPiece?]
                 }
             }
 

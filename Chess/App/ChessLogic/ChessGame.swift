@@ -36,8 +36,9 @@ class ChessGame {
             board[move.toPos.y][move.toPos.x] = piece
             
             if piece?.pieceType == .pawn {
-                if move.toPos.y == (piece?.pieceColor == .white ? 0 : 7), uiMove {
-                    delegate?.pawnReachedEnd(color: piece!.pieceColor, completion: { type in
+                if move.toPos.y == (piece?.pieceColor == .white ? 0 : 7), uiMove, !(move.additionalMove is PawnToQueenMove) {
+                    delegate?.pawnReachedEnd(color: piece!.pieceColor, completion: { [weak self] type in
+                        guard let self = self else { return }
                         self.board[move.toPos.y][move.toPos.x]?.pieceType = type
                         self.checkChecks(ui: uiMove)
                         self.delegate?.changePieceType(piece: self.piece(at: move.toPos), at: move.toPos, to: type)
@@ -148,18 +149,20 @@ class ChessGame {
         fatalError("Unable to find the king...")
     }
     
-    func resetBoard(empty: Bool) {
-        if !empty {
-        board =
+    func resetBoard(empty: Bool, customBoard: [[ChessPiece?]]? = nil) {
+        if !empty || customBoard != nil {
+        board = customBoard ??
                 [
-                [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
+//                [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
+                    [.init(pieceColor: .black, pieceType: .king),nil,nil,nil,nil,nil,nil,nil],
                 [.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),],
                 [nil,nil,nil,nil,nil,nil,nil,nil],
                 [nil,nil,nil,nil,nil,nil,nil,nil],
                 [nil,nil,nil,nil,nil,nil,nil,nil],
                 [nil,nil,nil,nil,nil,nil,nil,nil],
                 [.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn)],
-                 [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
+                    [.init(pieceColor: .white, pieceType: .king),nil,nil,nil,nil,nil,nil,nil],
+//                    [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
             ]
         } else {
             board = Array(repeating:Array(repeating: nil, count: 8),count:8)

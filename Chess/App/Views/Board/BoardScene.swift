@@ -10,11 +10,9 @@ import SwiftUI
 
 class BoardScene: SKScene {
     
-    var online: Bool = false
-    
     var game = ChessGame()
-    var vcDelegate: GameUIDelegate?
-    var vc: GameViewController!
+    weak var vcDelegate: GameUIDelegate?
+    weak var vc: GameViewController!
     
     // Sizes
     var boardSize: CGFloat!
@@ -52,7 +50,7 @@ class BoardScene: SKScene {
     var showHints: Bool {
         return !UserDefaults.standard.bool(forKey: "showHints")
     }
-    var noRules:Bool { return UserDefaults.standard.bool(forKey: "noRules") }
+    var noRules:Bool { return UserDefaults.standard.bool(forKey: "noRules") && !vc.isOnline }
     var proVersion = false
     
     let checkmateSound: SKAction = .playSoundFileNamed("CheckSound3.wav", waitForCompletion: false)
@@ -68,20 +66,24 @@ class BoardScene: SKScene {
         if boardSize == nil {
 //            setup()
         }
-    }
-    
-    func setup() {
+        
+        run(.repeatForever(.sequence([.run { [weak self] in
+            self?.proVersion = UserDefaults.standard.bool(forKey: "pro")
+        },.wait(forDuration: 2)])))
+        
         game.delegate = self
         
         setUpSizes()
         createBoardImage()
-        game.resetBoard(empty: noRules)
-        
-        run(.repeatForever(.sequence([.run {
-            self.proVersion = UserDefaults.standard.bool(forKey: "pro")
-        },.wait(forDuration: 2)])))
-        
         game.logic.game = game
+    }
+    
+    func setupGame(customBoard: [[ChessPiece?]]? = nil) {
+        resetMoveHints()
+        game.history = []
+        removePieces()
+        game.resetBoard(empty: noRules, customBoard: customBoard)
+        createPieces()
     }
     
     func setUpSizes() {
@@ -197,6 +199,7 @@ class BoardScene: SKScene {
         if game.piece(at: move.toPos)?.pieceType != .king {
             removeRedCells(includingCheck: true)
             resetMoveHints()
+            guard !vc.isOnline || vc.socket?.isConnected ?? false else { return }
             game.perform(move: move, addToHistory: true, uiMove: true, noRules: noRules)
             saveGame()
             vcDelegate?.movedPiece(color: game.piece(at: move.toPos)?.pieceColor ?? .white, move: move)
@@ -301,11 +304,7 @@ class BoardScene: SKScene {
     }
     
     func restart(overrideSave: Bool = true) {
-        resetMoveHints()
-        game.history = []
-        removePieces()
-        game.resetBoard(empty: noRules)
-        createPieces()
+        setupGame()
         if overrideSave {
             saveGame()
         }
@@ -357,19 +356,20 @@ extension BoardScene: ChessGameDelegate {
         addRedCell(at: kingPos, check: true)
         run(.sequence([.wait(forDuration: 0.2),checkmateSound]))
         let alert = UIAlertController(title: wins == nil ? "Stalemate! (Draw)" : ((wins == .black) ? "Black wins! (Checkmate)" : "White wins! (Checkmate)"), message: "", preferredStyle: .alert)
-        alert.addAction(.init(title: "Close", style: .cancel, handler: { _ in
-            AppDelegate.review()
+        alert.addAction(.init(title: "Close", style: .cancel, handler: { [weak self] _ in
+            if abs((UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date())) > 750 {
+                self?.vc.showRatingView()
+            }
         }))
-        if !online {
-            alert.addAction(.init(title: "Start a new game", style: .default, handler: { _ in
-                self.restart()
+        if !vc.isOnline {
+            alert.addAction(.init(title: "Start a new game", style: .default, handler: { [weak self] _ in
+                self?.restart()
                 if abs((UIApplication.shared.delegate as! AppDelegate).startTime.timeIntervalSince(Date())) > 10 {
-                    self.vc.showRatingView()
+                    self?.vc.showRatingView()
                 }
             }))
         } else {
-//            vc.onlineGameCheckmate = true
-//            vc.backButton.setImage(UIImage(systemName: "chevron.left"), for: [])
+            vc.backButton.setImage(UIImage(systemName: "chevron.left"), for: [])
         }
         alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
         if !noRules {
@@ -377,18 +377,23 @@ extension BoardScene: ChessGameDelegate {
         }
     }
     func pawnReachedEnd(color: ChessPieceColor, completion: @escaping (ChessPieceType) -> ()) {
+        func callback(_ type: ChessPieceType) {
+            completion(type)
+            if vc.isOnline { vc.socket?.sendMove(game.history.last!) }
+        }
+        
         let alert = UIAlertController(title: "Piece selection", message: "", preferredStyle: .alert)
         alert.addAction(UIAlertAction(title: "Queen", style: .default, handler: { _ in
-            completion(.queen)
+            callback(.queen)
         }))
         alert.addAction(UIAlertAction(title: "Knight", style: .default, handler: { _ in
-            completion(.knight)
+            callback(.knight)
         }))
         alert.addAction(UIAlertAction(title: "Bishop", style: .default, handler: { _ in
-            completion(.bishop)
+            callback(.bishop)
         }))
         alert.addAction(UIAlertAction(title: "Rook", style: .default, handler: { _ in
-            completion(.rook)
+            callback(.rook)
         }))
         alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
         self.view?.window?.rootViewController?.present(alert, animated: true, completion: {
@@ -411,7 +416,8 @@ extension BoardScene: ChessGameDelegate {
         }
     }
     func uiMove(piece: ChessPiece, to position: Pos, withSound: Bool) {
-        piece.run(.sequence([.move(to: positionInBoard(at: position), duration: 0.2), withSound ? .run {
+        piece.run(.sequence([.move(to: positionInBoard(at: position), duration: 0.2), withSound ? .run { [weak self] in
+            guard let self = self else { return }
             if !self.noSounds {
                 self.run(self.piecePlaceSound)
             }
@@ -482,7 +488,7 @@ extension BoardScene {
 // MARK: Save game
 extension BoardScene {
     func saveGame() {
-        if !online {
+        if !vc.isOnline {
             let encoder = JSONEncoder()
             encoder.outputFormatting = .prettyPrinted
             let data = try! encoder.encode(game.history)
@@ -501,7 +507,8 @@ extension BoardScene {
                     game.perform(move: move, addToHistory: false, uiMove: false, noRules: noRules)
                 }
                 if let lastMove = moves.last {
-                    run(.sequence([.wait(forDuration: 0.2), .run {
+                    run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
+                        guard let self = self else { return }
                         self.game.perform(move: lastMove, addToHistory: false, uiMove: true, noRules: self.noRules)
                         self.game.checkChecks(ui: true)
                     }]))
