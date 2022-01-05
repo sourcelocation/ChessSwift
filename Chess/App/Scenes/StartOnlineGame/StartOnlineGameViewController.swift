@@ -19,24 +19,32 @@ class StartOnlineGameViewController: UIViewController {
     @IBOutlet weak var createButton: UIButton!
     
     @IBAction func findButtonTapped(_ sender: UIButton) {
-        if ChessAPI.login == nil {
-            let alert = UIAlertController(title: "Please type in your username", message: nil, preferredStyle: .alert)
+        func showRegistration(taken: Bool = false) {
+            let alert = UIAlertController(title: (taken ? "Sorry, this username has already been taken.".localized + " " : "") + "Please type in your username".localized, message: nil, preferredStyle: .alert)
             alert.addTextField { textField in
-                textField.placeholder = "Username"
+                textField.placeholder = "Username".localized
                 textField.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
             }
             alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
-            alert.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-            alert.addAction(UIAlertAction(title: "Register", style: .default, handler: { _ in
+            alert.addAction(UIAlertAction(title: "Cancel".localized, style: .cancel))
+            alert.addAction(UIAlertAction(title: "Register".localized, style: .default, handler: { _ in
                 if let text = alert.textFields![0].text, !text.isEmpty {
                     ChessAPI.register(username: text, completion: { result in
                         DispatchQueue.main.async { [weak self] in
-                            self?.findGame()
+                            switch result {
+                            case .failure(_):
+                                showRegistration(taken: true)
+                            case .success(_):
+                                self?.findGame()
+                            }
                         }
                     })
                 }
             }))
             present(alert, animated: true)
+        }
+        if ChessAPI.login == nil {
+            showRegistration()
         } else {
             findGame()
         }
@@ -51,6 +59,16 @@ class StartOnlineGameViewController: UIViewController {
         let tap = UITapGestureRecognizer(target: self, action: #selector(UIInputViewController.dismissKeyboard))
 
         view.addGestureRecognizer(tap)
+        
+        if let previousCode = UserDefaults.standard.string(forKey: "GAME_CODE") {
+            ChessAPI.isGameStillRunning(code: previousCode) { [weak self] running in
+                DispatchQueue.main.async {
+                    if running {
+                        self?.performSegue(withIdentifier: "ShowGame", sender: previousCode)
+                    }
+                }
+            }
+        }
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -62,20 +80,21 @@ class StartOnlineGameViewController: UIViewController {
     }
     
     func findGame() {
-        findPlayerButton.isEnabled = false
+//        findPlayerButton.isEnabled = false
         let difficulty = difficulties[picker.selectedRow(inComponent: 0)]
-        ChessAPI.findGame(difficulty: difficulty) { res in
-            DispatchQueue.main.async { [weak self] in
-                switch res {
-                case .success(let code):
-                    print(code)
-                    self?.join(code: code, difficulty: difficulty)
-                case .failure(let error):
-                    print(error)
-                }
-                self?.findPlayerButton.isEnabled = true
-            }
-        }
+//        ChessAPI.findGame(difficulty: difficulty) { res in
+//            DispatchQueue.main.async { [weak self] in
+//                switch res {
+//                case .success(let code):
+//                    print(code)
+//                    self?.join(code: code, difficulty: difficulty)
+//                case .failure(let error):
+//                    print(error)
+//                }
+//                self?.findPlayerButton.isEnabled = true
+//            }
+//        }
+        performSegue(withIdentifier: "WaitingSegue", sender: difficulty)
     }
 
     func join(code: String, difficulty: ChessAPI.ServerGame.Difficulty?) {
@@ -93,9 +112,12 @@ class StartOnlineGameViewController: UIViewController {
 
     // In a storyboard-based application, you will often want to do a little preparation before navigation
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let foundGame = sender as! FoundGame
-        let waitingVC = segue.destination as! WaitingViewController
-        waitingVC.foundGame = foundGame
+        if let vc = segue.destination as? WaitingViewController {
+            vc.difficulty = sender as? ChessAPI.ServerGame.Difficulty
+        } else if let vc = segue.destination as? GameViewController {
+            vc.isOnline = true
+            vc.onlineGameCode = sender as? String
+        }
     }
     
     struct FoundGame {

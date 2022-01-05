@@ -1,0 +1,80 @@
+/*
+  Localizable.strings
+  Chess
+
+  Created by exerhythm on 12/29/21.
+  
+*/
+
+"Pro version" = "प्रो वर्शन";
+"Chess: 2 Players" = "शतरंज: 2 खिलाड़ी";
+"Features" = "फ़ीचर";
+"No undo limits" = "कोई अनडू लिमिट नहीं";
+"Chess clock" = "शतरंज की घड़ी";
+"Puzzle configurator" = "पज़ल कॉन्फ़िगरेटर";
+"Draggable pieces" = "खींचने योग्य पीस";
+"More settings" = "अधिक सेटिंग";
+"Buy for" = "के लिए ख़रीदें";
+"Restore purchase" = "ख़रीद को रीस्टोर करें";
+
+
+"Start a new game?" = "एक नया गेम शुरू करें?";
+"Are you sure you want to start a new game?" = "क्या आप वाकई एक नया गेम शुरू करना चाहते हैं?";
+"Cancel" = "रद्द करें";
+"Restart" = "रीस्टार्ट करें";
+"Black wins!" = "ब्लैक जीत गया!";
+"White wins!" = "सफ़ेद जीत गया!";
+"(Time ran out)" = "(समय समाप्त हो गया)";
+"Continue without a clock" = "घड़ी के बिना जारी रखें";
+"Start a new game" = "एक नया गेम शुरू करें";
+"Stalemate! (Draw)" = "स्टेलमेट! (ड्रॉ)";
+"Black wins! (Checkmate)" = "ब्लैक जीत गया! (चेकमेट)";
+"White wins! (Checkmate)" = "सफ़ेद जीत गया! (चेकमेट)";
+"(Checkmate)" = "(चेकमेट)";
+"Close" = "बंद करे";
+"Piece selection" = "पीस का चुनाव";
+"Queen" = "रानी";
+"Knight" = "घोड़ा";
+"Bishop" = "बिशप";
+"Rook" = "रूक";
+
+
+"How do you want to play?" = "आप कैसे खेलना चाहते हैं?";
+"Random player" = "रैंडम खिलाड़ी";
+"Beginner" = "शुरुआती";
+"Intermediate" = "मध्यम";
+"Advanced" = "उन्नत";
+"Find player" = "खिलाड़ी खोजें";
+"Private game" = "निजी गेम";
+"Create new" = "नया बनाएं";
+"Join" = "शामिल हों";
+"Please type in your username" = "कृपया अपना यूज़र नाम टाइप करें";
+"Sorry, this username has already been taken." = "क्षमा करें, यह उपयोगकर्ता नाम पहले ही लिया जा चुका है।";
+"Username" = "यूज़र नाम";
+"Register" = "रजिस्टर करें";
+"Searching for another player..." = "दूसरे खिलाड़ी को सर्च कर रहे...";
+"Opponent reconnected" = "प्रतिद्वंद्वी फिर से कनेक्ट हुआ";
+"Opponent:" = "प्रतिद्वंद्वी:";
+"Opponent has left" = "प्रतिद्वंद्वी चला गया";
+"You can wait for him to come back or leave now" = "आप उसके वापस आने या अभी जाने का इंतज़ार कर सकते हैं";
+"No players are currently online..." = "अभी इस वक़्त कोई भी खिलाड़ी ऑनलाइन नहीं है...";
+"Try again later!" = "बाद में फिर से कोशिश करें!";
+"OK" = "बंद करे";
+
+
+"Settings" = "सेटिंग";
+"Puzzle Configurator" = "पज़ल कॉन्फ़िगरेटर";
+"Automatic clock" = "ऑटोमैटिक घड़ी";
+"These features are available only in the Pro version." = "ये फ़ीचर सिर्फ़ प्रो वर्शन में उपलब्ध हैं.";
+"Sounds" = "साउंड";
+"Show hints" = "हिंट दिखाएं";
+"Sounds" = "साउंड";
+"Visuals" = "विज़ुअल";
+"Gameplay" = "गेमप्ले";
+"Check sound" = "साउंड चेक करें";
+"  Online game" = "  ऑनलाइन गेम";
+"  Play" = "  खेलें";
+"Clock time" = "घड़ी का समय";
+"Back" = "वापस";
+"Please rotate your device" = "कृपया अपने डिवाइस को घुमाएं";
+"Clock can only work in Landscape device orientation" = "घड़ी केवल लैंडस्केप डिवाइस ओरिएंटेशन में काम कर सकती है";

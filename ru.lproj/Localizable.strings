@@ -1,0 +1,81 @@
+/*
+  Localizable.strings
+  Chess
+
+  Created by exerhythm on 12/29/21.
+  
+*/
+
+"Pro version" = "Pro version";
+"Chess: 2 Players" = "Chess: 2 Players";
+"Features" = "Features";
+"No undo limits" = "No undo limits";
+"Chess clock" = "Chess clock";
+"Puzzle configurator" = "Puzzle configurator";
+"Draggable pieces" = "Draggable pieces";
+"More settings" = "More settings";
+"Buy for" = "Buy for";
+"Restore purchase" = "Restore purchase";
+
+
+"Start a new game?" = "Start a new game?";
+"Are you sure you want to start a new game?" = "Are you sure you want to start a new game?";
+"Cancel" = "Cancel";
+"Restart" = "Restart";
+"Black wins!" = "Black wins!";
+"White wins!" = "White wins!";
+"(Time ran out)" = "(Time ran out)";
+"Continue without a clock" = "Continue without a clock";
+"Start a new game" = "Start a new game";
+"Stalemate! (Draw)" = "Stalemate! (Draw)";
+"Black wins! (Checkmate)" = "Black wins! (Checkmate)";
+"White wins! (Checkmate)" = "White wins! (Checkmate)";
+"(Checkmate)" = "(Checkmate)";
+"Close" = "Close";
+"Piece selection" = "Piece selection";
+"Queen" = "Queen";
+"Knight" = "Knight";
+"Bishop" = "Bishop";
+"Rook" = "Rook";
+
+
+"How do you want to play?" = "How do you want to play?";
+"Random player" = "Random player";
+"Beginner" = "Beginner";
+"Intermediate" = "Intermediate";
+"Advanced" = "Advanced";
+"Find player" = "Find player";
+"Private game" = "Private game";
+"Create new" = "Create new";
+"Join" = "Join";
+"Please type in your username" = "Please type in your username";
+"Sorry, this username has already been taken." = "Sorry, this username has already been taken.";
+"Username" = "Username";
+"Register" = "Register";
+"Searching for another player..." = "Searching for another player...";
+"Opponent reconnected" = "Opponent reconnected";
+"Opponent:" = "Opponent:";
+"Opponent has left" = "Opponent has left";
+"You can wait for him to come back or leave now" = "You can wait for him to come back or leave now";
+"No players are currently online..." = "No players are currently online...";
+"Try again later!" = "Try again later!";
+"OK" = "OK";
+
+
+"Settings" = "Settings";
+"Puzzle Configurator" = "Puzzle Configurator";
+"Chess clock" = "Chess clock";
+"Automatic clock" = "Automatic clock";
+"These features are available only in the Pro version." = "These features are available only in the Pro version.";
+"Sounds" = "Sounds";
+"Show hints" = "Show hints";
+"Sounds" = "Sounds";
+"Visuals" = "Visuals";
+"Gameplay" = "Gameplay";
+"Check sound" = "Check sound";
+"  Online game" = "  Online game";
+"  Play" = "  Play";
+"Clock time" = "Clock time";
+"Back" = "Back";
+"Please rotate your device" = "Please rotate your device";
+"Clock can only work in Landscape device orientation" = "Clock can only work in Landscape device orientation";
