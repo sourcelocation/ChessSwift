@@ -18,6 +18,7 @@ class StoreManager: NSObject, ObservableObject {
         SwiftyStoreKit.retrieveProductsInfo(["io.github.exerhythm.Chess.Pro"]) { [weak self] result in
             self?.proVersionProduct = result.retrievedProducts.first
         }
+        
     }
     func purchaseProVersion() {
         #if DEBUG
@@ -30,20 +31,7 @@ class StoreManager: NSObject, ObservableObject {
                 print("Purchase Success: \(purchase.productId)")
                 UserDefaults.standard.set(true, forKey: "pro")
                 self?.transactionState = .purchased
-            case .error(let error):
-                switch error.code {
-                case .unknown:
-                    print("Unknown error. Please contact support")
-                case .clientInvalid: print("Not allowed to make the payment")
-                case .paymentCancelled: break
-                case .paymentInvalid: print("The purchase identifier was invalid")
-                case .paymentNotAllowed: print("The device is not allowed to make the payment")
-                case .storeProductNotAvailable: print("The product is not available in the current storefront")
-                case .cloudServicePermissionDenied: print("Access to cloud service information is not allowed")
-                case .cloudServiceNetworkConnectionFailed: print("Could not connect to the network")
-                case .cloudServiceRevoked: print("User has revoked permission to use this cloud service")
-                default: print((error as NSError).localizedDescription)
-                }
+            case .error, .deferred: break
             }
         }
     }

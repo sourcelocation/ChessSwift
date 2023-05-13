@@ -7,6 +7,36 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2114AA062A0C169700627BFA /* UIColor+init+rgb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */; };
+		2133542B29E31095000A78A2 /* ChessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2133542A29E31095000A78A2 /* ChessApp.swift */; };
+		21D5BF152A0D756D006978A4 /* Stockfish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED32A0D756D006978A4 /* Stockfish.swift */; };
+		21D5BF162A0D756D006978A4 /* stockfishlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED52A0D756D006978A4 /* stockfishlib.cpp */; };
+		21D5BF172A0D756D006978A4 /* engines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED62A0D756D006978A4 /* engines.cpp */; };
+		21D5BF182A0D756D006978A4 /* thread.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEDA2A0D756D006978A4 /* thread.cpp */; };
+		21D5BF192A0D756D006978A4 /* timeman.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEDC2A0D756D006978A4 /* timeman.cpp */; };
+		21D5BF1A2A0D756D006978A4 /* ucioption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEDD2A0D756D006978A4 /* ucioption.cpp */; };
+		21D5BF1B2A0D756D006978A4 /* evaluate_nnue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEDF2A0D756D006978A4 /* evaluate_nnue.cpp */; };
+		21D5BF1C2A0D756D006978A4 /* half_ka_v2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEE72A0D756D006978A4 /* half_ka_v2.cpp */; };
+		21D5BF1D2A0D756D006978A4 /* misc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEED2A0D756D006978A4 /* misc.cpp */; };
+		21D5BF1E2A0D756D006978A4 /* bitboard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEF02A0D756D006978A4 /* bitboard.cpp */; };
+		21D5BF1F2A0D756D006978A4 /* Makefile in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEF12A0D756D006978A4 /* Makefile */; };
+		21D5BF202A0D756D006978A4 /* psqt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEF32A0D756D006978A4 /* psqt.cpp */; };
+		21D5BF222A0D756D006978A4 /* movepick.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEF52A0D756D006978A4 /* movepick.cpp */; };
+		21D5BF232A0D756D006978A4 /* tune.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEF72A0D756D006978A4 /* tune.cpp */; };
+		21D5BF242A0D756D006978A4 /* tbprobe.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEFA2A0D756D006978A4 /* tbprobe.cpp */; };
+		21D5BF252A0D756D006978A4 /* bitbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEFC2A0D756D006978A4 /* bitbase.cpp */; };
+		21D5BF262A0D756D006978A4 /* evaluate.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BEFD2A0D756D006978A4 /* evaluate.cpp */; };
+		21D5BF272A0D756D006978A4 /* search.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF002A0D756D006978A4 /* search.cpp */; };
+		21D5BF282A0D756D006978A4 /* pawns.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF042A0D756D006978A4 /* pawns.cpp */; };
+		21D5BF292A0D756D006978A4 /* movegen.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF052A0D756D006978A4 /* movegen.cpp */; };
+		21D5BF2A2A0D756D006978A4 /* UNLICENCE in Resources */ = {isa = PBXBuildFile; fileRef = 21D5BF072A0D756D006978A4 /* UNLICENCE */; };
+		21D5BF2B2A0D756D006978A4 /* material.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF092A0D756D006978A4 /* material.cpp */; };
+		21D5BF2C2A0D756D006978A4 /* tt.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF0A2A0D756D006978A4 /* tt.cpp */; };
+		21D5BF2D2A0D756D006978A4 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF0D2A0D756D006978A4 /* main.cpp */; };
+		21D5BF2E2A0D756D006978A4 /* position.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF112A0D756D006978A4 /* position.cpp */; };
+		21D5BF2F2A0D756D006978A4 /* uci.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF122A0D756D006978A4 /* uci.cpp */; };
+		21D5BF302A0D756D006978A4 /* endgame.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF132A0D756D006978A4 /* endgame.cpp */; };
+		21D5BF322A0D7DB3006978A4 /* benchmark.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BF312A0D7DB3006978A4 /* benchmark.cpp */; };
 		CE0774782781B5FF00E321FB /* ChessTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE0774772781B5FF00E321FB /* ChessTests.swift */; };
 		CE09D48C2697544400EEBF01 /* SettingsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE09D48B2697544400EEBF01 /* SettingsViewController.swift */; };
 		CE103A9726AF038D00064D42 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE103A9626AF038D00064D42 /* PremiumView.swift */; };
@@ -28,12 +58,16 @@
 		CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F627073E4C00385F73 /* ChessAPIModels.swift */; };
 		CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F827073E8400385F73 /* ChessAPI.swift */; };
 		CE5F186126C5787300983603 /* PGNParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5F186026C5787300983603 /* PGNParser.swift */; };
-		CE60B5F3276650BB00D719C8 /* BoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F2276650BB00D719C8 /* BoardView.swift */; };
 		CE60B5F52766518F00D719C8 /* BoardControlsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F42766518F00D719C8 /* BoardControlsView.swift */; };
 		CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F6276749B500D719C8 /* Extensions.swift */; };
 		CE61EE8E26B0544200531FBF /* BuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE61EE8D26B0544200531FBF /* BuyButton.swift */; };
+		CE706E042874803700288A62 /* SavedGamesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE706E032874803600288A62 /* SavedGamesViewController.swift */; };
+		CE706E06287480A200288A62 /* SavedChessGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE706E05287480A200288A62 /* SavedChessGame.swift */; };
 		CE77AD2527117AF500511326 /* WaitingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE77AD2427117AF500511326 /* WaitingViewController.swift */; };
+		CE89929E287DCD2B000561F8 /* AnaylzedMoveCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE89929D287DCD2B000561F8 /* AnaylzedMoveCell.swift */; };
+		CE928ECD2874B25C0058B65E /* SavedGameViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE928ECC2874B25C0058B65E /* SavedGameViewCell.swift */; };
 		CE966AA4276255DE00965991 /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE966AA3276255DE00965991 /* GameView.swift */; };
+		CEA1CDD32876265500F34D20 /* AnalysableGameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA1CDD22876265500F34D20 /* AnalysableGameViewController.swift */; };
 		CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */; };
 		CEA71E50261A039F00FD02F5 /* BoardScene.sks in Resources */ = {isa = PBXBuildFile; fileRef = CEA71E4F261A039F00FD02F5 /* BoardScene.sks */; };
 		CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEA71E55261A039F00FD02F5 /* GameViewController.swift */; };
@@ -51,7 +85,24 @@
 		CEBD758C26B0849A0027FB09 /* StoreManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBD758B26B0849A0027FB09 /* StoreManager.swift */; };
 		CEBD758E26B0DA180027FB09 /* FeatureListItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEBD758D26B0DA180027FB09 /* FeatureListItem.swift */; };
 		CEC7C30426B489D000BC50AA /* ClockSwitched.wav in Resources */ = {isa = PBXBuildFile; fileRef = CEC7C30326B489D000BC50AA /* ClockSwitched.wav */; };
+		CECC3B0D2879B95400D009B8 /* nn-9e3c6298299a.nnue in Resources */ = {isa = PBXBuildFile; fileRef = CECC3AAB2879B8A200D009B8 /* nn-9e3c6298299a.nnue */; };
 		CED29C162705E032000F4518 /* MenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED29C152705E032000F4518 /* MenuButton.swift */; };
+		CED60C4F287C422E00F0969A /* SKAction+Shake.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C3B287C422E00F0969A /* SKAction+Shake.swift */; };
+		CED60C50287C422E00F0969A /* SKTexture+RadialGradient.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C3C287C422E00F0969A /* SKTexture+RadialGradient.swift */; };
+		CED60C51287C422E00F0969A /* UIBezierPath+Character.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C3D287C422E00F0969A /* UIBezierPath+Character.swift */; };
+		CED60C52287C422E00F0969A /* Logger.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C3E287C422E00F0969A /* Logger.swift */; };
+		CED60C53287C422E00F0969A /* UIBezierPath+Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C3F287C422E00F0969A /* UIBezierPath+Arrow.swift */; };
+		CED60C54287C422E00F0969A /* SKAction+Spiral.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C40287C422E00F0969A /* SKAction+Spiral.swift */; };
+		CED60C55287C422E00F0969A /* MSKCameraNode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C41287C422E00F0969A /* MSKCameraNode.swift */; };
+		CED60C56287C422E00F0969A /* SKShapeNode+Arrow.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C42287C422E00F0969A /* SKShapeNode+Arrow.swift */; };
+		CED60C57287C422E00F0969A /* CGFloat+Arithmetics.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C43287C422E00F0969A /* CGFloat+Arithmetics.swift */; };
+		CED60C58287C422E00F0969A /* MSKButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C44287C422E00F0969A /* MSKButton.swift */; };
+		CED60C59287C422E00F0969A /* MSKEmitterLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C45287C422E00F0969A /* MSKEmitterLabel.swift */; };
+		CED60C5A287C422E00F0969A /* Array+SKAction.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C46287C422E00F0969A /* Array+SKAction.swift */; };
+		CED60C5B287C422E00F0969A /* CGPath+GetPaths.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C47287C422E00F0969A /* CGPath+GetPaths.swift */; };
+		CED60C5C287C422E00F0969A /* SKAction+TimingMode.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C48287C422E00F0969A /* SKAction+TimingMode.swift */; };
+		CED60C5D287C422E00F0969A /* MSKAnimatedLabel.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C49287C422E00F0969A /* MSKAnimatedLabel.swift */; };
+		CED60C5F287C422E00F0969A /* CGPath+ForEach.swift in Sources */ = {isa = PBXBuildFile; fileRef = CED60C4B287C422E00F0969A /* CGPath+ForEach.swift */; };
 		CEEFF16E269F14600011A674 /* ChessGame.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEEFF16D269F14600011A674 /* ChessGame.swift */; };
 		CEF02BE826DFE68000D86D11 /* CrashHistory.json in Resources */ = {isa = PBXBuildFile; fileRef = CEF02BE726DFE68000D86D11 /* CrashHistory.json */; };
 		CEF6D519269B892E0071B40A /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CEF6D518269B892E0071B40A /* SceneDelegate.swift */; };
@@ -70,6 +121,67 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+init+rgb.swift"; sourceTree = "<group>"; };
+		2133542A29E31095000A78A2 /* ChessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessApp.swift; sourceTree = "<group>"; };
+		21D5BED32A0D756D006978A4 /* Stockfish.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stockfish.swift; sourceTree = "<group>"; };
+		21D5BED52A0D756D006978A4 /* stockfishlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stockfishlib.cpp; sourceTree = "<group>"; };
+		21D5BED62A0D756D006978A4 /* engines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = engines.cpp; sourceTree = "<group>"; };
+		21D5BED72A0D756D006978A4 /* engineids.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = engineids.h; sourceTree = "<group>"; };
+		21D5BED92A0D756D006978A4 /* endgame.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endgame.h; sourceTree = "<group>"; };
+		21D5BEDA2A0D756D006978A4 /* thread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = thread.cpp; sourceTree = "<group>"; };
+		21D5BEDB2A0D756D006978A4 /* psqt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = psqt.h; sourceTree = "<group>"; };
+		21D5BEDC2A0D756D006978A4 /* timeman.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = timeman.cpp; sourceTree = "<group>"; };
+		21D5BEDD2A0D756D006978A4 /* ucioption.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ucioption.cpp; sourceTree = "<group>"; };
+		21D5BEDF2A0D756D006978A4 /* evaluate_nnue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = evaluate_nnue.cpp; sourceTree = "<group>"; };
+		21D5BEE12A0D756D006978A4 /* affine_transform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = affine_transform.h; sourceTree = "<group>"; };
+		21D5BEE22A0D756D006978A4 /* clipped_relu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clipped_relu.h; sourceTree = "<group>"; };
+		21D5BEE32A0D756D006978A4 /* input_slice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = input_slice.h; sourceTree = "<group>"; };
+		21D5BEE42A0D756D006978A4 /* nnue_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nnue_common.h; sourceTree = "<group>"; };
+		21D5BEE52A0D756D006978A4 /* nnue_feature_transformer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nnue_feature_transformer.h; sourceTree = "<group>"; };
+		21D5BEE72A0D756D006978A4 /* half_ka_v2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = half_ka_v2.cpp; sourceTree = "<group>"; };
+		21D5BEE82A0D756D006978A4 /* half_ka_v2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = half_ka_v2.h; sourceTree = "<group>"; };
+		21D5BEE92A0D756D006978A4 /* evaluate_nnue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evaluate_nnue.h; sourceTree = "<group>"; };
+		21D5BEEA2A0D756D006978A4 /* nnue_accumulator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nnue_accumulator.h; sourceTree = "<group>"; };
+		21D5BEEB2A0D756D006978A4 /* nnue_architecture.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = nnue_architecture.h; sourceTree = "<group>"; };
+		21D5BEEC2A0D756D006978A4 /* types.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = types.h; sourceTree = "<group>"; };
+		21D5BEED2A0D756D006978A4 /* misc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = misc.cpp; sourceTree = "<group>"; };
+		21D5BEEE2A0D756D006978A4 /* tune.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tune.h; sourceTree = "<group>"; };
+		21D5BEEF2A0D756D006978A4 /* misc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = misc.h; sourceTree = "<group>"; };
+		21D5BEF02A0D756D006978A4 /* bitboard.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitboard.cpp; sourceTree = "<group>"; };
+		21D5BEF12A0D756D006978A4 /* Makefile */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.make; path = Makefile; sourceTree = "<group>"; };
+		21D5BEF22A0D756D006978A4 /* material.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = material.h; sourceTree = "<group>"; };
+		21D5BEF32A0D756D006978A4 /* psqt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = psqt.cpp; sourceTree = "<group>"; };
+		21D5BEF52A0D756D006978A4 /* movepick.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = movepick.cpp; sourceTree = "<group>"; };
+		21D5BEF62A0D756D006978A4 /* bitboard.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = bitboard.h; sourceTree = "<group>"; };
+		21D5BEF72A0D756D006978A4 /* tune.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tune.cpp; sourceTree = "<group>"; };
+		21D5BEF82A0D756D006978A4 /* pawns.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pawns.h; sourceTree = "<group>"; };
+		21D5BEFA2A0D756D006978A4 /* tbprobe.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tbprobe.cpp; sourceTree = "<group>"; };
+		21D5BEFB2A0D756D006978A4 /* tbprobe.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tbprobe.h; sourceTree = "<group>"; };
+		21D5BEFC2A0D756D006978A4 /* bitbase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = bitbase.cpp; sourceTree = "<group>"; };
+		21D5BEFD2A0D756D006978A4 /* evaluate.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = evaluate.cpp; sourceTree = "<group>"; };
+		21D5BEFE2A0D756D006978A4 /* thread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread.h; sourceTree = "<group>"; };
+		21D5BEFF2A0D756D006978A4 /* movegen.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movegen.h; sourceTree = "<group>"; };
+		21D5BF002A0D756D006978A4 /* search.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = search.cpp; sourceTree = "<group>"; };
+		21D5BF012A0D756D006978A4 /* thread_win32_osx.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = thread_win32_osx.h; sourceTree = "<group>"; };
+		21D5BF022A0D756D006978A4 /* movepick.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = movepick.h; sourceTree = "<group>"; };
+		21D5BF032A0D756D006978A4 /* evaluate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = evaluate.h; sourceTree = "<group>"; };
+		21D5BF042A0D756D006978A4 /* pawns.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = pawns.cpp; sourceTree = "<group>"; };
+		21D5BF052A0D756D006978A4 /* movegen.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = movegen.cpp; sourceTree = "<group>"; };
+		21D5BF072A0D756D006978A4 /* UNLICENCE */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = UNLICENCE; sourceTree = "<group>"; };
+		21D5BF082A0D756D006978A4 /* incbin.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = incbin.h; sourceTree = "<group>"; };
+		21D5BF092A0D756D006978A4 /* material.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = material.cpp; sourceTree = "<group>"; };
+		21D5BF0A2A0D756D006978A4 /* tt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tt.cpp; sourceTree = "<group>"; };
+		21D5BF0B2A0D756D006978A4 /* search.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = search.h; sourceTree = "<group>"; };
+		21D5BF0C2A0D756D006978A4 /* tt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = tt.h; sourceTree = "<group>"; };
+		21D5BF0D2A0D756D006978A4 /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		21D5BF0E2A0D756D006978A4 /* uci.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uci.h; sourceTree = "<group>"; };
+		21D5BF0F2A0D756D006978A4 /* position.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = position.h; sourceTree = "<group>"; };
+		21D5BF102A0D756D006978A4 /* timeman.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = timeman.h; sourceTree = "<group>"; };
+		21D5BF112A0D756D006978A4 /* position.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = position.cpp; sourceTree = "<group>"; };
+		21D5BF122A0D756D006978A4 /* uci.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = uci.cpp; sourceTree = "<group>"; };
+		21D5BF132A0D756D006978A4 /* endgame.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = endgame.cpp; sourceTree = "<group>"; };
+		21D5BF142A0D756D006978A4 /* engines-bridging-header.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "engines-bridging-header.h"; sourceTree = "<group>"; };
+		21D5BF312A0D7DB3006978A4 /* benchmark.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = benchmark.cpp; sourceTree = "<group>"; };
 		CE0774752781B5FF00E321FB /* ChessTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ChessTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CE0774772781B5FF00E321FB /* ChessTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessTests.swift; sourceTree = "<group>"; };
 		CE09D48B2697544400EEBF01 /* SettingsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsViewController.swift; sourceTree = "<group>"; };
@@ -91,12 +203,16 @@
 		CE5831F627073E4C00385F73 /* ChessAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPIModels.swift; sourceTree = "<group>"; };
 		CE5831F827073E8400385F73 /* ChessAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPI.swift; sourceTree = "<group>"; };
 		CE5F186026C5787300983603 /* PGNParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGNParser.swift; sourceTree = "<group>"; };
-		CE60B5F2276650BB00D719C8 /* BoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardView.swift; sourceTree = "<group>"; };
 		CE60B5F42766518F00D719C8 /* BoardControlsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardControlsView.swift; sourceTree = "<group>"; };
 		CE60B5F6276749B500D719C8 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		CE61EE8D26B0544200531FBF /* BuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyButton.swift; sourceTree = "<group>"; };
+		CE706E032874803600288A62 /* SavedGamesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedGamesViewController.swift; sourceTree = "<group>"; };
+		CE706E05287480A200288A62 /* SavedChessGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedChessGame.swift; sourceTree = "<group>"; };
 		CE77AD2427117AF500511326 /* WaitingViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaitingViewController.swift; sourceTree = "<group>"; };
+		CE89929D287DCD2B000561F8 /* AnaylzedMoveCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnaylzedMoveCell.swift; sourceTree = "<group>"; };
+		CE928ECC2874B25C0058B65E /* SavedGameViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedGameViewCell.swift; sourceTree = "<group>"; };
 		CE966AA3276255DE00965991 /* GameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		CEA1CDD22876265500F34D20 /* AnalysableGameViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnalysableGameViewController.swift; sourceTree = "<group>"; };
 		CEA71E4A261A039E00FD02F5 /* Chess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Chess.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CEA71E4F261A039F00FD02F5 /* BoardScene.sks */ = {isa = PBXFileReference; lastKnownFileType = file.sks; path = BoardScene.sks; sourceTree = "<group>"; };
@@ -114,8 +230,25 @@
 		CEBD758B26B0849A0027FB09 /* StoreManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StoreManager.swift; sourceTree = "<group>"; };
 		CEBD758D26B0DA180027FB09 /* FeatureListItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FeatureListItem.swift; sourceTree = "<group>"; };
 		CEC7C30326B489D000BC50AA /* ClockSwitched.wav */ = {isa = PBXFileReference; lastKnownFileType = audio.wav; path = ClockSwitched.wav; sourceTree = "<group>"; };
+		CECC3AAB2879B8A200D009B8 /* nn-9e3c6298299a.nnue */ = {isa = PBXFileReference; lastKnownFileType = file; path = "nn-9e3c6298299a.nnue"; sourceTree = "<group>"; };
 		CED29C152705E032000F4518 /* MenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuButton.swift; sourceTree = "<group>"; };
-		CEEE93D6277DEDD000EBCD72 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		CED60C3B287C422E00F0969A /* SKAction+Shake.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKAction+Shake.swift"; sourceTree = "<group>"; };
+		CED60C3C287C422E00F0969A /* SKTexture+RadialGradient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKTexture+RadialGradient.swift"; sourceTree = "<group>"; };
+		CED60C3D287C422E00F0969A /* UIBezierPath+Character.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBezierPath+Character.swift"; sourceTree = "<group>"; };
+		CED60C3E287C422E00F0969A /* Logger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logger.swift; sourceTree = "<group>"; };
+		CED60C3F287C422E00F0969A /* UIBezierPath+Arrow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "UIBezierPath+Arrow.swift"; sourceTree = "<group>"; };
+		CED60C40287C422E00F0969A /* SKAction+Spiral.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKAction+Spiral.swift"; sourceTree = "<group>"; };
+		CED60C41287C422E00F0969A /* MSKCameraNode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSKCameraNode.swift; sourceTree = "<group>"; };
+		CED60C42287C422E00F0969A /* SKShapeNode+Arrow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKShapeNode+Arrow.swift"; sourceTree = "<group>"; };
+		CED60C43287C422E00F0969A /* CGFloat+Arithmetics.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGFloat+Arithmetics.swift"; sourceTree = "<group>"; };
+		CED60C44287C422E00F0969A /* MSKButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSKButton.swift; sourceTree = "<group>"; };
+		CED60C45287C422E00F0969A /* MSKEmitterLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSKEmitterLabel.swift; sourceTree = "<group>"; };
+		CED60C46287C422E00F0969A /* Array+SKAction.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Array+SKAction.swift"; sourceTree = "<group>"; };
+		CED60C47287C422E00F0969A /* CGPath+GetPaths.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPath+GetPaths.swift"; sourceTree = "<group>"; };
+		CED60C48287C422E00F0969A /* SKAction+TimingMode.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "SKAction+TimingMode.swift"; sourceTree = "<group>"; };
+		CED60C49287C422E00F0969A /* MSKAnimatedLabel.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MSKAnimatedLabel.swift; sourceTree = "<group>"; };
+		CED60C4B287C422E00F0969A /* CGPath+ForEach.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CGPath+ForEach.swift"; sourceTree = "<group>"; };
+		CEEE93D6277DEDD000EBCD72 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = Chess/Info.plist; sourceTree = SOURCE_ROOT; };
 		CEEFF16D269F14600011A674 /* ChessGame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessGame.swift; sourceTree = "<group>"; };
 		CEF02BE726DFE68000D86D11 /* CrashHistory.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = CrashHistory.json; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.json; };
 		CEF6D518269B892E0071B40A /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -145,6 +278,137 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2114AA042A0C167900627BFA /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CE60B5F6276749B500D719C8 /* Extensions.swift */,
+				2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		21D5BED22A0D756D006978A4 /* Stockfish */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BED32A0D756D006978A4 /* Stockfish.swift */,
+				21D5BED42A0D756D006978A4 /* engines */,
+				21D5BF142A0D756D006978A4 /* engines-bridging-header.h */,
+			);
+			path = Stockfish;
+			sourceTree = "<group>";
+		};
+		21D5BED42A0D756D006978A4 /* engines */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BED72A0D756D006978A4 /* engineids.h */,
+				21D5BED62A0D756D006978A4 /* engines.cpp */,
+				21D5BED82A0D756D006978A4 /* stockfish */,
+				21D5BED52A0D756D006978A4 /* stockfishlib.cpp */,
+			);
+			path = engines;
+			sourceTree = "<group>";
+		};
+		21D5BED82A0D756D006978A4 /* stockfish */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BF312A0D7DB3006978A4 /* benchmark.cpp */,
+				21D5BEFC2A0D756D006978A4 /* bitbase.cpp */,
+				21D5BEF02A0D756D006978A4 /* bitboard.cpp */,
+				21D5BEF62A0D756D006978A4 /* bitboard.h */,
+				21D5BF132A0D756D006978A4 /* endgame.cpp */,
+				21D5BED92A0D756D006978A4 /* endgame.h */,
+				21D5BEFD2A0D756D006978A4 /* evaluate.cpp */,
+				21D5BF032A0D756D006978A4 /* evaluate.h */,
+				21D5BF062A0D756D006978A4 /* incbin */,
+				21D5BF0D2A0D756D006978A4 /* main.cpp */,
+				21D5BEF12A0D756D006978A4 /* Makefile */,
+				21D5BF092A0D756D006978A4 /* material.cpp */,
+				21D5BEF22A0D756D006978A4 /* material.h */,
+				21D5BEED2A0D756D006978A4 /* misc.cpp */,
+				21D5BEEF2A0D756D006978A4 /* misc.h */,
+				21D5BF052A0D756D006978A4 /* movegen.cpp */,
+				21D5BEFF2A0D756D006978A4 /* movegen.h */,
+				21D5BEF52A0D756D006978A4 /* movepick.cpp */,
+				21D5BF022A0D756D006978A4 /* movepick.h */,
+				21D5BEDE2A0D756D006978A4 /* nnue */,
+				21D5BF042A0D756D006978A4 /* pawns.cpp */,
+				21D5BEF82A0D756D006978A4 /* pawns.h */,
+				21D5BF112A0D756D006978A4 /* position.cpp */,
+				21D5BF0F2A0D756D006978A4 /* position.h */,
+				21D5BEF32A0D756D006978A4 /* psqt.cpp */,
+				21D5BEDB2A0D756D006978A4 /* psqt.h */,
+				21D5BF002A0D756D006978A4 /* search.cpp */,
+				21D5BF0B2A0D756D006978A4 /* search.h */,
+				21D5BEF92A0D756D006978A4 /* syzygy */,
+				21D5BF012A0D756D006978A4 /* thread_win32_osx.h */,
+				21D5BEDA2A0D756D006978A4 /* thread.cpp */,
+				21D5BEFE2A0D756D006978A4 /* thread.h */,
+				21D5BEDC2A0D756D006978A4 /* timeman.cpp */,
+				21D5BF102A0D756D006978A4 /* timeman.h */,
+				21D5BF0A2A0D756D006978A4 /* tt.cpp */,
+				21D5BF0C2A0D756D006978A4 /* tt.h */,
+				21D5BEF72A0D756D006978A4 /* tune.cpp */,
+				21D5BEEE2A0D756D006978A4 /* tune.h */,
+				21D5BEEC2A0D756D006978A4 /* types.h */,
+				21D5BF122A0D756D006978A4 /* uci.cpp */,
+				21D5BF0E2A0D756D006978A4 /* uci.h */,
+				21D5BEDD2A0D756D006978A4 /* ucioption.cpp */,
+			);
+			path = stockfish;
+			sourceTree = "<group>";
+		};
+		21D5BEDE2A0D756D006978A4 /* nnue */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BEDF2A0D756D006978A4 /* evaluate_nnue.cpp */,
+				21D5BEE02A0D756D006978A4 /* layers */,
+				21D5BEE42A0D756D006978A4 /* nnue_common.h */,
+				21D5BEE52A0D756D006978A4 /* nnue_feature_transformer.h */,
+				21D5BEE62A0D756D006978A4 /* features */,
+				21D5BEE92A0D756D006978A4 /* evaluate_nnue.h */,
+				21D5BEEA2A0D756D006978A4 /* nnue_accumulator.h */,
+				21D5BEEB2A0D756D006978A4 /* nnue_architecture.h */,
+			);
+			path = nnue;
+			sourceTree = "<group>";
+		};
+		21D5BEE02A0D756D006978A4 /* layers */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BEE12A0D756D006978A4 /* affine_transform.h */,
+				21D5BEE22A0D756D006978A4 /* clipped_relu.h */,
+				21D5BEE32A0D756D006978A4 /* input_slice.h */,
+			);
+			path = layers;
+			sourceTree = "<group>";
+		};
+		21D5BEE62A0D756D006978A4 /* features */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BEE72A0D756D006978A4 /* half_ka_v2.cpp */,
+				21D5BEE82A0D756D006978A4 /* half_ka_v2.h */,
+			);
+			path = features;
+			sourceTree = "<group>";
+		};
+		21D5BEF92A0D756D006978A4 /* syzygy */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BEFA2A0D756D006978A4 /* tbprobe.cpp */,
+				21D5BEFB2A0D756D006978A4 /* tbprobe.h */,
+			);
+			path = syzygy;
+			sourceTree = "<group>";
+		};
+		21D5BF062A0D756D006978A4 /* incbin */ = {
+			isa = PBXGroup;
+			children = (
+				21D5BF072A0D756D006978A4 /* UNLICENCE */,
+				21D5BF082A0D756D006978A4 /* incbin.h */,
+			);
+			path = incbin;
+			sourceTree = "<group>";
+		};
 		CE0774762781B5FF00E321FB /* ChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -241,13 +505,25 @@
 			path = Settings;
 			sourceTree = "<group>";
 		};
-		CE5831FC27073F2200385F73 /* Lifecycle */ = {
+		CE5831FC27073F2200385F73 /* App */ = {
 			isa = PBXGroup;
 			children = (
 				CEF6D518269B892E0071B40A /* SceneDelegate.swift */,
 				CEA71E4D261A039E00FD02F5 /* AppDelegate.swift */,
+				2133542A29E31095000A78A2 /* ChessApp.swift */,
 			);
-			path = Lifecycle;
+			path = App;
+			sourceTree = "<group>";
+		};
+		CE706E022874801400288A62 /* SavedGames */ = {
+			isa = PBXGroup;
+			children = (
+				CE706E032874803600288A62 /* SavedGamesViewController.swift */,
+				CE928ECC2874B25C0058B65E /* SavedGameViewCell.swift */,
+				CEA1CDD22876265500F34D20 /* AnalysableGameViewController.swift */,
+				CE89929D287DCD2B000561F8 /* AnaylzedMoveCell.swift */,
+			);
+			path = SavedGames;
 			sourceTree = "<group>";
 		};
 		CE77AD2327117ABD00511326 /* Waiting */ = {
@@ -263,7 +539,6 @@
 			children = (
 				CE966AA3276255DE00965991 /* GameView.swift */,
 				CE60B5F42766518F00D719C8 /* BoardControlsView.swift */,
-				CE60B5F2276650BB00D719C8 /* BoardView.swift */,
 			);
 			path = "Board Screen";
 			sourceTree = "<group>";
@@ -271,6 +546,7 @@
 		CEA71E41261A039E00FD02F5 = {
 			isa = PBXGroup;
 			children = (
+				CECC3AAB2879B8A200D009B8 /* nn-9e3c6298299a.nnue */,
 				CE3ADB31277CB55700835BBC /* Localizable.strings */,
 				CEA71E4C261A039E00FD02F5 /* Chess */,
 				CE0774762781B5FF00E321FB /* ChessTests */,
@@ -300,6 +576,8 @@
 				CEA71E63261A06D300FD02F5 /* Launch Screen.storyboard */,
 				CEA71E5A261A03A000FD02F5 /* Assets.xcassets */,
 				CEF02BE726DFE68000D86D11 /* CrashHistory.json */,
+				CED60C36287C422E00F0969A /* MoreSpriteKit */,
+				21D5BED22A0D756D006978A4 /* Stockfish */,
 			);
 			path = Chess;
 			sourceTree = "<group>";
@@ -310,7 +588,6 @@
 				CE1BE552276522E100E0BE9C /* Settings Screen */,
 				CE966AA2276255CA00965991 /* Board Screen */,
 				CE10E0292704982700F5BF52 /* Menu Screen */,
-				CE60B5F6276749B500D719C8 /* Extensions.swift */,
 			);
 			path = SwiftUI;
 			sourceTree = "<group>";
@@ -342,6 +619,29 @@
 			path = iAP;
 			sourceTree = "<group>";
 		};
+		CED60C36287C422E00F0969A /* MoreSpriteKit */ = {
+			isa = PBXGroup;
+			children = (
+				CED60C3B287C422E00F0969A /* SKAction+Shake.swift */,
+				CED60C3C287C422E00F0969A /* SKTexture+RadialGradient.swift */,
+				CED60C3D287C422E00F0969A /* UIBezierPath+Character.swift */,
+				CED60C3E287C422E00F0969A /* Logger.swift */,
+				CED60C3F287C422E00F0969A /* UIBezierPath+Arrow.swift */,
+				CED60C40287C422E00F0969A /* SKAction+Spiral.swift */,
+				CED60C41287C422E00F0969A /* MSKCameraNode.swift */,
+				CED60C42287C422E00F0969A /* SKShapeNode+Arrow.swift */,
+				CED60C43287C422E00F0969A /* CGFloat+Arithmetics.swift */,
+				CED60C44287C422E00F0969A /* MSKButton.swift */,
+				CED60C45287C422E00F0969A /* MSKEmitterLabel.swift */,
+				CED60C46287C422E00F0969A /* Array+SKAction.swift */,
+				CED60C47287C422E00F0969A /* CGPath+GetPaths.swift */,
+				CED60C48287C422E00F0969A /* SKAction+TimingMode.swift */,
+				CED60C49287C422E00F0969A /* MSKAnimatedLabel.swift */,
+				CED60C4B287C422E00F0969A /* CGPath+ForEach.swift */,
+			);
+			path = MoreSpriteKit;
+			sourceTree = "<group>";
+		};
 		CEEFF167269DF9BC0011A674 /* ChessLogic */ = {
 			isa = PBXGroup;
 			children = (
@@ -349,6 +649,7 @@
 				CEA71E67261A36AF00FD02F5 /* ChessLogic.swift */,
 				CE5F186026C5787300983603 /* PGNParser.swift */,
 				CEEFF16D269F14600011A674 /* ChessGame.swift */,
+				CE706E05287480A200288A62 /* SavedChessGame.swift */,
 			);
 			path = ChessLogic;
 			sourceTree = "<group>";
@@ -356,6 +657,7 @@
 		CEEFF168269DF9CC0011A674 /* Scenes */ = {
 			isa = PBXGroup;
 			children = (
+				CE706E022874801400288A62 /* SavedGames */,
 				CE103A9826AF0A7900064D42 /* PremiumView */,
 				CE34AE2B2776FF440073AC92 /* Root */,
 				CE3042CC27708EB50068EBC0 /* StartOnlineGame */,
@@ -371,11 +673,12 @@
 		CEEFF169269DF9D30011A674 /* App */ = {
 			isa = PBXGroup;
 			children = (
-				CEF7A8F2277A326A00DBDB77 /* Other */,
+				2114AA042A0C167900627BFA /* Extensions */,
+				CE5831FC27073F2200385F73 /* App */,
 				CE5831F527073E3D00385F73 /* ChessAPI */,
-				CEBD758A26B084870027FB09 /* iAP */,
 				CEEFF167269DF9BC0011A674 /* ChessLogic */,
-				CE5831FC27073F2200385F73 /* Lifecycle */,
+				CEBD758A26B084870027FB09 /* iAP */,
+				CEF7A8F2277A326A00DBDB77 /* Other */,
 				CEEFF168269DF9CC0011A674 /* Scenes */,
 			);
 			path = App;
@@ -459,6 +762,7 @@
 					};
 					CEA71E49261A039E00FD02F5 = {
 						CreatedOnToolsVersion = 12.4;
+						LastSwiftMigration = 1400;
 					};
 				};
 			};
@@ -509,6 +813,8 @@
 				CEA71E64261A06D300FD02F5 /* Launch Screen.storyboard in Resources */,
 				CEF02BE826DFE68000D86D11 /* CrashHistory.json in Resources */,
 				CEAD174D261C495500F91647 /* ChessPiecePlace.wav in Resources */,
+				CECC3B0D2879B95400D009B8 /* nn-9e3c6298299a.nnue in Resources */,
+				21D5BF2A2A0D756D006978A4 /* UNLICENCE in Resources */,
 				CE3042E227720E7E0068EBC0 /* EnjoymentView.xib in Resources */,
 				CEAD1758261C4DD900F91647 /* CheckSound3.wav in Resources */,
 			);
@@ -529,39 +835,88 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CED60C5A287C422E00F0969A /* Array+SKAction.swift in Sources */,
 				CEBD758E26B0DA180027FB09 /* FeatureListItem.swift in Sources */,
+				CED60C50287C422E00F0969A /* SKTexture+RadialGradient.swift in Sources */,
+				21D5BF232A0D756D006978A4 /* tune.cpp in Sources */,
+				21D5BF1C2A0D756D006978A4 /* half_ka_v2.cpp in Sources */,
 				CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */,
+				CED60C52287C422E00F0969A /* Logger.swift in Sources */,
+				CE706E06287480A200288A62 /* SavedChessGame.swift in Sources */,
 				CE3042CE27708ED90068EBC0 /* StartOnlineGameViewController.swift in Sources */,
 				CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */,
+				21D5BF242A0D756D006978A4 /* tbprobe.cpp in Sources */,
 				CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */,
+				21D5BF172A0D756D006978A4 /* engines.cpp in Sources */,
+				21D5BF2C2A0D756D006978A4 /* tt.cpp in Sources */,
 				CE966AA4276255DE00965991 /* GameView.swift in Sources */,
+				21D5BF302A0D756D006978A4 /* endgame.cpp in Sources */,
+				21D5BF2F2A0D756D006978A4 /* uci.cpp in Sources */,
+				2133542B29E31095000A78A2 /* ChessApp.swift in Sources */,
+				21D5BF1A2A0D756D006978A4 /* ucioption.cpp in Sources */,
+				CEA1CDD32876265500F34D20 /* AnalysableGameViewController.swift in Sources */,
 				CE13C6DB2710A71A00DA888A /* SnackBar.swift in Sources */,
 				CEF7A8F4277A327A00DBDB77 /* ThemeColoredView.swift in Sources */,
+				CED60C4F287C422E00F0969A /* SKAction+Shake.swift in Sources */,
 				CEA71E56261A039F00FD02F5 /* GameViewController.swift in Sources */,
 				CE60B5F52766518F00D719C8 /* BoardControlsView.swift in Sources */,
+				CED60C53287C422E00F0969A /* UIBezierPath+Arrow.swift in Sources */,
 				CED29C162705E032000F4518 /* MenuButton.swift in Sources */,
+				21D5BF272A0D756D006978A4 /* search.cpp in Sources */,
 				CEEFF16E269F14600011A674 /* ChessGame.swift in Sources */,
-				CE60B5F3276650BB00D719C8 /* BoardView.swift in Sources */,
+				CED60C5B287C422E00F0969A /* CGPath+GetPaths.swift in Sources */,
+				CE89929E287DCD2B000561F8 /* AnaylzedMoveCell.swift in Sources */,
+				21D5BF162A0D756D006978A4 /* stockfishlib.cpp in Sources */,
 				CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */,
 				CE09D48C2697544400EEBF01 /* SettingsViewController.swift in Sources */,
+				21D5BF202A0D756D006978A4 /* psqt.cpp in Sources */,
+				21D5BF2E2A0D756D006978A4 /* position.cpp in Sources */,
 				CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */,
+				21D5BF192A0D756D006978A4 /* timeman.cpp in Sources */,
 				CE30D8CA269F8E170005B343 /* BoardScene.swift in Sources */,
+				CED60C58287C422E00F0969A /* MSKButton.swift in Sources */,
+				CED60C59287C422E00F0969A /* MSKEmitterLabel.swift in Sources */,
+				2114AA062A0C169700627BFA /* UIColor+init+rgb.swift in Sources */,
+				CED60C54287C422E00F0969A /* SKAction+Spiral.swift in Sources */,
+				21D5BF322A0D7DB3006978A4 /* benchmark.cpp in Sources */,
 				CE103A9726AF038D00064D42 /* PremiumView.swift in Sources */,
+				21D5BF1F2A0D756D006978A4 /* Makefile in Sources */,
+				21D5BF2D2A0D756D006978A4 /* main.cpp in Sources */,
+				CED60C51287C422E00F0969A /* UIBezierPath+Character.swift in Sources */,
+				21D5BF1D2A0D756D006978A4 /* misc.cpp in Sources */,
+				21D5BF1B2A0D756D006978A4 /* evaluate_nnue.cpp in Sources */,
+				CED60C56287C422E00F0969A /* SKShapeNode+Arrow.swift in Sources */,
+				21D5BF182A0D756D006978A4 /* thread.cpp in Sources */,
+				21D5BF282A0D756D006978A4 /* pawns.cpp in Sources */,
 				CE10E02B2704984300F5BF52 /* MenuView.swift in Sources */,
 				CE3042E027720D620068EBC0 /* EnjoymentView.swift in Sources */,
 				CE5F186126C5787300983603 /* PGNParser.swift in Sources */,
+				CE928ECD2874B25C0058B65E /* SavedGameViewCell.swift in Sources */,
+				CED60C57287C422E00F0969A /* CGFloat+Arithmetics.swift in Sources */,
+				21D5BF292A0D756D006978A4 /* movegen.cpp in Sources */,
 				CE34AE2D2776FF5A0073AC92 /* RootViewController.swift in Sources */,
+				CE706E042874803700288A62 /* SavedGamesViewController.swift in Sources */,
+				21D5BF262A0D756D006978A4 /* evaluate.cpp in Sources */,
+				21D5BF152A0D756D006978A4 /* Stockfish.swift in Sources */,
+				21D5BF2B2A0D756D006978A4 /* material.cpp in Sources */,
+				21D5BF252A0D756D006978A4 /* bitbase.cpp in Sources */,
 				CEBD758C26B0849A0027FB09 /* StoreManager.swift in Sources */,
 				CE3D04E6277CF2880003A237 /* Localization.swift in Sources */,
+				CED60C5C287C422E00F0969A /* SKAction+TimingMode.swift in Sources */,
+				CED60C5D287C422E00F0969A /* MSKAnimatedLabel.swift in Sources */,
 				CEFA6EA126AB338300DD6549 /* ChessLogicModels.swift in Sources */,
 				CEACA048270ADF8600364074 /* RoomsViewController.swift in Sources */,
 				CEA71E68261A36AF00FD02F5 /* ChessLogic.swift in Sources */,
 				CE3042D52770F8970068EBC0 /* KeyboardLayoutConstraint.swift in Sources */,
 				CE13C6D52710A1FA00DA888A /* RoomTableViewCell.swift in Sources */,
 				CE77AD2527117AF500511326 /* WaitingViewController.swift in Sources */,
+				21D5BF1E2A0D756D006978A4 /* bitboard.cpp in Sources */,
 				CE61EE8E26B0544200531FBF /* BuyButton.swift in Sources */,
 				CEF6D519269B892E0071B40A /* SceneDelegate.swift in Sources */,
+				CED60C5F287C422E00F0969A /* CGPath+ForEach.swift in Sources */,
+				CED60C55287C422E00F0969A /* MSKCameraNode.swift in Sources */,
 				CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */,
+				21D5BF222A0D756D006978A4 /* movepick.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -639,11 +994,12 @@
 		CEA71E5D261A03A000FD02F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -688,6 +1044,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Chess/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -701,11 +1058,12 @@
 		CEA71E5E261A03A000FD02F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -744,6 +1102,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Chess/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -757,12 +1116,16 @@
 		CEA71E60261A03A000FD02F5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -772,6 +1135,8 @@
 				OTHER_SWIFT_FLAGS = "-Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Chess/Stockfish/engines-bridging-header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -780,12 +1145,16 @@
 		CEA71E61261A03A000FD02F5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 14;
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
 				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -795,6 +1164,7 @@
 				OTHER_SWIFT_FLAGS = "-Xfrontend -debug-time-function-bodies";
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.exerhythm.Chess;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Chess/Stockfish/engines-bridging-header.h";
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

@@ -21,6 +21,7 @@ extension ChessAPI {
         var whiteID: String?
         var chessGame: Game?
         var difficulty: Difficulty
+        var turnOf: ChessPieceColor
         
         enum Difficulty: String, Codable {
             case beginner, intermediate, advanced
@@ -28,11 +29,11 @@ extension ChessAPI {
             func localized() -> String {
                 switch self {
                 case .beginner:
-                    return "Beginner"
+                    return "Beginner".localized
                 case .intermediate:
-                    return "Intermediate"
+                    return "Intermediate".localized
                 case .advanced:
-                    return "Advanced"
+                    return "Advanced".localized
                 }
             }
         }

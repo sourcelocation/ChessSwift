@@ -13,15 +13,12 @@ class ChessWebsocket: WebSocketDelegate {
     var isConnected: Bool = false
     weak var delegate: OnlineGameDelegate?
     
-    func connect(to code: String, difficulty: ChessAPI.ServerGame.Difficulty?) {
+    func connect(to code: String) {
         var url = URLComponents(url: ChessAPI.serverAddress.appendingPathComponent("channel"), resolvingAgainstBaseURL: false)
         url!.queryItems = [URLQueryItem(name: "id", value: code)]
-        if let difficulty = difficulty {
-            url!.queryItems!.append(URLQueryItem(name: "difficulty", value: difficulty.rawValue))
-        }
         var request = URLRequest(url: url!.url!)
         request.timeoutInterval = 5
-        request.addValue("Basic \(ChessAPI.base64Login())", forHTTPHeaderField: "Authorization")
+        request.addValue("Basic \(ChessAPI.base64Login()!)", forHTTPHeaderField: "Authorization")
         let pinner = FoundationSecurity(allowSelfSigned: true) // don't validate SSL certificates
         socket = WebSocket(request: request, certPinner: pinner)
         socket.delegate = self

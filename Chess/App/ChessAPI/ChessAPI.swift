@@ -14,7 +14,7 @@ class ChessAPI {
         case unauthorized
     }
 
-    static let serverAddress = URL(string: "http://192.168.1.151:5432")!
+    static let serverAddress = URL(string: "http://home.sourceloc.net:5432")!
 
     enum HTTPMethod: String {
         case get = "GET"
@@ -24,8 +24,9 @@ class ChessAPI {
 }
 
 extension ChessAPI {
-    static func base64Login() -> String {
-        guard let loginData = "\(login!.username):\(login!.passwordHash)".data(using: String.Encoding.utf8) else { return "" }
+    static func base64Login() -> String? {
+        guard let login = login else { return nil }
+        guard let loginData = "\(login.username):\(login.passwordHash)".data(using: String.Encoding.utf8) else { return "" }
         return loginData.base64EncodedString()
     }
     private static func request(url: URL, method: HTTPMethod, body: Data? = nil, withAuth: Bool = true, completion: @escaping (Result<Data, Error>) -> Void) {
@@ -37,7 +38,8 @@ extension ChessAPI {
             request.httpBody = body
 
             if withAuth {
-                guard let loginData = "\(login!.username):\(login!.passwordHash)".data(using: String.Encoding.utf8) else { return }
+                guard let login = login else { return }
+                guard let loginData = "\(login.username):\(login.passwordHash)".data(using: String.Encoding.utf8) else { return }
                 let loginBase64 = loginData.base64EncodedString()
                 request.addValue("Basic \(loginBase64)", forHTTPHeaderField: "Authorization")
             }
@@ -120,6 +122,20 @@ extension ChessAPI {
             case .failure(let error):
                 print(error)
                 completion(.failure(error))
+            }
+        }
+    }
+    
+    static func isGameStillRunning(code: String, completion: @escaping (Bool) -> Void) {
+        let address = serverAddress.appendingPathComponent("/games/state/\(code)")
+        print(address.absoluteString)
+        request(url: address, method: .get) { result in
+            switch result {
+            case .success(let data):
+                completion(Bool(String(data: data, encoding: .utf8) ?? "false") ?? false)
+            case .failure(let error):
+                print(error)
+                completion(false)
             }
         }
     }

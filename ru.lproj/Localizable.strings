@@ -1,81 +1,207 @@
-/*
+
+
+"  Online game" = "  Онлайн игра";
+
+
+"  Play" = "  Играть";
+
+
+"(Checkmate)" = "(Шах и мат)";
+
+
+"(Time ran out)" = "(Время истекло)";
+
+
+"Advanced" = "Продвинутый";
+
+
+"Are you sure you want to start a new game?" = "Вы уверены, что хотите начать новую игру?";
+
+
+"Automatic clock" = "Автоматические часы";
+
+
+"Back" = "Назад";
+
+
+"Beginner" = "Начинающий";
+
+
+"Bishop" = "Слон";
+
+
+"Black wins!" = "Черные выиграли!";
+
+
+"Black wins! (Checkmate)" = "Черные выиграли! (Шах и мат)";
+
+
+"Buy for" = "Купить за";
+
+
+"Cancel" = "Отмена";
+
+
+"Check sound" = "Звук шаха";
+
+
+"Chess clock" = "Часы";
+
+
+"Chess clock" = "Chess clock";
+
+
+"Chess: 2 Players" = "Шахматы: 2 Игрока";
+
+
+"Clock can only work in Landscape device orientation" = "Часы могут работать только в горизонтальной ориентации";
+
+
+"Clock time" = "Время";
+
+
+"Close" = "Закрыть";
+
+
+"Continue without a clock" = "Продолжить без часов";
+
+
+"Create new" = "Создать новую";
+
+
+"Draggable pieces" = "Draggable pieces";
+
+
+"Features" = "Функции";
+
+
+"Find player" = "Найти игрока";
+
+
+"Gameplay" = "Игра";
+
+
+"How do you want to play?" = "Как вы хотите играть?";
+
+
+"Intermediate" = "Продвинутый";
+
+
+"Join" = "Присоединиться";
+
+
+"Knight" = "Конь";
+
+
+"More settings" = "Больше настроек";
+
+
+"No players are currently online..." = "Онлайн игроков не найдено...";
+
+
+"No undo limits" = "Нет лимитов";
+
+
+"OK" = "OK";
+
+
+"Opponent has left" = "Противник вышел";
+
+
+"Opponent reconnected" = "Противник переприсоединился";
+
+
+"Opponent:" = "Противник:";
+
+
+"Piece selection" = "Выбор фигуры";
+
+
+"Please rotate your device" = "Пожалуйста поверните устройство";
+
+
+"Please type in your username" = "Пожалуйста введите ваше имя ползователя";
+
+
+"Private game" = "Частная игра";
+
+/* 
   Localizable.strings
   Chess
 
   Created by exerhythm on 12/29/21.
   
-*/
-
-"Pro version" = "Pro version";
-"Chess: 2 Players" = "Chess: 2 Players";
-"Features" = "Features";
-"No undo limits" = "No undo limits";
-"Chess clock" = "Chess clock";
-"Puzzle configurator" = "Puzzle configurator";
-"Draggable pieces" = "Draggable pieces";
-"More settings" = "More settings";
-"Buy for" = "Buy for";
-"Restore purchase" = "Restore purchase";
+ */
+"Pro version" = "Про версия";
 
 
-"Start a new game?" = "Start a new game?";
-"Are you sure you want to start a new game?" = "Are you sure you want to start a new game?";
-"Cancel" = "Cancel";
-"Restart" = "Restart";
-"Black wins!" = "Black wins!";
-"White wins!" = "White wins!";
-"(Time ran out)" = "(Time ran out)";
-"Continue without a clock" = "Continue without a clock";
-"Start a new game" = "Start a new game";
-"Stalemate! (Draw)" = "Stalemate! (Draw)";
-"Black wins! (Checkmate)" = "Black wins! (Checkmate)";
-"White wins! (Checkmate)" = "White wins! (Checkmate)";
-"(Checkmate)" = "(Checkmate)";
-"Close" = "Close";
-"Piece selection" = "Piece selection";
-"Queen" = "Queen";
-"Knight" = "Knight";
-"Bishop" = "Bishop";
-"Rook" = "Rook";
+"Puzzle Configurator" = "Конфигуратор дебютов";
 
 
-"How do you want to play?" = "How do you want to play?";
-"Random player" = "Random player";
-"Beginner" = "Beginner";
-"Intermediate" = "Intermediate";
-"Advanced" = "Advanced";
-"Find player" = "Find player";
-"Private game" = "Private game";
-"Create new" = "Create new";
-"Join" = "Join";
-"Please type in your username" = "Please type in your username";
-"Sorry, this username has already been taken." = "Sorry, this username has already been taken.";
-"Username" = "Username";
-"Register" = "Register";
-"Searching for another player..." = "Searching for another player...";
-"Opponent reconnected" = "Opponent reconnected";
-"Opponent:" = "Opponent:";
-"Opponent has left" = "Opponent has left";
-"You can wait for him to come back or leave now" = "You can wait for him to come back or leave now";
-"No players are currently online..." = "No players are currently online...";
-"Try again later!" = "Try again later!";
-"OK" = "OK";
+"Puzzle configurator" = "Конфигуратор дебютов";
 
 
-"Settings" = "Settings";
-"Puzzle Configurator" = "Puzzle Configurator";
-"Chess clock" = "Chess clock";
-"Automatic clock" = "Automatic clock";
-"These features are available only in the Pro version." = "These features are available only in the Pro version.";
+"Queen" = "Ферзь";
+
+
+"Random player" = "Случайный игрок";
+
+
+"Register" = "Зарегистрироваться";
+
+
+"Restart" = "Начать заново";
+
+
+"Restore purchase" = "Восстановить покупку";
+
+
+"Rook" = "Ладья";
+
+
+"Searching for another player..." = "Поиск другого игрока";
+
+
+"Settings" = "Настройки";
+
+
+"Show hints" = "Показывать ходы";
+
+
+"Sorry, this username has already been taken." = "Извините, но это имя пользователя уже занято";
+
+
+"Sounds" = "Звуки";
+
+
 "Sounds" = "Sounds";
-"Show hints" = "Show hints";
-"Sounds" = "Sounds";
-"Visuals" = "Visuals";
-"Gameplay" = "Gameplay";
-"Check sound" = "Check sound";
-"  Online game" = "  Online game";
-"  Play" = "  Play";
-"Clock time" = "Clock time";
-"Back" = "Back";
-"Please rotate your device" = "Please rotate your device";
-"Clock can only work in Landscape device orientation" = "Clock can only work in Landscape device orientation";
+
+
+"Stalemate! (Draw)" = "Пат! (Ничья)";
+
+
+"Start a new game" = "Начать новую игру";
+
+
+"Start a new game?" = "Начать новую игру?";
+
+
+"These features are available only in the Pro version." = "Эти функции доступны только в Про версии.";
+
+
+"Try again later!" = "Попробуйте позже!";
+
+
+"Username" = "Имя пользователя";
+
+
+"Visuals" = "Визуальные эффекты";
+
+
+"White wins!" = "Белые победили!";
+
+
+"White wins! (Checkmate)" = "Белые победили! (Шах и мат)ааа";
+
+
+"You can wait for him to come back or leave now" = "Вы можете его подождать или выйти";

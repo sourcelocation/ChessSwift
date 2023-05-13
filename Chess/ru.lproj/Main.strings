@@ -1,0 +1,69 @@
+
+/* Class = "UIButton"; normalTitle = "  Play"; ObjectID = "057-gp-0yZ"; */
+"057-gp-0yZ.normalTitle" = "  Играть";
+
+/* Class = "UILabel"; text = "Puzzle Configurator"; ObjectID = "2sj-Ya-qkW"; */
+"2sj-Ya-qkW.text" = "Режим дебютов";
+
+/* Class = "UIBarButtonItem"; title = "Back"; ObjectID = "5ao-D6-8sz"; */
+"5ao-D6-8sz.title" = "Назад";
+
+/* Class = "UINavigationItem"; title = "Settings"; ObjectID = "69i-bU-Cuy"; */
+"69i-bU-Cuy.title" = "Настройки";
+
+/* Class = "UITableViewSection"; headerTitle = "Sounds"; ObjectID = "9Ko-D2-Lg6"; */
+"9Ko-D2-Lg6.headerTitle" = "Звуки";
+
+/* Class = "UITableViewSection"; headerTitle = "Visuals"; ObjectID = "D93-dn-n1l"; */
+"D93-dn-n1l.headerTitle" = "Интерфейс";
+
+/* Class = "UITableViewSection"; footerTitle = "These features are avaliable only in the Pro version."; ObjectID = "GAD-nm-RcK"; */
+"GAD-nm-RcK.footerTitle" = "Эти функции доступны только в Про версии.";
+
+/* Class = "UITableViewSection"; headerTitle = "Gameplay"; ObjectID = "GAD-nm-RcK"; */
+"GAD-nm-RcK.headerTitle" = "Игра";
+
+/* Class = "UILabel"; text = "Automatic clock"; ObjectID = "HBo-ub-nYB"; */
+"HBo-ub-nYB.text" = "Автоматические часы";
+
+/* Class = "UILabel"; text = "Advanced"; ObjectID = "RQc-L2-YQ8"; */
+"RQc-L2-YQ8.text" = "Продвинутый";
+
+/* Class = "UILabel"; text = "Check sound"; ObjectID = "bBa-1z-4gt"; */
+"bBa-1z-4gt.text" = "Звук шаха";
+
+/* Class = "UILabel"; text = "Private game"; ObjectID = "fr6-HS-Y3C"; */
+"fr6-HS-Y3C.text" = "Приватная игра";
+
+/* Class = "UILabel"; text = "Chess clock"; ObjectID = "hbh-mS-FQz"; */
+"hbh-mS-FQz.text" = "Шахматные часы";
+
+/* Class = "UIButton"; normalTitle = "Create new"; ObjectID = "k3a-xm-yvc"; */
+"k3a-xm-yvc.normalTitle" = "Создать";
+
+/* Class = "UIButton"; normalTitle = "  Online game"; ObjectID = "kq3-l0-cpG"; */
+"kq3-l0-cpG.normalTitle" = "  Онлайн игра";
+
+/* Class = "UILabel"; text = "Clock time"; ObjectID = "mwQ-7D-rVU"; */
+"mwQ-7D-rVU.text" = "Время";
+
+/* Class = "UIButton"; normalTitle = "Join"; ObjectID = "qwe-kC-qkc"; */
+"qwe-kC-qkc.normalTitle" = "Присоединиться";
+
+/* Class = "UILabel"; text = "How do you want to play?"; ObjectID = "qxD-F5-Hjf"; */
+"qxD-F5-Hjf.text" = "Как вы хотите поиграть?";
+
+/* Class = "UIButton"; normalTitle = "Find player"; ObjectID = "uMY-vB-67D"; */
+"uMY-vB-67D.normalTitle" = "Найти игрока";
+
+/* Class = "UILabel"; text = "Searching for another player..."; ObjectID = "vdw-1p-RUD"; */
+"vdw-1p-RUD.text" = "Ищем другого игрока...";
+
+/* Class = "UILabel"; text = "Sounds"; ObjectID = "vfX-Zo-oWo"; */
+"vfX-Zo-oWo.text" = "Звуки";
+
+/* Class = "UILabel"; text = "Show hints"; ObjectID = "xYB-K3-7hp"; */
+"xYB-K3-7hp.text" = "Показывать подсказки";
+
+/* Class = "UILabel"; text = "Random player"; ObjectID = "y9c-mc-kZH"; */
+"y9c-mc-kZH.text" = "Случайный игрок";
