@@ -15,8 +15,6 @@ struct GameView: View {
     @Environment(\.verticalSizeClass) var vss: UserInterfaceSizeClass?
     @Environment(\.horizontalSizeClass) var hss: UserInterfaceSizeClass?
 
-    @EnvironmentObject var settings: SettingsStore
-
     @State var board: BoardScene?
     @State var noRules: Bool = false
 
@@ -218,6 +216,10 @@ struct GameView: View {
             }
         }
         .font(.system(size: 28))
+        .popover(isPresented: $showingSettings) {
+            SettingsView()
+                .frame(width: 300, height: 200)
+        }
     }
     
     func undoButtonPressed() {
@@ -245,7 +247,7 @@ struct GameView: View {
     }
     
     func settingsButtonPressed() {
-        
+        showingSettings = true
     }
     
     
@@ -266,9 +268,6 @@ struct GameView: View {
             //            scene.allowMovesOnlyFromColor = (onlineManager?.serverGame!.whitePlayeriD == ChessAPI.login?.id) ? .white : .black
             //            scene.view?.transform =  CGAffineTransform(rotationAngle: board!.allowMovesOnlyFromColor == .white ? 0 : .pi)
         }
-    }
-    func showSettingsView() {
-        showingSettings = true
     }
     
     func showRatingView() {

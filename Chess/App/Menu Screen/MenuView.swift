@@ -11,8 +11,6 @@ struct MenuView: View {
     @State var showOfflineGame = false
     @State var showOnlineGame = false
     
-    @StateObject var settings = SettingsStore()
-    
     var body: some View {
         NavigationView {
             ZStack {
@@ -62,7 +60,6 @@ struct MenuView: View {
             .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())
-        .environmentObject(settings)
     }
 }
 

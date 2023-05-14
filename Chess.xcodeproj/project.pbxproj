@@ -409,6 +409,30 @@
 			path = incbin;
 			sourceTree = "<group>";
 		};
+		93E04E232A11302B0009BCE3 /* UIKit Old */ = {
+			isa = PBXGroup;
+			children = (
+				93E04E242A11304B0009BCE3 /* Very Old */,
+				CE706E022874801400288A62 /* SavedGames */,
+				CE103A9826AF0A7900064D42 /* PremiumView */,
+				CE34AE2B2776FF440073AC92 /* Root */,
+				CE3042CC27708EB50068EBC0 /* StartOnlineGame */,
+				CE77AD2327117ABD00511326 /* Waiting */,
+				CE13C6D92710A71000DA888A /* SnackBar */,
+				CEEFF16A269DF9E60011A674 /* Board */,
+				CE5831FA27073F0D00385F73 /* Settings */,
+			);
+			path = "UIKit Old";
+			sourceTree = "<group>";
+		};
+		93E04E242A11304B0009BCE3 /* Very Old */ = {
+			isa = PBXGroup;
+			children = (
+				CE13C6D32710A1E000DA888A /* Rooms */,
+			);
+			path = "Very Old";
+			sourceTree = "<group>";
+		};
 		CE0774762781B5FF00E321FB /* ChessTests */ = {
 			isa = PBXGroup;
 			children = (
@@ -451,23 +475,6 @@
 				CE13C6DA2710A71A00DA888A /* SnackBar.swift */,
 			);
 			path = SnackBar;
-			sourceTree = "<group>";
-		};
-		CE1BE552276522E100E0BE9C /* Settings Screen */ = {
-			isa = PBXGroup;
-			children = (
-				CE1BE5532765232000E0BE9C /* SettingsView.swift */,
-			);
-			path = "Settings Screen";
-			sourceTree = "<group>";
-		};
-		CE3042CB27708EAD0068EBC0 /* Old */ = {
-			isa = PBXGroup;
-			children = (
-				CE13C6D32710A1E000DA888A /* Rooms */,
-				CEACA045270ADF4600364074 /* SwiftUI */,
-			);
-			path = Old;
 			sourceTree = "<group>";
 		};
 		CE3042CC27708EB50068EBC0 /* StartOnlineGame */ = {
@@ -582,16 +589,6 @@
 			path = Chess;
 			sourceTree = "<group>";
 		};
-		CEACA045270ADF4600364074 /* SwiftUI */ = {
-			isa = PBXGroup;
-			children = (
-				CE1BE552276522E100E0BE9C /* Settings Screen */,
-				CE966AA2276255CA00965991 /* Board Screen */,
-				CE10E0292704982700F5BF52 /* Menu Screen */,
-			);
-			path = SwiftUI;
-			sourceTree = "<group>";
-		};
 		CEAD174F261C495800F91647 /* SFX */ = {
 			isa = PBXGroup;
 			children = (
@@ -654,32 +651,19 @@
 			path = ChessLogic;
 			sourceTree = "<group>";
 		};
-		CEEFF168269DF9CC0011A674 /* Scenes */ = {
-			isa = PBXGroup;
-			children = (
-				CE706E022874801400288A62 /* SavedGames */,
-				CE103A9826AF0A7900064D42 /* PremiumView */,
-				CE34AE2B2776FF440073AC92 /* Root */,
-				CE3042CC27708EB50068EBC0 /* StartOnlineGame */,
-				CE77AD2327117ABD00511326 /* Waiting */,
-				CE13C6D92710A71000DA888A /* SnackBar */,
-				CEEFF16A269DF9E60011A674 /* Board */,
-				CE5831FA27073F0D00385F73 /* Settings */,
-				CE3042CB27708EAD0068EBC0 /* Old */,
-			);
-			path = Scenes;
-			sourceTree = "<group>";
-		};
 		CEEFF169269DF9D30011A674 /* App */ = {
 			isa = PBXGroup;
 			children = (
+				CE1BE5532765232000E0BE9C /* SettingsView.swift */,
+				CE966AA2276255CA00965991 /* Board Screen */,
+				CE10E0292704982700F5BF52 /* Menu Screen */,
 				2114AA042A0C167900627BFA /* Extensions */,
 				CE5831FC27073F2200385F73 /* App */,
 				CE5831F527073E3D00385F73 /* ChessAPI */,
 				CEEFF167269DF9BC0011A674 /* ChessLogic */,
 				CEBD758A26B084870027FB09 /* iAP */,
 				CEF7A8F2277A326A00DBDB77 /* Other */,
-				CEEFF168269DF9CC0011A674 /* Scenes */,
+				93E04E232A11302B0009BCE3 /* UIKit Old */,
 			);
 			path = App;
 			sourceTree = "<group>";
