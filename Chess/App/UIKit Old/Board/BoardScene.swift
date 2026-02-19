@@ -10,51 +10,63 @@ import SwiftUI
 
 class BoardScene: SKScene {
     
-    var game = ChessGame()
-//    weak var vcDelegate: GameUIDelegate?
-    weak var socket: ChessWebsocket?
-//    weak var vc: GameViewController!
+    public var game = ChessGame()
     
-    // Sizes
-    var boardSize: CGFloat!
-    var borderWidth: CGFloat!
-    var cellSize: CGFloat!
-    var pieceSize: CGSize!
-    var alignToTop: Bool = false
-    var boardFrame: CGRect {
+    // MARK: delegate stuff
+    public var movedPieceCallback: ((_ color: ChessPieceColor, _ move: Move) -> ())!
+    public var checkmateCallback: ((_ wins: ChessPieceColor?) -> ())!
+
+    
+//    private weak var socket: ChessWebsocket?
+    
+    // MARK: Sizes
+    private var boardSize: CGFloat!
+    private var borderWidth: CGFloat!
+    private var cellSize: CGFloat!
+    private var pieceSize: CGSize!
+    private var alignToTop: Bool = false
+    private var boardFrame: CGRect {
         return CGRect(x: -boardSize / 2, y: alignToTop ? size.height / 2 - boardSize - borderWidth : -boardSize / 2, width: boardSize, height: boardSize)
     }
     
     
-    var boardImage: SKSpriteNode?
-    var selectedPiece: ChessPiece? {
+    private var boardImage: SKSpriteNode?
+    private var selectedPiece: ChessPiece? {
         get {
             guard let selectedPiecePos = selectedPiecePos else { return nil }
             return game.piece(at: selectedPiecePos)
         }
     }
-    var selectedPieceMoves: [NormalMove] = []
-    var selectedPiecePos: Pos?
-    var isDraggingPiece = false
-    var didSelectPieceWithTap = false
-    var hintsShown = false
+    private var selectedPieceMoves: [NormalMove] = []
+    private var selectedPiecePos: Pos?
+    private var isDraggingPiece = false
+    private var didSelectPieceWithTap = false
+    private var hintsShown = false
     
-    var touchPos: CGPoint?
-    var moveTouchPos: CGPoint?
+    // engine
+    private var moveArrows: [SKShapeNode]? = nil
     
-    var canMove = true // Non-auto timer
-    var allowMovesOnlyFromColor: ChessPieceColor?
-    var serverTurnOf: ChessPieceColor?
-    var draggedPieceFromEditor: ChessPiece?
-    var moveArrows: [SKShapeNode]? = nil
-    var highlightFirstArrow: Bool = false
+    
+    private var touchPos: CGPoint?
+    private var moveTouchPos: CGPoint?
+    
+    private var canMove = true // Non-auto timer
+    private var allowMovesOnlyFromColor: ChessPieceColor?
+    private var serverTurnOf: ChessPieceColor?
+    private var draggedPieceFromEditor: ChessPiece?
+    private var highlightFirstArrow: Bool = false
+    
+    // MARK: Toggles
     
     /// Used in SavedGamesViewController to disable resource intensive tasks.
-    var viewOnly: Bool = false
+    public var viewOnly: Bool = false
     
-    var isOnline: Bool = false
+    // puzzle
+    public var noRules: Bool = false
     
-    // Settings
+    public var shouldRotatePieces: Bool = true
+    
+    // MARK: Settings
     var showHints: Bool {
         return !UserDefaults.standard.bool(forKey: "showHints")
     }
@@ -62,15 +74,23 @@ class BoardScene: SKScene {
         get { UserDefaults.standard.integer(forKey: "undos") }
         set { UserDefaults.standard.set(newValue, forKey: "undos") }
     }
-    var noRules: Bool = false
-    var proVersion = false
     
     let checkmateSound: SKAction = .playSoundFileNamed("CheckSound3.wav", waitForCompletion: false)
     let piecePlaceSound: SKAction = .playSoundFileNamed("ChessPiecePlace.wav", waitForCompletion: false)
     let checkSound: SKAction = .playSoundFileNamed("CheckSound2.wav", waitForCompletion: false)
     var noSounds: Bool { return UserDefaults.standard.bool(forKey: "noSounds") }
     var noCheckSound: Bool { return UserDefaults.standard.bool(forKey: "noCheckSound") }
+    private var proVersion = false
     
+    
+    override init(size: CGSize) {
+        super.init(size: size)
+        print("reinit board with size \(size)")
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
@@ -89,12 +109,12 @@ class BoardScene: SKScene {
         
     }
     
-    func resetGame(customBoard: [[ChessPiece?]]? = nil) {
+    func resetBoardAndGame(customBoard: [[ChessPiece?]]? = nil) {
         game.history = []
         game.currentMoveIHistory = nil
         resetMoveHints()
         removePieces()
-        game.resetBoard(empty: noRules, customBoard: customBoard)
+        game.resetBoard(customBoard: customBoard)
         setUpSizes()
         createPieces()
     }
@@ -107,6 +127,10 @@ class BoardScene: SKScene {
         pieceSize = CGSize(width: cellSize * 0.9, height: cellSize * 0.9)
     }
     
+    func adjustSizes() {
+        setUpSizes()
+    }
+    
     func touchUp(atPoint loc: CGPoint) {
         guard !viewOnly else { return }
         self.touchPos = loc
@@ -116,9 +140,8 @@ class BoardScene: SKScene {
             pieceRef?.zPosition = 1
         }]))
         
-        if boardFrame.contains(loc) {
+        if boardFrame.contains(loc), let cellPos = positionInBoard(at: loc) {
             // Touched a cell
-            let cellPos = positionInBoard(at: loc)
             if selectedPiecePos != nil {
                 if !selectedPieceMoves.contains(where: { $0.toPos == cellPos }) {
                     // Cannot move to dragged cell
@@ -161,8 +184,8 @@ class BoardScene: SKScene {
     func touchDown(atPoint loc: CGPoint) {
         guard !viewOnly else { return }
         self.touchPos = loc
-        if boardFrame.contains(loc) {
-            touchedDownBoardCell(at: positionInBoard(at: loc))
+        if boardFrame.contains(loc), let pos = positionInBoard(at: loc) {
+            touchedDownBoardCell(at: pos)
         } else {
             // Touched outside the board
             tappedNode(atPoint(loc))
@@ -201,10 +224,10 @@ class BoardScene: SKScene {
                 }
             }
         } else if let draggedPieceFromEditor = draggedPieceFromEditor {
-            draggedPieceFromEditor.removeFromParent()
-            perform(move: NormalMove(from: pos, to: pos, additionalMove: CreateMove(pos: pos, pieceType: draggedPieceFromEditor.pieceType, pieceColor: draggedPieceFromEditor.pieceColor), doublePawnMove: false))
-            self.draggedPieceFromEditor = nil
-            game.checkChecks(ui: true)
+//            draggedPieceFromEditor.removeFromParent()
+//            perform(move: NormalMove(from: pos, to: pos, additionalMove: CreateMove(pos: pos, pieceType: draggedPieceFromEditor.pieceType, pieceColor: draggedPieceFromEditor.pieceColor), doublePawnMove: false))
+//            self.draggedPieceFromEditor = nil
+//            game.checkChecks(ui: true)
         }
     }
     
@@ -213,10 +236,11 @@ class BoardScene: SKScene {
         if game.piece(at: move.toPos)?.pieceType != .king {
             removeRedCells(includingCheck: true)
             resetMoveHints()
-            guard !isOnline || socket?.isConnected ?? false else { return }
+//            guard !isOnline || socket?.isConnected ?? false else { return }
             game.perform(move: move, addToHistory: true, uiMove: true, noRules: noRules)
-            saveGame()
-//            vcDelegate?.movedPiece(color: game.piece(at: move.toPos)?.pieceColor ?? .white, move: move)
+            
+            // timer
+            movedPieceCallback(game.piece(at: move.toPos)?.pieceColor ?? .white, move)
         } else {
             bringSelectedPieceBack()
             deselectPiece()
@@ -263,7 +287,7 @@ class BoardScene: SKScene {
         for y in 0...7 {
             for x in 0...7 {
                 if let piece = game.piece(at: Pos(x: x, y: y)) {
-                    if piece.pieceColor == .black && (!UserDefaults.standard.bool(forKey: "noPieceRotation") || isOnline) {
+                    if piece.pieceColor == .black && !(UserDefaults.standard.bool(forKey: "noPieceRotation") || !shouldRotatePieces) { // fix me
                         piece.run(.rotate(toAngle: .pi, duration: 0))
                     } else {
                         piece.run(.rotate(toAngle: 0, duration: 0))
@@ -285,21 +309,21 @@ class BoardScene: SKScene {
         }
     }
     
-    func undo() {
+    func undo(noRulesEnabled: Bool) {
         if !game.history.isEmpty {
             deselectPiece()
             removeRedCells(includingCheck: true)
-            game.undo(noRulesEnabled: false)
-            saveGame()
+            game.undo(noRulesEnabled: noRulesEnabled)
+//            saveGame()
         }
     }
     
-    func redo() {
+    func redo(noRulesEnabled: Bool) {
         if !game.history.isEmpty, game.currentMoveIHistory != game.history.count - 1 {
             deselectPiece()
             removeRedCells(includingCheck: true)
-            game.redo(noRulesEnabled: false)
-            saveGame()
+            game.redo(noRulesEnabled: noRulesEnabled)
+//            saveGame()
         }
     }
     
@@ -327,7 +351,7 @@ class BoardScene: SKScene {
         circle.lineWidth = isEmptyCell ? 0 : cellSize * 0.075
         circle.fillColor = .init(white: 0.4, alpha: isEmptyCell ? 0.15 : 0)
         circle.strokeColor = .init(white: 0.4, alpha: 0.2)
-        circle.zPosition = 3
+        circle.zPosition = isEmptyCell ? 0.9 : 3
         circle.name = "MoveCircle"
         addChild(circle)
     }
@@ -367,12 +391,14 @@ class BoardScene: SKScene {
         addChild(boardImage!)
     }
     
-    func restart(overrideSave: Bool = true) {
-        resetGame()
-        if overrideSave {
-            saveGame()
-        }
+    func tryAddingPieceAtDroppedPoint(type: ChessPieceType, color: ChessPieceColor, point: CGPoint) {
+        guard let positionInBoard = positionInBoard(at: point) else { return }
+        
+        perform(move: NormalMove(from: positionInBoard, to: positionInBoard, additionalMove: CreateMove(pos: positionInBoard, pieceType: type, pieceColor: color), doublePawnMove: false))
+        self.draggedPieceFromEditor = nil
+        game.checkChecks(ui: true)
     }
+    
     
     // MARK: Utils
     private func positionInBoard(at pos: Pos) -> CGPoint {
@@ -381,13 +407,14 @@ class BoardScene: SKScene {
         let halfSpacing = cellSize / 2
         return CGPoint(x: startX + cellSize * CGFloat(pos.x) + halfSpacing, y: startY - cellSize * CGFloat(pos.y) - halfSpacing)
     }
-    private func positionInBoard(at pos: CGPoint) -> Pos {
+    private func positionInBoard(at pos: CGPoint) -> Pos? {
         let startX = -boardSize / 2.0
         let startY = alignToTop ? self.frame.height / 2 - borderWidth : boardSize / 2.0
         let xd = (pos.x - startX) / cellSize
         let yd = (startY - pos.y) / cellSize
         let x = xd >= 0 ? Int(xd) : Int(xd - 1)
         let y = yd >= 0 ? Int(yd) : Int(yd - 1)
+        guard x >= 0, x <= 7, y >= 0, y <= 7 else { return nil }
         return Pos(x: x, y: y)
     }
 }
@@ -420,12 +447,12 @@ extension BoardScene: ChessGameDelegate {
         addRedCell(at: kingPos, check: true)
         run(.sequence([.wait(forDuration: 0.2),checkmateSound]))
 
-//        vcDelegate?.checkmate(wins: wins)
+        checkmateCallback(wins)
     }
     func pawnReachedEnd(color: ChessPieceColor, completion: @escaping (ChessPieceType) -> ()) {
         func callback(_ type: ChessPieceType) {
             completion(type)
-            if isOnline { socket?.sendMove(game.history.last!) }
+//            if isOnline { socket?.sendMove(game.history.last!) }
         }
         
         let alert = UIAlertController(title: "Piece selection".localized, message: "", preferredStyle: .alert)
@@ -443,7 +470,7 @@ extension BoardScene: ChessGameDelegate {
         }))
         alert.view.tintColor = #colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)
         self.view?.window?.rootViewController?.present(alert, animated: true, completion: { [weak self] in
-            if color == .black && !(self?.isOnline ?? true) {
+            if color == .black && self?.shouldRotatePieces ?? false {
                 UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: { () -> Void in
                     alert.view.transform = CGAffineTransform(rotationAngle: .pi)
                 })
@@ -534,16 +561,14 @@ extension BoardScene {
 
 // MARK: Save game
 extension BoardScene {
-    func saveGame() {
-        if !isOnline {
-            let encoder = JSONEncoder()
-            encoder.outputFormatting = .prettyPrinted
-            let data = try! encoder.encode(game.history)
-            UserDefaults.standard.set(data, forKey: "History")
-        }
+    public func saveGame() {
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let data = try! encoder.encode(game.history)
+        UserDefaults.standard.set(data, forKey: "History")
     }
     
-    func loadGameFromSave(history: [NormalMove]? = nil) {
+    public func loadGameFromSave(history: [NormalMove]? = nil) {
         if let data = UserDefaults.standard.data(forKey: "History") {
             let jsonDecoder = JSONDecoder()
             do {
@@ -558,7 +583,7 @@ extension BoardScene {
                     run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
                         guard let self = self else { return }
                         self.game.perform(move: lastMove, addToHistory: false, uiMove: true, noRules: self.noRules)
-                        self.game.checkChecks(ui: true)
+//                        self.game.checkChecks(ui: true)
                     }]))
                 }
                 createPieces()
@@ -568,7 +593,7 @@ extension BoardScene {
         }
     }
     
-    func addGameToSavedGames(_ savedGame: SavedChessGame) {
+    public func addGameToSavedGames(_ savedGame: SavedChessGame) {
         let data = UserDefaults.standard.data(forKey: "SavedGames")
         var savedGames = data != nil ? try! JSONDecoder().decode([SavedChessGame].self, from: data!) : []
         savedGames.insert(savedGame, at: 0)
@@ -576,43 +601,6 @@ extension BoardScene {
     }
 }
 
-class ChessPiece: SKSpriteNode {
-    var pieceColor: ChessPieceColor = .white
-    var pieceType: ChessPieceType = .pawn
-    var id = UUID()
-    init(pieceColor: ChessPieceColor, pieceType: ChessPieceType) {
-        self.pieceColor = pieceColor
-        self.pieceType = pieceType
-        let imageName = pieceType.rawValue + "-" + pieceColor.rawValue
-        let texture = SKTexture(imageNamed: imageName)
-        
-        super.init(texture: texture, color: .clear, size: texture.size())
-    }
-    convenience init(_ pieceColor: ChessPieceColor, _ pieceType: ChessPieceType) {
-        self.init(pieceColor: pieceColor, pieceType: pieceType)
-    }
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    func letterFenRepresentation() -> String {
-        var l = ""
-        switch pieceType {
-        case .pawn:
-            l = "p"
-        case .knight:
-            l = "n"
-        case .bishop:
-            l = "b"
-        case .rook:
-            l = "r"
-        case .queen:
-            l = "q"
-        case .king:
-            l = "k"
-        }
-        return pieceColor == .black ? l : l.uppercased()
-    }
-}
 
 extension CGPoint {
     func distance(to point: CGPoint) -> CGFloat {

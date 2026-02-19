@@ -3,12 +3,14 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 52;
+	objectVersion = 54;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		2114AA062A0C169700627BFA /* UIColor+init+rgb.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */; };
 		2133542B29E31095000A78A2 /* ChessApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2133542A29E31095000A78A2 /* ChessApp.swift */; };
+		214BB43B2AFA63FD00B9992E /* ChessPiece.swift in Sources */ = {isa = PBXBuildFile; fileRef = 214BB43A2AFA63FD00B9992E /* ChessPiece.swift */; };
+		218573702AF97D3D00DDB9AE /* Alert++.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2185736F2AF97D3D00DDB9AE /* Alert++.swift */; };
 		21D5BF152A0D756D006978A4 /* Stockfish.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED32A0D756D006978A4 /* Stockfish.swift */; };
 		21D5BF162A0D756D006978A4 /* stockfishlib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED52A0D756D006978A4 /* stockfishlib.cpp */; };
 		21D5BF172A0D756D006978A4 /* engines.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 21D5BED62A0D756D006978A4 /* engines.cpp */; };
@@ -123,6 +125,8 @@
 /* Begin PBXFileReference section */
 		2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+init+rgb.swift"; sourceTree = "<group>"; };
 		2133542A29E31095000A78A2 /* ChessApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessApp.swift; sourceTree = "<group>"; };
+		214BB43A2AFA63FD00B9992E /* ChessPiece.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessPiece.swift; sourceTree = "<group>"; };
+		2185736F2AF97D3D00DDB9AE /* Alert++.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Alert++.swift"; sourceTree = "<group>"; };
 		21D5BED32A0D756D006978A4 /* Stockfish.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Stockfish.swift; sourceTree = "<group>"; };
 		21D5BED52A0D756D006978A4 /* stockfishlib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stockfishlib.cpp; sourceTree = "<group>"; };
 		21D5BED62A0D756D006978A4 /* engines.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = engines.cpp; sourceTree = "<group>"; };
@@ -283,6 +287,7 @@
 			children = (
 				CE60B5F6276749B500D719C8 /* Extensions.swift */,
 				2114AA052A0C169700627BFA /* UIColor+init+rgb.swift */,
+				2185736F2AF97D3D00DDB9AE /* Alert++.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -414,7 +419,6 @@
 			children = (
 				93E04E242A11304B0009BCE3 /* Very Old */,
 				CE706E022874801400288A62 /* SavedGames */,
-				CE103A9826AF0A7900064D42 /* PremiumView */,
 				CE34AE2B2776FF440073AC92 /* Root */,
 				CE3042CC27708EB50068EBC0 /* StartOnlineGame */,
 				CE77AD2327117ABD00511326 /* Waiting */,
@@ -657,6 +661,7 @@
 				CE1BE5532765232000E0BE9C /* SettingsView.swift */,
 				CE966AA2276255CA00965991 /* Board Screen */,
 				CE10E0292704982700F5BF52 /* Menu Screen */,
+				CE103A9826AF0A7900064D42 /* PremiumView */,
 				2114AA042A0C167900627BFA /* Extensions */,
 				CE5831FC27073F2200385F73 /* App */,
 				CE5831F527073E3D00385F73 /* ChessAPI */,
@@ -675,6 +680,7 @@
 				CEA71E55261A039F00FD02F5 /* GameViewController.swift */,
 				CEA71E4F261A039F00FD02F5 /* BoardScene.sks */,
 				CE30D8C9269F8E170005B343 /* BoardScene.swift */,
+				214BB43A2AFA63FD00B9992E /* ChessPiece.swift */,
 			);
 			path = Board;
 			sourceTree = "<group>";
@@ -737,8 +743,9 @@
 		CEA71E42261A039E00FD02F5 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				BuildIndependentTargetsInParallel = YES;
 				LastSwiftUpdateCheck = 1320;
-				LastUpgradeCheck = 1240;
+				LastUpgradeCheck = 1500;
 				TargetAttributes = {
 					CE0774742781B5FF00E321FB = {
 						CreatedOnToolsVersion = 13.2;
@@ -854,6 +861,7 @@
 				CEA71E4E261A039E00FD02F5 /* AppDelegate.swift in Sources */,
 				CE09D48C2697544400EEBF01 /* SettingsViewController.swift in Sources */,
 				21D5BF202A0D756D006978A4 /* psqt.cpp in Sources */,
+				214BB43B2AFA63FD00B9992E /* ChessPiece.swift in Sources */,
 				21D5BF2E2A0D756D006978A4 /* position.cpp in Sources */,
 				CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */,
 				21D5BF192A0D756D006978A4 /* timeman.cpp in Sources */,
@@ -881,6 +889,7 @@
 				CE34AE2D2776FF5A0073AC92 /* RootViewController.swift in Sources */,
 				CE706E042874803700288A62 /* SavedGamesViewController.swift in Sources */,
 				21D5BF262A0D756D006978A4 /* evaluate.cpp in Sources */,
+				218573702AF97D3D00DDB9AE /* Alert++.swift in Sources */,
 				21D5BF152A0D756D006978A4 /* Stockfish.swift in Sources */,
 				21D5BF2B2A0D756D006978A4 /* material.cpp in Sources */,
 				21D5BF252A0D756D006978A4 /* bitbase.cpp in Sources */,
@@ -980,6 +989,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1014,6 +1024,7 @@
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -1044,6 +1055,7 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = NO;
 				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
 				CLANG_ANALYZER_NONNULL = YES;
 				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
@@ -1078,6 +1090,7 @@
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu11;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -1110,7 +1123,7 @@
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -1139,7 +1152,7 @@
 				DEVELOPMENT_TEAM = 92S6JX27W2;
 				INFOPLIST_FILE = Chess/Info.plist;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",

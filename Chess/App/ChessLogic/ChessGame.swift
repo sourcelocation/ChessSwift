@@ -7,6 +7,10 @@
 
 import Foundation
 
+enum GameType {
+    case overTheBoard, online, puzzle, engine
+}
+
 class ChessGame {
     var board: [[ChessPiece?]] = []
     var history: [NormalMove] = []
@@ -130,7 +134,7 @@ class ChessGame {
             if uiMove {
                 let pieceColor = self.piece(at: move.toPos)!.pieceColor
                 let check = checkCheck(forPieceColor: pieceColor.inverted, ui: uiMove)
-//                if noRules { let _ = checkCheck(forPieceColor: pieceColor, ui: uiMove) } // No Rules mode
+                if noRules { let _ = checkCheck(forPieceColor: pieceColor, ui: uiMove) } // No Rules mode
                 delegate?.uiMove(piece: self.piece(at: move.toPos)!, to: move.toPos, withSound: !check)
             }
         }
@@ -158,15 +162,17 @@ class ChessGame {
         return false
     }
     func checkChecks(ui: Bool) {
-        let _ = self.checkCheck(forPieceColor: .white, ui: ui)
-        let _ = self.checkCheck(forPieceColor: .black, ui: ui)
+        let isWhiteInCheck = self.checkCheck(forPieceColor: .white, ui: ui)
+//        if !isWhiteInCheck { // prevent double alert
+            let _ = self.checkCheck(forPieceColor: .black, ui: ui)
+//        }
     }
     
     func moveHistoryToBeginning() {
         guard history.count > 0 else { return }
         currentMoveIHistory = 0
         delegate?.removePieces()
-        resetBoard(empty: false)
+        resetBoard()
         delegate?.createPieces()
     }
     func undo(noRulesEnabled: Bool) {
@@ -179,7 +185,15 @@ class ChessGame {
         }
         
         delegate?.removePieces()
-        resetBoard(empty: noRulesEnabled)
+        if noRulesEnabled {
+            var emptyBoardPieces: [[ChessPiece?]] = Array(repeating:Array(repeating: nil, count: 8),count:8)
+            emptyBoardPieces[0][0] = .init(pieceColor: .black, pieceType: .king)
+            emptyBoardPieces[7][7] = .init(pieceColor: .white, pieceType: .king)
+            
+            resetBoard(customBoard: emptyBoardPieces)
+        } else {
+            resetBoard()
+        }
         for move in slicedHistory {
             perform(move: move, addToHistory: false, uiMove: false, noRules: noRulesEnabled)
         }
@@ -206,26 +220,20 @@ class ChessGame {
 //        if let rookMove = moveToRedo.additionalMove as? NormalMove {
 //            delegate?.uiMove(piece: piece(at: rookMove.fromPos)!, to: rookMove.toPos, withSound: false)
 //        }
-        checkChecks(ui: true)
+//        checkChecks(ui: true)
     }
     
-    func resetBoard(empty: Bool, customBoard: [[ChessPiece?]]? = nil) {
-        if !empty || customBoard != nil {
-            board = customBoard ?? [
-                [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
-                [.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),],
-                [nil,nil,nil,nil,nil,nil,nil,nil],
-                [nil,nil,nil,nil,nil,nil,nil,nil],
-                [nil,nil,nil,nil,nil,nil,nil,nil],
-                [nil,nil,nil,nil,nil,nil,nil,nil],
-                [.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn)],
-                [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
-            ]
-        } else {
-            board = Array(repeating:Array(repeating: nil, count: 8),count:8)
-            board[0][0] = .init(pieceColor: .black, pieceType: .king)
-            board[7][7] = .init(pieceColor: .white, pieceType: .king)
-        }
+    func resetBoard(customBoard: [[ChessPiece?]]? = nil) {
+        board = customBoard ?? [
+            [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
+            [.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),],
+            [nil,nil,nil,nil,nil,nil,nil,nil],
+            [nil,nil,nil,nil,nil,nil,nil,nil],
+            [nil,nil,nil,nil,nil,nil,nil,nil],
+            [nil,nil,nil,nil,nil,nil,nil,nil],
+            [.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn)],
+            [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
+        ]
         logic.isWhiteInCheck = false
         logic.isBlackInCheck = false
         logic.whiteCanCastle = true

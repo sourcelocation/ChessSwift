@@ -24,32 +24,30 @@ struct BoardControlsView: View {
             Image(systemName: "arrow.left")
                 .font(.system(size: 24, weight: .medium))
         })
-        let restart =
-        Button(action: {
+        let restart = Button(action: {
             self.restart()
         }, label: {
             Image(systemName: "arrow.clockwise")
                 .font(.system(size: 24, weight: .medium))
         })
-        let pro =
-        Button(action: {
+        let pro = Button(action: {
             showProView()
         }, label: {
             Image(systemName: "crown")
                 .font(.system(size: 24, weight: .medium))
         })
         
-        let settings =
-        Button(action: {
+        let settings = Button(action: {
             self.showSettingsView()
         }, label: {
             Image(systemName: "gearshape")
                 .font(.system(size: 24, weight: .medium))
         })
-            .popover(isPresented: $showingSettings) {
-                SettingsView()
-                    .frame(width: 375, height: 500)
-            }
+        .popover(isPresented: $showingSettings) {
+            SettingsView()
+                .frame(width: 375, height: 500)
+        }
+        
         if squareControls {
             VStack(alignment: .center) {
                 HStack(alignment: .center) {

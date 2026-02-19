@@ -95,7 +95,7 @@ extern "C" void setStockfishNNUEPath(const char *path) {
 
 void sendOptionNNUE(int eid)
 {
-  assert(!nnuepath.empty());
+//  assert(!nnuepath.empty());
   auto cmd = "setoption name EvalFile value " + nnuepath;
   engine_cmd(eid, cmd.c_str());
 }

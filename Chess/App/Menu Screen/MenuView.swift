@@ -10,13 +10,19 @@ import SwiftUI
 struct MenuView: View {
     @State var showOfflineGame = false
     @State var showOnlineGame = false
+    @State var showPuzzleGame = false
+    
+    @State var showingSettings = false
+    @State var showingPremium = false
+    
+    @AppStorage("pro") var isPro = false
     
     var body: some View {
         NavigationView {
             ZStack {
                 Color(.init(rgb: 0xF4EDE3))
                     .edgesIgnoringSafeArea(.all)
-                VStack {
+                VStack(spacing: 12) {
                     Spacer()
                     Image("Logo")
                         .resizable()
@@ -26,25 +32,32 @@ struct MenuView: View {
                         .padding(.bottom,24)
                         .padding(.horizontal, 32)
                     
-                    NavigationLink(destination: GameView(shown: $showOfflineGame, online: false), isActive: $showOfflineGame) {
+                    NavigationLink(destination: GameView(shown: $showOfflineGame, gameType: .overTheBoard), isActive: $showOfflineGame) {
                         MenuButton(image: "ipad", text: "Play")
-                            .padding(8)
-                            .padding(.horizontal, 20)
                     }
-                    NavigationLink(destination: GameView(shown: $showOnlineGame, online: true), isActive: $showOnlineGame) {
+                    NavigationLink(destination: GameView(shown: $showOnlineGame, gameType: .online), isActive: $showOnlineGame) {
                         MenuButton(image: "globe", text: "Online game")
-                            .padding(8)
-                            .padding(.horizontal, 20)
+                    }
+                    if isPro {
+                        NavigationLink(destination: GameView(shown: $showPuzzleGame, gameType: .puzzle), isActive: $showPuzzleGame) {
+                            MenuButton(image: "puzzlepiece", text: "Custom Position")
+                        }
+                    } else {
+                        Button(action: {
+                            showingPremium = true
+                        }) {
+                            MenuButton(image: "puzzlepiece", text: "Custom Position")
+                        }
                     }
                     
                     HStack(spacing:20) {
                         Button(action: {
-                            
+                            showingSettings = true
                         }) {
                             Image(systemName: "gearshape")
                         }
                         Button(action: {
-                            
+                            showingPremium = true
                         }) {
                             Image(systemName: "crown")
                         }
@@ -54,12 +67,19 @@ struct MenuView: View {
                     .padding(4)
                     Spacer()
                 }
+                .padding(.horizontal, 32)
                 .ignoresSafeArea()
 //                .padding()
             }
             .navigationBarHidden(true)
         }
         .navigationViewStyle(StackNavigationViewStyle())
+        .sheet(isPresented: $showingSettings) {
+            SettingsView()
+        }
+        .sheet(isPresented: $showingPremium) {
+            PremiumView(showModal: $showingPremium)
+        }
     }
 }
 
