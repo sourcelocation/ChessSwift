@@ -211,30 +211,143 @@ class DestroyMove: Move {
 
 
 
-class History: Decodable {
-    var moves: [NormalMove]
-    
-    enum MoveTypeKey: CodingKey {
-        case type
-    }
-    enum MoveTypes: String, Decodable {
-        case normalMove = "normal"
-        case enPassantMove = "enPassant"
-        case destroy = "destroy"
-        case create = "create"
-    }
-    
-    required init(from decoder: Decoder) throws {
-        var container = try decoder.unkeyedContainer()
-        var moves: [NormalMove] = []
-        
-        while (!container.isAtEnd) {
-            moves.append(try container.decode(NormalMove.self))
+struct StoredPly: Codable, Equatable {
+    struct Coordinate: Codable, Equatable {
+        let x: Int
+        let y: Int
+
+        init(x: Int, y: Int) {
+            self.x = x
+            self.y = y
         }
-        self.moves = moves
+
+        init(_ pos: Pos) {
+            self.x = pos.x
+            self.y = pos.y
+        }
+
+        func asPos() -> Pos {
+            Pos(x: x, y: y)
+        }
+    }
+
+    let from: Coordinate
+    let to: Coordinate
+    let promotion: ChessPieceType?
+    let doublePawnMove: Bool
+
+    init(from: Coordinate, to: Coordinate, promotion: ChessPieceType?, doublePawnMove: Bool) {
+        self.from = from
+        self.to = to
+        self.promotion = promotion
+        self.doublePawnMove = doublePawnMove
     }
 }
 
+struct StoredGameHistory: Codable, Equatable {
+    enum StartPosition: String, Codable {
+        case standard
+    }
 
+    let gameID: UUID
+    let schemaVersion: Int
+    let startPosition: StartPosition
+    let plies: [StoredPly]
+    let cursor: Int?
 
+    init(
+        gameID: UUID = UUID(),
+        schemaVersion: Int = 2,
+        startPosition: StartPosition = .standard,
+        plies: [StoredPly],
+        cursor: Int?
+    ) {
+        self.gameID = gameID
+        self.schemaVersion = schemaVersion
+        self.startPosition = startPosition
+        self.plies = plies
+        self.cursor = cursor
+    }
+
+    init(gameID: UUID, fromMoves moves: [NormalMove], cursor: Int?) {
+        self.init(
+            gameID: gameID,
+            schemaVersion: 2,
+            startPosition: .standard,
+            plies: moves.map(StoredPly.init),
+            cursor: cursor
+        )
+    }
+
+    static var empty: StoredGameHistory {
+        StoredGameHistory(plies: [], cursor: nil)
+    }
+
+    var clampedCursor: Int? {
+        guard !plies.isEmpty else { return nil }
+        guard let cursor else { return plies.count - 1 }
+        let maxIndex = plies.count - 1
+        if cursor < 0 { return nil }
+        return min(cursor, maxIndex)
+    }
+
+    func toMoves() -> [NormalMove] {
+        guard startPosition == .standard else {
+            return plies.map { ply in
+                let move = NormalMove(
+                    from: ply.from.asPos(),
+                    to: ply.to.asPos(),
+                    doublePawnMove: ply.doublePawnMove
+                )
+                if let promotion = ply.promotion {
+                    move.additionalMove = PawnToQueenMove(pos: ply.to.asPos(), turnedTo: promotion)
+                }
+                return move
+            }
+        }
+
+        let game = ChessGame()
+        game.resetBoard()
+
+        var moves: [NormalMove] = []
+        moves.reserveCapacity(plies.count)
+
+        for ply in plies {
+            let from = ply.from.asPos()
+            let to = ply.to.asPos()
+            let legalMove = game.moves(for: from).first(where: { $0.toPos == to })
+
+            let move = legalMove ?? NormalMove(from: from, to: to, doublePawnMove: ply.doublePawnMove)
+            move.doublePawnMove = move.doublePawnMove || ply.doublePawnMove
+
+            if let promotion = ply.promotion {
+                move.additionalMove = PawnToQueenMove(pos: to, turnedTo: promotion)
+            }
+
+            game.perform(move: move, addToHistory: true, uiMove: false, noRules: false)
+            moves.append(move)
+        }
+
+        return moves
+    }
+}
+
+private extension StoredPly {
+    init(_ move: NormalMove) {
+        self.init(
+            from: .init(move.fromPos),
+            to: .init(move.toPos),
+            promotion: Self.promotionType(in: move.additionalMove),
+            doublePawnMove: move.doublePawnMove
+        )
+    }
+
+    static func promotionType(in move: Move?) -> ChessPieceType? {
+        guard let move else { return nil }
+        if let promotionMove = move as? PawnToQueenMove {
+            return promotionMove.turnedTo
+        }
+        return promotionType(in: move.additionalMove)
+    }
+}
 

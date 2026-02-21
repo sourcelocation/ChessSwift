@@ -1,535 +1,808 @@
-//
-//  GameView.swift
-//  Chess
-//
-//  Created by exerhythm on 12/9/21.
-//
-
 import SwiftUI
 import SpriteKit
-import StoreKit
-import SwiftMessages
 
 struct GameView: View {
+    @Environment(\.dismiss) private var dismiss
 
-    @Environment(\.verticalSizeClass) var vss: UserInterfaceSizeClass?
-    @Environment(\.horizontalSizeClass) var hss: UserInterfaceSizeClass?
-
-    @State var board: BoardScene?
-    @State var noRules: Bool = false
-    
-    // Clock stuff
-    @State var clockTurnOf: ChessPieceColor? = nil
-    @State var whiteTimerRemaining = 10.0
-    @State var blackTimerRemaining = 10.0
-    @State var timerWhite: Timer?
-    @State var timerBlack: Timer?
-
-    @State var showingRestartAlert = false
-    @State var showingWinAlert = false
-    @State var showingTimerAlert = false
-    @State var showingWhiteRanOutOfTime = false
-    @State var showingBlackRanOutOfTime = false
-
-
-    @State var showingProView = false
-    @State var showingSettings = false
-
-    // Dismiss
     @Binding var shown: Bool
 
-    @State var gameType: GameType = .overTheBoard
-    
-    @State var draggedPiecePosition: CGPoint = .zero
-     
-    // free users
-    @AppStorage("undos") var undos = 0
-    
-    @AppStorage("chessClock") var chessClockEnabled = false
-    @AppStorage("chessClockTime") var chessClockTime = 5 // in minutes
-    @AppStorage("pro") var isPro = false
-    
-    // For asking for a review. A specified time has to pass for review popup to show
-    var startTime = Date()
-    
-    var squareControls: Bool {
-        return UIScreen.main.bounds.width > UIScreen.main.bounds.height
-    }
-    
-    var boardPadding: CGFloat { hss == .regular && vss == .regular ? 20 : 4 }
-    
-    
-    // MARK: Views
-    var body: some View {
-        GeometryReader { gp in
-            ZStack {
-                Color(.init(rgb: 0xF4EDE3))
-                    .ignoresSafeArea()
-                
-                
-                if let board = board {
-                    SpriteView(scene: board, options: [.allowsTransparency])
-                        .padding(boardPadding)
-                        .ignoresSafeArea()
-                }
-                
-                if squareControls {
-                    HStack {
-                        controls
-                            .hidden()
-                        
-                        let boardSize = min(UIScreen.main.bounds.size.width - boardPadding * 2, UIScreen.main.bounds.size.height - boardPadding * 2)
-                        Rectangle()
-                            .frame(width: boardSize, height: boardSize)
-                            .hidden()
-                        VStack {
-                            if gp.size.height > 500 {
-                                controls
-                                    .hidden()
-                            }
-                            if chessClockEnabled && gameType == .overTheBoard {
-                                clock
-                            } else if gameType == .puzzle {
-                                Spacer()
-                                customBoardPieces
-                                    .padding()
-                                Spacer()
-                            } else {
-                                Spacer()
-                            }
-                            controls
-                        }
-                        .padding(.vertical)
-                    }
-                    .ignoresSafeArea()
-//                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    VStack {
-                        controls
-                            .hidden()
-                        
-                        let boardSize = min(UIScreen.main.bounds.size.width - boardPadding * 2, UIScreen.main.bounds.size.height - boardPadding * 2)
-                        Rectangle()
-                            .frame(width: boardSize, height: boardSize)
-                            .hidden()
-                        controls
-                    }
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .ignoresSafeArea()
-                    .padding(.vertical)
-                }
+    let gameType: GameType
+    let loadedHistory: StoredGameHistory?
+    let persistCurrentGame: Bool
+    let archiveOnExit: Bool
+    let screenTitle: String
 
-                
+    @ObservedObject private var settings: AppSettings
+    @StateObject private var session: GameSessionStore
+    @State private var displayedLines: [GameAnalyzer.AnalysisLine] = []
+    @State private var displayedBestMove: GameAnalyzer.MoveInfo?
+    @State private var measuredBoardSide: CGFloat = 0
+
+    private enum LayoutMode {
+        case regularPortrait
+        case regularLandscape
+        case replayPortrait
+        case replayLandscape
+
+        var isLandscape: Bool {
+            self == .regularLandscape || self == .replayLandscape
+        }
+
+        var isReplay: Bool {
+            self == .replayPortrait || self == .replayLandscape
+        }
+    }
+
+    private struct LayoutConstants {
+        let horizontalPadding: CGFloat = 12
+        let verticalPadding: CGFloat = 8
+        let compactSpacing: CGFloat = 10
+        let regularSpacing: CGFloat = 12
+        let controlsPortraitHeight: CGFloat = 64
+        let controlsRailWidth: CGFloat = 56
+        let regularLandscapeSidePanelWidth: CGFloat = 132
+        let replayAnalyzerPortraitHeight: CGFloat = 220
+        let replayAnalyzerLandscapeWidth: CGFloat = 320
+    }
+
+    private struct LayoutMetrics {
+        let mode: LayoutMode
+        let showsClock: Bool
+    }
+
+    private var isReplayMode: Bool {
+        loadedHistory != nil
+    }
+
+    private var showsAnalysisPanel: Bool {
+        session.analysisAvailable && (session.analysisEnabled || session.analysisPreparing || session.analysisPreparationMessage != nil)
+    }
+
+    init(
+        shown: Binding<Bool>,
+        gameType: GameType = .overTheBoard,
+        loadedHistory: StoredGameHistory? = nil,
+        persistCurrentGame: Bool = true,
+        archiveOnExit: Bool = true,
+        screenTitle: String = "Game"
+    ) {
+        self._shown = shown
+        self.gameType = gameType
+        self.loadedHistory = loadedHistory
+        self.persistCurrentGame = persistCurrentGame
+        self.archiveOnExit = archiveOnExit
+        self.screenTitle = screenTitle
+
+        let env = AppEnvironment.shared
+        _settings = ObservedObject(wrappedValue: env.settings)
+        _session = StateObject(wrappedValue: GameSessionStore(
+            config: .init(
+                gameType: gameType,
+                loadedHistory: loadedHistory,
+                persistCurrentGame: persistCurrentGame,
+                archiveOnExit: archiveOnExit
+            ),
+            settings: env.settings,
+            repository: env.gameRepository,
+            reviewPrompt: env.reviewPrompt
+        ))
+    }
+
+    var body: some View {
+        GeometryReader { geometry in
+            let metrics = layoutMetrics(for: geometry)
+            ZStack {
+                Color(.init(rgb: 0xF4EDE3)).ignoresSafeArea()
+                mainContent(metrics: metrics)
+                enjoymentPromptOverlay
+
                 VStack {
                     HStack {
-                        Button {
-                            shown = false
-                        } label: {
+                        Button(action: leaveGame) {
                             Image(systemName: "chevron.left")
                                 .font(.system(size: 24, weight: .medium))
                                 .padding()
                         }
-
                         Spacer()
                     }
                     Spacer()
                 }
             }
             .onAppear {
-                createBoardScene(size: gp.size)
+                let fallbackBoardSide = max(1, min(geometry.size.width, geometry.size.height))
+                session.onAppear(boardSide: max(measuredBoardSide, fallbackBoardSide))
             }
-            .onReceive(NotificationCenter.default.publisher(for: UIDevice.orientationDidChangeNotification)) { _ in
-//                board = nil
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                    // make sure we don't update multiple times for no reason
-                    guard board?.size != .init(width: UIScreen.main.bounds.size.width - boardPadding * 2,
-                                              height: UIScreen.main.bounds.size.height - boardPadding * 2) else { return }
-                    board?.size = .init(width: UIScreen.main.bounds.size.width - boardPadding * 2,
-                                        height: UIScreen.main.bounds.size.height - boardPadding * 2)
-                    board?.adjustSizes()
-//                    createBoardScene(size: gp.size)
-                }
+            .onDisappear {
+                session.onDisappear()
             }
-//            .onChange(of: gp.size) { new in
-//                DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-//                    createBoardScene(size: new)
-//                }
-//            }
         }
-        .sheet(isPresented: $showingProView) {
-            PremiumView(showModal: $showingProView)
+        .onChange(of: measuredBoardSide) { side in
+            session.onBoardSideChanged(side)
+        }
+        .sheet(isPresented: $session.showingProView) {
+            PremiumView(showModal: $session.showingProView)
+        }
+        .sheet(isPresented: $session.showingSettings) {
+            SettingsView()
+        }
+        .onReceive(session.analyzer.$lines) { lines in
+            let moves = lines.map { NormalMove(from: $0.move.from, to: $0.move.to) }
+            session.board.displayMoveArrows(moves: moves)
+            if !lines.isEmpty {
+                displayedLines = lines
+            } else if !session.analysisEnabled {
+                displayedLines = []
+            }
+        }
+        .onReceive(session.analyzer.$bestMove) { bestMove in
+            session.board.setHighlightFirstArrow(bestMove != nil)
+            displayedBestMove = bestMove
+        }
+        .onChange(of: session.analysisEnabled) { enabled in
+            if !enabled {
+                displayedLines = []
+                displayedBestMove = nil
+            }
+        }
+        .onChange(of: settings.chessClockMinutes) { _ in
+            session.resetTimer()
         }
         .navigationBarHidden(true)
     }
-    
+
     @ViewBuilder
-    var controls: some View {
-        VStack {
-            if squareControls {
-                HStack {
-                    Spacer()
-                    VStack(spacing: 0) {
-                        HStack(spacing: 0) {
-                            Button {
-                                undoButtonPressed()
-                            } label: {
-                                Image(systemName: "arrow.left")
-                                    .padding(12)
-                            }
-                            Button {
-                                redoButtonPressed()
-                            } label: {
-                                Image(systemName: "arrow.right")
-                                    .padding(12)
-                            }
-                        }
-                        HStack(spacing: 0) {
-                            Button {
-                                restartButtonPressed()
-                            } label: {
-                                Image(systemName: "arrow.clockwise")
-                                    .padding(12)
-                            }
-                            Button {
-                                settingsButtonPressed()
-                                showingSettings = true
-                            } label: {
-                                Image(systemName: "gearshape")
-                                    .padding(12)
-                            }
-                        }
+    private var enjoymentPromptOverlay: some View {
+        if session.showingEnjoymentPrompt {
+            ZStack(alignment: .bottom) {
+                Color.black.opacity(0.35)
+                    .ignoresSafeArea()
+                    .onTapGesture {
+                        session.dismissEnjoymentPrompt(markReviewed: false)
                     }
-                    Spacer()
-                }
-            } else if !squareControls {
-                VStack {
-                    HStack(spacing: 0) {
-                        Button {
-                            undoButtonPressed()
-                        } label: {
-                            Image(systemName: "arrow.left")
-                                .padding(12)
+
+                VStack(spacing: 12) {
+                    Text("Hey there! 🤙")
+                        .font(.headline)
+                        .foregroundStyle(Color(.init(rgb: 0x2C2016)))
+
+                    Text("Are you enjoying this app?")
+                        .font(.subheadline)
+                        .foregroundStyle(Color(.init(rgb: 0x4B3729)))
+
+                    HStack(spacing: 10) {
+                        Button(action: {
+                            session.dismissEnjoymentPrompt(markReviewed: true)
+                        }) {
+                            Text("Not really")
+                                .font(.system(size: 16, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
                         }
-                        Button {
-                            redoButtonPressed()
-                        } label: {
-                            Image(systemName: "arrow.right")
-                                .padding(12)
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(.init(rgb: 0xCDB6A2)))
+
+                        Button(action: {
+                            session.confirmEnjoymentPrompt()
+                        }) {
+                            Text("Yes")
+                                .font(.system(size: 16, weight: .semibold))
+                                .frame(maxWidth: .infinity)
+                                .padding(.vertical, 10)
                         }
-                        Button {
-                            restartButtonPressed()
-                        } label: {
-                            Image(systemName: "arrow.clockwise")
-                                .padding(12)
-                        }
-                        Button {
-                            settingsButtonPressed()
-                        } label: {
-                            Image(systemName: "gearshape")
-                                .padding(12)
-                        }
+                        .buttonStyle(.borderedProminent)
+                        .tint(Color(.init(rgb: 0x8A6348)))
                     }
-                    Spacer()
                 }
-                .padding(.top)
+                .padding(16)
+                .frame(maxWidth: 420)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(Color(.init(rgb: 0xF4EDE3)))
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .stroke(Color(.init(rgb: 0x6D4A34)).opacity(0.25), lineWidth: 1)
+                )
+                .padding(.horizontal, 16)
+                .padding(.bottom, 20)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+            }
+            .zIndex(10)
+            .animation(.easeInOut(duration: 0.2), value: session.showingEnjoymentPrompt)
+        }
+    }
+
+    private func layoutMetrics(for geometry: GeometryProxy) -> LayoutMetrics {
+        let mode = layoutMode(for: geometry)
+        return LayoutMetrics(
+            mode: mode,
+            showsClock: showsClock(mode: mode)
+        )
+    }
+
+    @ViewBuilder
+    private func mainContent(metrics: LayoutMetrics) -> some View {
+        switch metrics.mode {
+        case .regularPortrait:
+            regularPortraitLayout(metrics: metrics)
+        case .regularLandscape:
+            regularLandscapeLayout(metrics: metrics)
+        case .replayPortrait:
+            replayPortraitLayout(metrics: metrics)
+        case .replayLandscape:
+            replayLandscapeLayout(metrics: metrics)
+        }
+    }
+
+    @ViewBuilder
+    private func regularPortraitLayout(metrics: LayoutMetrics) -> some View {
+        let constants = LayoutConstants()
+        VStack(spacing: constants.compactSpacing) {
+            Spacer()
+            if metrics.showsClock {
+                portraitTopClockCard
+            }
+
+            boardSurface()
+                .layoutPriority(1)
+
+            if metrics.showsClock {
+                portraitBottomClockCard
+            }
+
+            controls(isLandscape: false)
+                .frame(height: constants.controlsPortraitHeight)
+
+            Spacer()
+
+            if !metrics.showsClock && showsAnalysisPanel {
+                analysisPanel(isLandscape: false)
+                    .padding(.horizontal, constants.horizontalPadding)
+            }
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.horizontal, constants.horizontalPadding)
+        .padding(.top, constants.verticalPadding)
+        .padding(.bottom, constants.verticalPadding)
+    }
+
+    @ViewBuilder
+    private func regularLandscapeLayout(metrics: LayoutMetrics) -> some View {
+        let constants = LayoutConstants()
+        let rightPanelWidth = showsAnalysisPanel
+            ? constants.replayAnalyzerLandscapeWidth
+            : constants.regularLandscapeSidePanelWidth
+        let sidePanelWidth = max(constants.regularLandscapeSidePanelWidth, rightPanelWidth)
+        HStack(spacing: constants.regularSpacing) {
+            HStack(spacing: 0) {
+                Spacer(minLength: 0)
+                controls(isLandscape: true)
+                    .frame(width: constants.controlsRailWidth)
+            }
+            .frame(maxHeight: .infinity, alignment: .center)
+            .frame(width: sidePanelWidth, alignment: .trailing)
+
+            boardSurface()
+                .layoutPriority(1)
+
+            Group {
+                if showsAnalysisPanel {
+                    analysisPanel(isLandscape: true)
+                        .frame(width: constants.replayAnalyzerLandscapeWidth, alignment: .top)
+                        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                } else if metrics.showsClock {
+                    VStack {
+                        landscapeClockPanel
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .frame(width: constants.regularLandscapeSidePanelWidth)
+                } else {
+                    VStack {
+                        landscapeClockPlaceholder
+                    }
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+                    .frame(width: constants.regularLandscapeSidePanelWidth)
+                }
+            }
+            .frame(width: sidePanelWidth, alignment: .leading)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .padding(.horizontal, constants.horizontalPadding)
+        .padding(.top, constants.verticalPadding)
+        .padding(.bottom, constants.verticalPadding)
+        .ignoresSafeArea(.container, edges: [.horizontal, .bottom])
+    }
+
+    @ViewBuilder
+    private func replayPortraitLayout(metrics: LayoutMetrics) -> some View {
+        let constants = LayoutConstants()
+        VStack(spacing: constants.compactSpacing) {
+            boardSurface()
+                .layoutPriority(1)
+
+            replayAnalysisPanel(isLandscape: false)
+                .frame(minHeight: 180, idealHeight: constants.replayAnalyzerPortraitHeight, maxHeight: 260)
+                .padding(.horizontal, constants.horizontalPadding)
+
+            controls(isLandscape: false)
+                .frame(height: constants.controlsPortraitHeight)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+        .padding(.horizontal, constants.horizontalPadding)
+        .padding(.top, constants.verticalPadding)
+        .padding(.bottom, constants.verticalPadding)
+    }
+
+    @ViewBuilder
+    private func replayLandscapeLayout(metrics: LayoutMetrics) -> some View {
+        let constants = LayoutConstants()
+        HStack(spacing: constants.regularSpacing) {
+            controls(isLandscape: true)
+                .frame(width: constants.controlsRailWidth)
+
+            boardSurface()
+                .layoutPriority(1)
+
+            replayAnalysisPanel(isLandscape: true)
+                .frame(width: constants.replayAnalyzerLandscapeWidth, alignment: .top)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .center)
+        .padding(.horizontal, constants.horizontalPadding)
+        .padding(.top, 0)
+        .padding(.bottom, 0)
+        .ignoresSafeArea(.container, edges: [.horizontal, .bottom])
+    }
+
+    private func layoutMode(for geometry: GeometryProxy) -> LayoutMode {
+        let isLandscape = geometry.size.width > geometry.size.height
+        if isReplayMode {
+            return isLandscape ? .replayLandscape : .replayPortrait
+        }
+        return isLandscape ? .regularLandscape : .regularPortrait
+    }
+
+    private func showsClock(mode: LayoutMode) -> Bool {
+        guard !mode.isReplay else { return false }
+        return settings.chessClockEnabled && gameType == .overTheBoard && !session.analysisEnabled
+    }
+
+    private func boardSurface() -> some View {
+        Color.clear
+            .aspectRatio(1, contentMode: .fit)
+            .overlay {
+                SpriteView(scene: session.board, options: [.allowsTransparency])
+                    .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            }
+            .background {
+                GeometryReader { proxy in
+                    Color.clear
+                        .onAppear {
+                            updateMeasuredBoardSide(min(proxy.size.width, proxy.size.height))
+                        }
+                        .onChange(of: proxy.size) { newSize in
+                            updateMeasuredBoardSide(min(newSize.width, newSize.height))
+                        }
+                }
+            }
+    }
+
+    private func updateMeasuredBoardSide(_ rawSide: CGFloat) {
+        let normalized = max(0, rawSide.rounded(.down))
+        guard abs(normalized - measuredBoardSide) >= 1 else { return }
+        measuredBoardSide = normalized
+    }
+
+    @ViewBuilder
+    private func replayAnalysisPanel(isLandscape: Bool) -> some View {
+        if showsAnalysisPanel {
+            analysisPanel(isLandscape: isLandscape)
+        } else {
+            analysisStartPlaceholder(isLandscape: isLandscape)
+        }
+    }
+
+    @ViewBuilder
+    private func analysisStartPlaceholder(isLandscape: Bool) -> some View {
+        VStack(spacing: 14) {
+            Text("Replay Analysis")
+                .font(.headline)
+                .foregroundColor(.primary)
+
+            Button(action: session.startAnalysis) {
+                Text(session.analysisPreparing ? "Preparing..." : "Start analysing")
+                    .font(.headline)
+                    .foregroundColor(.white)
+                    .padding(.horizontal, 18)
+                    .padding(.vertical, 12)
+                    .background(Color(.init(rgb: 0x8A6348)), in: Capsule())
+            }
+            .disabled(session.analysisPreparing)
+        }
+        .padding(20)
+        .frame(maxWidth: isLandscape ? 340 : .infinity, maxHeight: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .fill(.ultraThinMaterial)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: 12, style: .continuous)
+                .stroke(Color.black.opacity(0.08), lineWidth: 1)
+        }
+    }
+
+    @ViewBuilder
+    private func controls(isLandscape: Bool) -> some View {
+        Group {
+            if isLandscape {
+                VStack(spacing: 0) {
+                    controlButton("arrow.left", action: session.undo, enabled: session.canUndo)
+                    controlButton("arrow.right", action: session.redo, enabled: session.canRedo)
+                    controlButton("flag.checkered", action: { session.showingRestartAlert = true })
+                    controlButton("gearshape", action: { session.showingSettings = true })
+                }
+            } else {
+                HStack(spacing: 0) {
+                    controlButton("arrow.left", action: session.undo, enabled: session.canUndo)
+                    controlButton("arrow.right", action: session.redo, enabled: session.canRedo)
+                    controlButton("flag.checkered", action: { session.showingRestartAlert = true })
+                    controlButton("gearshape", action: { session.showingSettings = true })
+                }
+                .frame(maxWidth: .infinity)
             }
         }
         .font(.system(size: 28))
-        .sheet(isPresented: $showingSettings) {
-            SettingsView()
-        }
-        .alert(isPresented: $showingRestartAlert) {
+        .alert(isPresented: $session.showingRestartAlert) {
             Alert(
                 title: Text("Start a new game?"),
                 message: Text("Are you sure you want to start a new game?"),
-                primaryButton: .default(Text("Restart"), action: {
-                    self.board!.resetBoardAndGame()
-                    if startTime.timeIntervalSinceNow < -60 {
-                        showRatingView()
-                    }
-                    self.undos = 0
-                    //                    self.resetClockValues()
-                    if gameType == .overTheBoard {
-                        self.board?.saveGame()
-                    }
-                    
-                    resetTimer()
-                }),
+                primaryButton: .default(Text("Restart"), action: session.restart),
                 secondaryButton: .cancel(Text("Cancel"))
             )
         }
     }
-    
+
+    private func controlButton(_ systemName: String, action: @escaping () -> Void, enabled: Bool = true) -> some View {
+        Button(action: action) {
+            Image(systemName: systemName)
+                .padding(12)
+        }
+        .disabled(!enabled)
+    }
+
     @ViewBuilder
-    var clock: some View {
-        let activeColor = Color(.init(rgb: 0xAA724A))
-//        let activeColor = Color(.init(rgb: 0x7E5536))
-        //        let nonactiveColor = Color(.init(rgb: 0x5E3E25))
-        let nonactiveColor = Color(.init(rgb: 0x7E5536))
-        VStack(spacing: 0) {
+    private func analysisPanel(isLandscape: Bool) -> some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("Analyzer")
+                    .font(.headline)
+                Spacer()
+                if session.analyzer.isAnalyzing {
+                    ProgressView().scaleEffect(0.8)
+                }
+            }
+
+            evaluationBar
+
+            if displayedLines.isEmpty && !session.analysisPreparing {
+                Text("No lines yet")
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            } else {
+                ScrollView {
+                    LazyVStack(alignment: .leading, spacing: 8) {
+                        ForEach(displayedLines) { line in
+                            analysisLineRow(line)
+                        }
+                    }
+                }
+            }
+
+            if session.analysisPreparing {
+                ProgressView(value: session.analysisPreparationProgress)
+            }
+            if let message = session.analysisPreparationMessage {
+                Text(message)
+                    .font(.footnote)
+                    .foregroundColor(.secondary)
+            }
+        }
+        .padding(10)
+        .frame(maxWidth: isLandscape ? 340 : .infinity, alignment: .top)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+    }
+
+    private var portraitTopClockCard: some View {
+        portraitClockCard(
+            time: session.formatTimeToString(session.blackTimerRemaining),
+            isActive: session.clockTurnOf == .black,
+            background: Color(.init(rgb: 0x8A6348)),
+            activeBackground: Color(.init(rgb: 0xAA724A)),
+            foreground: .white
+        )
+        .alert(isPresented: $session.showingBlackRanOutOfTime) {
+            Alert(
+                title: Text("White wins! (Timeout)"),
+                message: Text(""),
+                dismissButton: .default(Text("OK"), action: {
+                    settings.chessClockEnabled = false
+                })
+            )
+        }
+    }
+
+    private var portraitBottomClockCard: some View {
+        portraitClockCard(
+            time: session.formatTimeToString(session.whiteTimerRemaining),
+            isActive: session.clockTurnOf == .white,
+            background: Color(.init(rgb: 0xDCC6B3)),
+            activeBackground: Color(.init(rgb: 0xE9D7C8)),
+            foreground: Color.black.opacity(0.78)
+        )
+        .alert(isPresented: $session.showingWhiteRanOutOfTime) {
+            Alert(
+                title: Text("Black wins! (Timeout)"),
+                message: Text(""),
+                dismissButton: .default(Text("OK"), action: {
+                    settings.chessClockEnabled = false
+                })
+            )
+        }
+    }
+
+    private func portraitClockCard(
+        time: String,
+        isActive: Bool,
+        background: Color,
+        activeBackground: Color,
+        foreground: Color
+    ) -> some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(isActive ? activeBackground : background)
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color(.init(rgb: 0x6D4A34)), lineWidth: 2)
+            Text(time)
+                .font(.title2.monospacedDigit())
+                .lineLimit(1)
+                .minimumScaleFactor(0.65)
+                .foregroundStyle(foreground)
+                .padding(.horizontal, 8)
+        }
+        .frame(maxWidth: .infinity, minHeight: 54, maxHeight: 54)
+    }
+
+    private var landscapeClockPanel: some View {
+        clock
+    }
+
+    private var landscapeClockPlaceholder: some View {
+        clock
+            .hidden()
+            .allowsHitTesting(false)
+    }
+
+    @ViewBuilder
+    private func analysisLineRow(_ line: GameAnalyzer.AnalysisLine) -> some View {
+        HStack(spacing: 10) {
+            pieceIcon(for: line)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("#\(line.index) \(line.move.description)")
+                    .font(.subheadline)
+                    .lineLimit(1)
+                Text("Depth \(line.depth ?? 0)")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer(minLength: 8)
+
+            Text(line.score.text)
+                .font(.system(.subheadline, design: .monospaced))
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(isBest(line: line) ? Color.brown.opacity(0.16) : Color.clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
+    @ViewBuilder
+    private var evaluationBar: some View {
+        let score = displayedLines.first?.score
+        let fraction = evaluationFraction(from: score)
+
+        VStack(alignment: .leading, spacing: 4) {
+            HStack {
+                Text("Eval")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+                Spacer()
+                Text(score?.text ?? "-")
+                    .font(.system(.caption, design: .monospaced))
+            }
+            GeometryReader { proxy in
+                ZStack(alignment: .leading) {
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .fill(Color.black.opacity(0.15))
+                    RoundedRectangle(cornerRadius: 5, style: .continuous)
+                        .fill(Color.white.opacity(0.9))
+                        .frame(width: proxy.size.width * fraction)
+                }
+            }
+            .frame(height: 12)
+        }
+    }
+
+    private func evaluationFraction(from score: GameAnalyzer.AnalysisScore?) -> CGFloat {
+        guard let score else { return 0.5 }
+        if let mate = score.mate {
+            return mate > 0 ? 1 : 0
+        }
+        guard let cp = score.cp else { return 0.5 }
+        let clamped = max(-1200.0, min(1200.0, cp))
+        return CGFloat((clamped + 1200.0) / 2400.0)
+    }
+
+    @ViewBuilder
+    private func pieceIcon(for line: GameAnalyzer.AnalysisLine) -> some View {
+        if let imageName = pieceImageName(for: line.move) {
+            Image(imageName)
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 22, height: 22)
+        } else {
+            Image(systemName: "circle.fill")
+                .font(.caption)
+                .foregroundColor(.secondary)
+                .frame(width: 22, height: 22)
+        }
+    }
+
+    private func pieceImageName(for move: GameAnalyzer.MoveInfo) -> String? {
+        guard (0..<8).contains(move.from.y), (0..<8).contains(move.from.x) else { return nil }
+        if let piece = session.board.game.board[move.from.y][move.from.x] {
+            return "\(piece.pieceType.rawValue)-\(piece.pieceColor.rawValue)"
+        }
+        if let promotion = move.promotion {
+            return "\(promotion.rawValue)-\(session.board.game.turnOf.rawValue)"
+        }
+        return nil
+    }
+
+    @ViewBuilder
+    private var clock: some View {
+        let lightBg = Color(.init(rgb: 0xDCC6B3))
+        let darkBg = Color(.init(rgb: 0x8A6348))
+        let lightActiveBg = Color(.init(rgb: 0xE9D7C8))
+        let darkActiveBg = Color(.init(rgb: 0xAA724A))
+        let borderColor = Color(.init(rgb: 0x6D4A34))
+
+        VStack(spacing: 12) {
             ZStack {
-                Rectangle()
-                    .fill(clockTurnOf == nil ? nonactiveColor : (clockTurnOf == .black ?  activeColor : nonactiveColor))
-                    .cornerRadius(20, corners: [.topLeft, .topRight])
-                Text("\(formatTimeToString(blackTimerRemaining))")
-                    .font(.largeTitle)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(session.clockTurnOf == .black ? darkActiveBg : darkBg)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(borderColor, lineWidth: 2)
+                Text(session.formatTimeToString(session.blackTimerRemaining))
+                    .font(.largeTitle.monospacedDigit())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
                     .foregroundStyle(.white)
                     .rotationEffect(.radians(.pi / 2))
+                    .padding(.horizontal, 8)
             }
-            .alert(isPresented: $showingBlackRanOutOfTime) {
+            .frame(width: 96, height: 168)
+            .alert(isPresented: $session.showingBlackRanOutOfTime) {
                 Alert(
                     title: Text("White wins! (Timeout)"),
                     message: Text(""),
                     dismissButton: .default(Text("OK"), action: {
-                        chessClockEnabled = false
+                        settings.chessClockEnabled = false
                     })
                 )
             }
-            
+
             ZStack {
-                Rectangle()
-                    .fill(clockTurnOf == nil ? nonactiveColor : (clockTurnOf == .white ?  activeColor : nonactiveColor))
-                    .cornerRadius(20, corners: [.bottomLeft, .bottomRight])
-                Text("\(formatTimeToString(whiteTimerRemaining))")
-                    .font(.largeTitle)
-                    .foregroundStyle(.white)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .fill(session.clockTurnOf == .white ? lightActiveBg : lightBg)
+                RoundedRectangle(cornerRadius: 18, style: .continuous)
+                    .stroke(borderColor, lineWidth: 2)
+                Text(session.formatTimeToString(session.whiteTimerRemaining))
+                    .font(.largeTitle.monospacedDigit())
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.65)
+                    .foregroundStyle(.black.opacity(0.78))
                     .rotationEffect(.radians(.pi / 2))
+                    .padding(.horizontal, 8)
             }
-            .alert(isPresented: $showingWhiteRanOutOfTime) {
+            .frame(width: 96, height: 168)
+            .alert(isPresented: $session.showingWhiteRanOutOfTime) {
                 Alert(
                     title: Text("Black wins! (Timeout)"),
                     message: Text(""),
                     dismissButton: .default(Text("OK"), action: {
-                        chessClockEnabled = false
+                        settings.chessClockEnabled = false
                     })
                 )
             }
-            
         }
-        .frame(maxHeight: .infinity)
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 16)
         .padding(.vertical, 12)
-        .onChange(of: chessClockTime) { newValue in
-            resetTimer()
-        }
     }
-    
+
     @ViewBuilder
-    var customBoardPieces: some View {
+    private var customBoardPieces: some View {
         HStack {
             ForEach([ChessPieceColor.white, .black], id: \.self) { color in
                 VStack {
                     ForEach([ChessPieceType.pawn, .knight, .bishop, .rook, .queen], id: \.self) { type in
-                        DraggableChessPiece(tryAddingPieceAtDroppedPoint: { point in
-                            board?.tryAddingPieceAtDroppedPoint(type: type, color: color, point: point)
-                        }, chessPieceType: type, chessPieceColor: color)
+                        DraggableChessPiece { point in
+                            session.board.tryAddingPieceAtDroppedPoint(type: type, color: color, point: point)
+                        } chessPieceType: {
+                            type
+                        } chessPieceColor: {
+                            color
+                        }
                     }
                 }
             }
         }
     }
-    
-    struct DraggableChessPiece: View {
-        var tryAddingPieceAtDroppedPoint: (CGPoint) -> ()
-        
-        @State var position: CGPoint = .zero
-        @State var initialPosition: CGPoint = .zero
-        @State var chessPieceType: ChessPieceType
-        @State var chessPieceColor: ChessPieceColor
 
-        var body: some View {
-            GeometryReader { p in
-                Image("\(chessPieceType.rawValue)-\(chessPieceColor.rawValue)")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .position(position)
-                    .gesture(
-                        DragGesture()
-                            .onChanged { gesture in
-                                position = gesture.location
-                            }
-                            .onEnded { _ in
-                                tryAddingPieceAtDroppedPoint(
-                                    CGPoint(x: p.frame(in: .global).origin.x + position.x - UIScreen.main.bounds.width / 2,
-                                                                   y: -(p.frame(in: .global).origin.y + position.y - UIScreen.main.bounds.height / 2)) )
-                                position = initialPosition
-                            }
-                    )
-                    .onAppear {
-                        initialPosition = .init(x: p.size.width / 2, y: p.size.height / 2)
-                        position = initialPosition
-                    }
-            }
+    private func isBest(line: GameAnalyzer.AnalysisLine) -> Bool {
+        guard let bestMove = displayedBestMove else { return false }
+        return line.move == bestMove
+    }
 
-        }
-    }
-                                
-    
-    func undoButtonPressed() {
-        pauseTimer()
-        if undos < 4 || isPro {
-            board?.undo(noRulesEnabled: gameType == .puzzle)
-//            stopTimers()
-            undos += 1
-        } else {
-            showingProView = true
-        }
-    }
-    
-    func redoButtonPressed() {
-        pauseTimer()
-        if undos < 4 || isPro {
-            board?.redo(noRulesEnabled: gameType == .puzzle)
-            //        stopTimers()
-            undos += 1
-        } else {
-            showingProView = true
-        }
-    }
-    
-    func restartButtonPressed() {
-        showingRestartAlert = true
-    }
-    
-    func settingsButtonPressed() {
-        showingSettings = true
-    }
-    
-    
-    func createBoardScene(size: CGSize) {
-        print(size)
-        board = BoardScene(size: .init(width: UIScreen.main.bounds.size.width - boardPadding * 2,
-                                       height: UIScreen.main.bounds.size.height - boardPadding * 2))
-        board!.scaleMode = .aspectFill
-        board!.anchorPoint = CGPoint(x: 0.5, y: 0.5)
-        
-        board!.movedPieceCallback = movedPiece
-        board!.checkmateCallback = checkmate
-        
-        switch gameType {
-        case .overTheBoard:
-            board!.resetBoardAndGame()
-            board!.loadGameFromSave()
-            
-            resetTimer()
-        case .puzzle:
-            board!.shouldRotatePieces = false
-            
-            var emptyBoardPieces: [[ChessPiece?]] = Array(repeating:Array(repeating: nil, count: 8),count:8)
-            emptyBoardPieces[0][0] = .init(pieceColor: .black, pieceType: .king)
-            emptyBoardPieces[7][7] = .init(pieceColor: .white, pieceType: .king)
-
-            board!.resetBoardAndGame(customBoard: emptyBoardPieces)
-            //            onlineManager?.game = scene.game
-            //            scene.loadGame(history: onlineManager?.serverGame?.moves)
-            //            scene.allowMovesOnlyFromColor = (onlineManager?.serverGame!.whitePlayeriD == ChessAPI.login?.id) ? .white : .black
-            //            scene.view?.transform =  CGAffineTransform(rotationAngle: board!.allowMovesOnlyFromColor == .white ? 0 : .pi)
-        case .online:
-            break
-        case .engine:
-            break
-        }
-    }
-    
-    func movedPiece(color: ChessPieceColor, move: Move) {
-        resumeTimer()
-        if gameType == .overTheBoard {
-            board?.saveGame()
-        }
-    }
-    func checkmate(color: ChessPieceColor?) {
-        UIApplication.shared.alert(title: color == nil ? "Stalemate! (Draw)".localized : ((color == .black) ? "Black wins! (Checkmate)".localized : "White wins! (Checkmate)".localized), body: "")
-    }
-    
-    func resetTimer() {
-        pauseTimer()
-        whiteTimerRemaining = chessClockTime * 60
-        blackTimerRemaining = chessClockTime * 60
-    }
-    
-//    func changedTimerSettings() {
-//        resetTimer()
-//    }
-    
-    func showRatingView() {
-        func review() {
-            if !UserDefaults.standard.bool(forKey: "reviewed") {
-                if let scene = UIApplication.shared.connectedScenes.first(where: { $0.activationState == .foregroundActive }) as? UIWindowScene {
-                    SKStoreReviewController.requestReview(in: scene)
-                }
-                UserDefaults.standard.setValue(true, forKey: "reviewed")
-            }
-        }
-        
-        if !UserDefaults.standard.bool(forKey: "reviewed") {
-            let view: EnjoymentView = try! SwiftMessages.viewFromNib()
-            view.yesAction = { review(); SwiftMessages.hide() }
-            view.noAction = { SwiftMessages.hide(); UserDefaults.standard.set(true, forKey: "reviewed") }
-            var config = SwiftMessages.defaultConfig
-            config.presentationContext = .window(windowLevel: UIWindow.Level.statusBar)
-            config.duration = .forever
-            config.presentationStyle = .bottom
-            config.dimMode = .gray(interactive: true)
-            SwiftMessages.show(config: config, view: view)
-        }
-    }
-    
-    
-    // MARK: - Clock -
-    func resumeTimer() {
-        clockTurnOf = board!.game.turnOf
-        if clockTurnOf == .white {
-            timerBlack?.invalidate()
-            startWhiteTimer()
-        } else {
-            timerWhite?.invalidate()
-            startBlackTimer()
-        }
-    }
-    func pauseTimer() {
-        clockTurnOf = nil
-        timerWhite?.invalidate()
-        timerBlack?.invalidate()
-    }
-    fileprivate func startWhiteTimer() {
-        if !(timerWhite?.isValid ?? false) {
-            timerWhite = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { t in
-                whiteTimerRemaining -= 0.1
-                
-                if whiteTimerRemaining <= 0 {
-                    showingWhiteRanOutOfTime = true
-                    pauseTimer()
-                }
-            })
-        }
-    }
-    fileprivate func startBlackTimer() {
-        if !(timerBlack?.isValid ?? false) {
-            timerBlack = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true, block: { t in
-                blackTimerRemaining -= 0.1
-                
-                if blackTimerRemaining <= 0 {
-                    showingBlackRanOutOfTime = true
-                    pauseTimer()
-                }
-            })
-        }
-    }
-    
-    func formatTimeToString(_ time: Double) -> String {
-        let formatter = DateComponentsFormatter()
-        formatter.unitsStyle = .positional
-        formatter.allowedUnits = [.second, .minute]
-        formatter.zeroFormattingBehavior = [ .pad ]
-        return formatter.string(from: time) ?? "5:00"
+    private func leaveGame() {
+        session.handleExitFlowIfNeeded()
+        shown = false
+        dismiss()
     }
 }
 
-@available(iOS 15.0, *)
-struct GameView_Previews: PreviewProvider {
-    static var previews: some View {
-        GameView(shown: .constant(true), gameType: .overTheBoard)
+private struct DraggableChessPiece: View {
+    let tryAddingPieceAtDroppedPoint: (CGPoint) -> Void
+    let chessPieceType: () -> ChessPieceType
+    let chessPieceColor: () -> ChessPieceColor
+
+    @State private var position: CGPoint = .zero
+    @State private var initialPosition: CGPoint = .zero
+
+    var body: some View {
+        GeometryReader { proxy in
+            Image("\(chessPieceType().rawValue)-\(chessPieceColor().rawValue)")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(maxWidth: .infinity)
+                .position(position)
+                .gesture(
+                    DragGesture()
+                        .onChanged { gesture in
+                            position = gesture.location
+                        }
+                        .onEnded { _ in
+                            tryAddingPieceAtDroppedPoint(
+                                CGPoint(
+                                    x: proxy.frame(in: .global).origin.x + position.x - UIScreen.main.bounds.width / 2,
+                                    y: -(proxy.frame(in: .global).origin.y + position.y - UIScreen.main.bounds.height / 2)
+                                )
+                            )
+                            position = initialPosition
+                        }
+                )
+                .onAppear {
+                    initialPosition = CGPoint(x: proxy.size.width / 2, y: proxy.size.height / 2)
+                    position = initialPosition
+                }
+        }
     }
 }
 
+#Preview("iPhone") {
+    GameView(shown: .constant(true), gameType: .overTheBoard)
+}
+
+#Preview("iPad") {
+    GameView(shown: .constant(true), gameType: .overTheBoard)
+}

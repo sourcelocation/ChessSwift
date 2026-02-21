@@ -12,7 +12,16 @@ struct SavedChessGame: Codable {
         var type: ChessPieceType
         var color: ChessPieceColor
     }
+
     var id: UUID
+    var createdAt: Date?
     var finalBoard: [[Piece?]]
-    var history: [NormalMove]
+    var history: StoredGameHistory
+
+    init(id: UUID, createdAt: Date?, finalBoard: [[Piece?]], history: StoredGameHistory) {
+        self.id = id
+        self.createdAt = createdAt
+        self.finalBoard = finalBoard
+        self.history = history
+    }
 }

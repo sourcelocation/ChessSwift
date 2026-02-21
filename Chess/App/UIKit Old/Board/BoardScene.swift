@@ -7,14 +7,25 @@
 
 import SpriteKit
 import SwiftUI
+import AVFoundation
 
 class BoardScene: SKScene {
+    struct SettingsProvider {
+        var isProEnabled: () -> Bool = { false }
+        var isSoundEnabled: () -> Bool = { true }
+        var isCheckSoundEnabled: () -> Bool = { true }
+        var showLegalMoves: () -> Bool = { true }
+        var flipBlackPieces: () -> Bool = { true }
+    }
+
+    private static var didStartLoadingSounds = false
+    private static let sfxLoadQueue = DispatchQueue(label: "BoardScene.SFXLoad", qos: .userInitiated)
     
     public var game = ChessGame()
     
     // MARK: delegate stuff
-    public var movedPieceCallback: ((_ color: ChessPieceColor, _ move: Move) -> ())!
-    public var checkmateCallback: ((_ wins: ChessPieceColor?) -> ())!
+    public var movedPieceCallback: ((_ color: ChessPieceColor, _ move: Move) -> ())?
+    public var checkmateCallback: ((_ wins: ChessPieceColor?) -> ())?
 
     
 //    private weak var socket: ChessWebsocket?
@@ -45,6 +56,7 @@ class BoardScene: SKScene {
     
     // engine
     private var moveArrows: [SKShapeNode]? = nil
+    private var displayedArrowMoves: [NormalMove] = []
     
     
     private var touchPos: CGPoint?
@@ -67,24 +79,18 @@ class BoardScene: SKScene {
     public var shouldRotatePieces: Bool = true
     
     // MARK: Settings
-    var showHints: Bool {
-        return !UserDefaults.standard.bool(forKey: "showHints")
-    }
-    var undos: Int { // For free users
-        get { UserDefaults.standard.integer(forKey: "undos") }
-        set { UserDefaults.standard.set(newValue, forKey: "undos") }
-    }
+    var settingsProvider = SettingsProvider()
     
-    let checkmateSound: SKAction = .playSoundFileNamed("CheckSound3.wav", waitForCompletion: false)
-    let piecePlaceSound: SKAction = .playSoundFileNamed("ChessPiecePlace.wav", waitForCompletion: false)
-    let checkSound: SKAction = .playSoundFileNamed("CheckSound2.wav", waitForCompletion: false)
-    var noSounds: Bool { return UserDefaults.standard.bool(forKey: "noSounds") }
-    var noCheckSound: Bool { return UserDefaults.standard.bool(forKey: "noCheckSound") }
-    private var proVersion = false
+    private static var checkmatePlayer: AVAudioPlayer?
+    private static var piecePlacePlayer: AVAudioPlayer?
+    private static var checkPlayer: AVAudioPlayer?
+    var noSounds: Bool { !settingsProvider.isSoundEnabled() }
+    var noCheckSound: Bool { !settingsProvider.isCheckSoundEnabled() }
     
     
     override init(size: CGSize) {
         super.init(size: size)
+        backgroundColor = .clear
         print("reinit board with size \(size)")
     }
     
@@ -94,12 +100,8 @@ class BoardScene: SKScene {
     
     override func didMove(to view: SKView) {
         backgroundColor = .clear
-        
-        if !viewOnly {
-            run(.repeatForever(.sequence([.run { [weak self] in
-                self?.proVersion = UserDefaults.standard.bool(forKey: "pro")
-            },.wait(forDuration: 2)])))
-        }
+        preloadSoundsIfNeeded()
+
         game.delegate = self
         
         setUpSizes()
@@ -107,6 +109,36 @@ class BoardScene: SKScene {
         game.logic.game = game
         
         
+    }
+
+    private func preloadSoundsIfNeeded() {
+        guard !Self.didStartLoadingSounds else { return }
+        Self.didStartLoadingSounds = true
+
+        Self.sfxLoadQueue.async {
+            let piecePlayer = self.makePlayer(sound: "ChessPiecePlace", ext: "wav")
+            let checkPlayer = self.makePlayer(sound: "CheckSound2", ext: "wav")
+            let checkmatePlayer = self.makePlayer(sound: "CheckSound3", ext: "wav")
+
+            DispatchQueue.main.async {
+                Self.piecePlacePlayer = piecePlayer
+                Self.checkPlayer = checkPlayer
+                Self.checkmatePlayer = checkmatePlayer
+            }
+        }
+    }
+
+    private func makePlayer(sound: String, ext: String) -> AVAudioPlayer? {
+        guard let url = Bundle.main.url(forResource: sound, withExtension: ext),
+              let player = try? AVAudioPlayer(contentsOf: url) else { return nil }
+        player.prepareToPlay()
+        return player
+    }
+
+    private func play(_ player: AVAudioPlayer?) {
+        guard let player = player else { return }
+        player.currentTime = 0
+        player.play()
     }
     
     func resetBoardAndGame(customBoard: [[ChessPiece?]]? = nil) {
@@ -129,6 +161,12 @@ class BoardScene: SKScene {
     
     func adjustSizes() {
         setUpSizes()
+        createBoardImage()
+        deselectPiece()
+        removePieces()
+        createPieces()
+        displayMoveArrows(moves: displayedArrowMoves)
+        setHighlightFirstArrow(highlightFirstArrow)
     }
     
     func touchUp(atPoint loc: CGPoint) {
@@ -173,7 +211,7 @@ class BoardScene: SKScene {
         
         self.touchPos = loc
         self.moveTouchPos = loc
-        if proVersion {
+        if settingsProvider.isProEnabled() {
             if isDraggingPiece || (selectedPiecePos != nil && positionInBoard(at: selectedPiecePos!).distance(to: loc) < cellSize / 2) {
                 selectedPiece?.position = loc
                 isDraggingPiece = true
@@ -240,7 +278,7 @@ class BoardScene: SKScene {
             game.perform(move: move, addToHistory: true, uiMove: true, noRules: noRules)
             
             // timer
-            movedPieceCallback(game.piece(at: move.toPos)?.pieceColor ?? .white, move)
+            movedPieceCallback?(game.piece(at: move.toPos)?.pieceColor ?? .white, move)
         } else {
             bringSelectedPieceBack()
             deselectPiece()
@@ -259,7 +297,7 @@ class BoardScene: SKScene {
         selectedPieceMoves = game.moves(for: pos)
         
         resetMoveHints()
-        if showHints {
+        if settingsProvider.showLegalMoves() {
             for move in selectedPieceMoves {
                 addMoveCircle(at: move.toPos)
             }
@@ -287,7 +325,7 @@ class BoardScene: SKScene {
         for y in 0...7 {
             for x in 0...7 {
                 if let piece = game.piece(at: Pos(x: x, y: y)) {
-                    if piece.pieceColor == .black && !(UserDefaults.standard.bool(forKey: "noPieceRotation") || !shouldRotatePieces) { // fix me
+                    if piece.pieceColor == .black && (settingsProvider.flipBlackPieces() && shouldRotatePieces) {
                         piece.run(.rotate(toAngle: .pi, duration: 0))
                     } else {
                         piece.run(.rotate(toAngle: 0, duration: 0))
@@ -356,6 +394,7 @@ class BoardScene: SKScene {
         addChild(circle)
     }
     func displayMoveArrows(moves: [NormalMove]) {
+        displayedArrowMoves = moves
         moveArrows?.forEach({ node in node.removeFromParent() })
         moveArrows = []
         for (i, move) in moves.enumerated() {
@@ -445,13 +484,18 @@ extension BoardScene: ChessGameDelegate {
     
     func checkmate(kingPos: Pos, wins: ChessPieceColor?) {
         addRedCell(at: kingPos, check: true)
-        run(.sequence([.wait(forDuration: 0.2),checkmateSound]))
+        run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
+            self?.play(Self.checkmatePlayer)
+        }]))
 
-        checkmateCallback(wins)
+        checkmateCallback?(wins)
     }
     func pawnReachedEnd(color: ChessPieceColor, completion: @escaping (ChessPieceType) -> ()) {
         func callback(_ type: ChessPieceType) {
             completion(type)
+            if let lastMove = game.history.last {
+                movedPieceCallback?(game.piece(at: lastMove.toPos)?.pieceColor ?? .white, lastMove)
+            }
 //            if isOnline { socket?.sendMove(game.history.last!) }
         }
         
@@ -481,18 +525,21 @@ extension BoardScene: ChessGameDelegate {
     func check(kingPos: Pos) {
         addRedCell(at: kingPos, check: true)
         if !self.noSounds {
-            if !self.noCheckSound {
-                run(.sequence([.wait(forDuration: 0.2),checkSound]))
-            } else {
-                run(.sequence([.wait(forDuration: 0.2),piecePlaceSound]))
-            }
+            run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
+                guard let self = self else { return }
+                if !self.noCheckSound {
+                    self.play(Self.checkPlayer)
+                } else {
+                    self.play(Self.piecePlacePlayer)
+                }
+            }]))
         }
     }
     func uiMove(piece: ChessPiece, to position: Pos, withSound: Bool) {
         piece.run(.sequence([.move(to: positionInBoard(at: position), duration: 0.2), withSound ? .run { [weak self] in
             guard let self = self else { return }
             if !self.noSounds {
-                self.run(self.piecePlaceSound)
+                self.play(Self.piecePlacePlayer)
             }
             UIImpactFeedbackGenerator(style: .light).impactOccurred()
         }: .init()]))
@@ -561,44 +608,38 @@ extension BoardScene {
 
 // MARK: Save game
 extension BoardScene {
-    public func saveGame() {
-        let encoder = JSONEncoder()
-        encoder.outputFormatting = .prettyPrinted
-        let data = try! encoder.encode(game.history)
-        UserDefaults.standard.set(data, forKey: "History")
-    }
-    
-    public func loadGameFromSave(history: [NormalMove]? = nil) {
-        if let data = UserDefaults.standard.data(forKey: "History") {
-            let jsonDecoder = JSONDecoder()
-            do {
-                let moves = history == nil ? (try jsonDecoder.decode(History.self, from: data)).moves : history!
-                game.history = moves
-                game.currentMoveIHistory = moves.count - 1
-                removePieces()
-                for move in moves.dropLast() {
-                    game.perform(move: move, addToHistory: false, uiMove: false, noRules: noRules)
-                }
-                if let lastMove = moves.last {
-                    run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
-                        guard let self = self else { return }
-                        self.game.perform(move: lastMove, addToHistory: false, uiMove: true, noRules: self.noRules)
-//                        self.game.checkChecks(ui: true)
-                    }]))
-                }
-                createPieces()
-            } catch {
-                print(error)
+    public func restore(history moves: [NormalMove], currentMoveIndex: Int? = nil) {
+        game.history = moves
+        if moves.isEmpty {
+            game.currentMoveIHistory = nil
+        } else if let currentMoveIndex {
+            if currentMoveIndex < 0 {
+                game.currentMoveIHistory = nil
+            } else {
+                game.currentMoveIHistory = min(currentMoveIndex, moves.count - 1)
             }
+        } else {
+            game.currentMoveIHistory = moves.count - 1
         }
+
+        let renderedMoves = game.slicedHistory
+        removePieces()
+        for move in renderedMoves.dropLast() {
+            game.perform(move: move, addToHistory: false, uiMove: false, noRules: noRules)
+        }
+        if let lastMove = renderedMoves.last {
+            run(.sequence([.wait(forDuration: 0.2), .run { [weak self] in
+                guard let self = self else { return }
+                self.game.perform(move: lastMove, addToHistory: false, uiMove: true, noRules: self.noRules)
+            }]))
+        }
+        createPieces()
+    }
+
+    public var currentHistory: [NormalMove] {
+        game.history
     }
     
-    public func addGameToSavedGames(_ savedGame: SavedChessGame) {
-        let data = UserDefaults.standard.data(forKey: "SavedGames")
-        var savedGames = data != nil ? try! JSONDecoder().decode([SavedChessGame].self, from: data!) : []
-        savedGames.insert(savedGame, at: 0)
-        UserDefaults.standard.set(try! JSONEncoder().encode(savedGames), forKey: "SavedGames")
-    }
 }
 
 

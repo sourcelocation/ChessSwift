@@ -12,6 +12,11 @@ enum GameType {
 }
 
 class ChessGame {
+    private struct FenPiece {
+        var color: ChessPieceColor
+        var type: ChessPieceType
+    }
+
     var board: [[ChessPiece?]] = []
     var history: [NormalMove] = []
     var slicedHistory: [NormalMove] {
@@ -162,10 +167,8 @@ class ChessGame {
         return false
     }
     func checkChecks(ui: Bool) {
-        let isWhiteInCheck = self.checkCheck(forPieceColor: .white, ui: ui)
-//        if !isWhiteInCheck { // prevent double alert
-            let _ = self.checkCheck(forPieceColor: .black, ui: ui)
-//        }
+        let _ = self.checkCheck(forPieceColor: .white, ui: ui)
+        let _ = self.checkCheck(forPieceColor: .black, ui: ui)
     }
     
     func moveHistoryToBeginning() {
@@ -275,22 +278,150 @@ class ChessGame {
             s +=  "-"
         }
         
-        s +=  " \(slicedHistory.count) \(slicedHistory.count / 2)"
+        let (halfmoveClock, fullmoveNumber) = fenCounters()
+        s +=  " \(halfmoveClock) \(fullmoveNumber)"
         
         return s
     }
     
     func getFenCastleRights() -> String {
         var s = ""
-        if logic.whiteCanCastle {
-            s += "KQ"
+        if canCastleKingSide(.white) {
+            s += "K"
         }
-        if logic.blackCanCastle {
-            s += "kq"
+        if canCastleQueenSide(.white) {
+            s += "Q"
         }
-        if s == "" { s = "-" }
+        if canCastleKingSide(.black) {
+            s += "k"
+        }
+        if canCastleQueenSide(.black) {
+            s += "q"
+        }
+        if s.isEmpty { s = "-" }
         
         return s
+    }
+    
+    private func canCastleKingSide(_ color: ChessPieceColor) -> Bool {
+        let kingPos = Pos(x: 4, y: color == .white ? 7 : 0)
+        let rookPos = Pos(x: 7, y: color == .white ? 7 : 0)
+        
+        guard let king = piece(at: kingPos),
+              let rook = piece(at: rookPos),
+              king.pieceType == .king,
+              rook.pieceType == .rook,
+              king.pieceColor == color,
+              rook.pieceColor == color
+        else {
+            return false
+        }
+        
+        return !hasHistoryTouching(square: kingPos) && !hasHistoryTouching(square: rookPos)
+    }
+    
+    private func canCastleQueenSide(_ color: ChessPieceColor) -> Bool {
+        let kingPos = Pos(x: 4, y: color == .white ? 7 : 0)
+        let rookPos = Pos(x: 0, y: color == .white ? 7 : 0)
+        
+        guard let king = piece(at: kingPos),
+              let rook = piece(at: rookPos),
+              king.pieceType == .king,
+              rook.pieceType == .rook,
+              king.pieceColor == color,
+              rook.pieceColor == color
+        else {
+            return false
+        }
+        
+        return !hasHistoryTouching(square: kingPos) && !hasHistoryTouching(square: rookPos)
+    }
+    
+    private func hasHistoryTouching(square: Pos) -> Bool {
+        slicedHistory.contains(where: { moveTouchesSquare($0, square: square) })
+    }
+    
+    private func moveTouchesSquare(_ move: Move, square: Pos) -> Bool {
+        if let normalMove = move as? NormalMove {
+            if normalMove.fromPos == square || normalMove.toPos == square {
+                return true
+            }
+        } else if let destroyMove = move as? DestroyMove {
+            if destroyMove.pos == square {
+                return true
+            }
+        } else if let createMove = move as? CreateMove {
+            if createMove.pos == square {
+                return true
+            }
+        } else if let promotion = move as? PawnToQueenMove {
+            if promotion.pos == square {
+                return true
+            }
+        }
+        
+        if let additionalMove = move.additionalMove {
+            return moveTouchesSquare(additionalMove, square: square)
+        }
+        return false
+    }
+    
+    private func fenCounters() -> (halfmove: Int, fullmove: Int) {
+        var tempBoard = ChessGame.initialBoard.map { row in
+            row.map { piece -> FenPiece? in
+                guard let piece else { return nil }
+                return FenPiece(color: piece.pieceColor, type: piece.pieceType)
+            }
+        }
+        
+        var halfmoveClock = 0
+        var fullmoveNumber = 1
+        var sideToMove: ChessPieceColor = .white
+        
+        for move in slicedHistory {
+            guard let fromPos = move.fromPos, let toPos = move.toPos else { continue }
+            let movingPiece = tempBoard[fromPos.y][fromPos.x]
+            let isPawnMove = movingPiece?.type == .pawn
+            let isCapture = (fromPos != toPos && tempBoard[toPos.y][toPos.x] != nil) || move.additionalMove is DestroyMove
+            
+            if isPawnMove || isCapture {
+                halfmoveClock = 0
+            } else {
+                halfmoveClock += 1
+            }
+            
+            applyMoveToFenBoard(move, board: &tempBoard)
+            
+            if sideToMove == .black {
+                fullmoveNumber += 1
+            }
+            sideToMove = sideToMove.inverted
+        }
+        
+        return (halfmoveClock, fullmoveNumber)
+    }
+    
+    private func applyMoveToFenBoard(_ move: Move, board: inout [[FenPiece?]]) {
+        if let normalMove = move as? NormalMove {
+            if normalMove.fromPos != normalMove.toPos {
+                let piece = board[normalMove.fromPos.y][normalMove.fromPos.x]
+                board[normalMove.fromPos.y][normalMove.fromPos.x] = nil
+                board[normalMove.toPos.y][normalMove.toPos.x] = piece
+            }
+        } else if let destroyMove = move as? DestroyMove {
+            board[destroyMove.pos.y][destroyMove.pos.x] = nil
+        } else if let createMove = move as? CreateMove {
+            board[createMove.pos.y][createMove.pos.x] = FenPiece(color: createMove.pieceColor, type: createMove.pieceType)
+        } else if let promotion = move as? PawnToQueenMove {
+            if var piece = board[promotion.pos.y][promotion.pos.x] {
+                piece.type = promotion.turnedTo
+                board[promotion.pos.y][promotion.pos.x] = piece
+            }
+        }
+        
+        if let additional = move.additionalMove {
+            applyMoveToFenBoard(additional, board: &board)
+        }
     }
     
     func posToCoordinateString(_ pos: Pos) -> String {

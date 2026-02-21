@@ -8,17 +8,13 @@
 import SwiftUI
 
 struct MenuView: View {
-    @State var showOfflineGame = false
-    @State var showOnlineGame = false
-    @State var showPuzzleGame = false
-    
     @State var showingSettings = false
     @State var showingPremium = false
     
-    @AppStorage("pro") var isPro = false
+    @ObservedObject private var settings = AppEnvironment.shared.settings
     
     var body: some View {
-        NavigationView {
+        NavigationStack {
             ZStack {
                 Color(.init(rgb: 0xF4EDE3))
                     .edgesIgnoringSafeArea(.all)
@@ -32,14 +28,15 @@ struct MenuView: View {
                         .padding(.bottom,24)
                         .padding(.horizontal, 32)
                     
-                    NavigationLink(destination: GameView(shown: $showOfflineGame, gameType: .overTheBoard), isActive: $showOfflineGame) {
+                    NavigationLink {
+                        GameView(shown: .constant(true), gameType: .overTheBoard)
+                    } label: {
                         MenuButton(image: "ipad", text: "Play")
                     }
-                    NavigationLink(destination: GameView(shown: $showOnlineGame, gameType: .online), isActive: $showOnlineGame) {
-                        MenuButton(image: "globe", text: "Online game")
-                    }
-                    if isPro {
-                        NavigationLink(destination: GameView(shown: $showPuzzleGame, gameType: .puzzle), isActive: $showPuzzleGame) {
+                    if settings.proEnabled {
+                        NavigationLink {
+                            GameView(shown: .constant(true), gameType: .puzzle)
+                        } label: {
                             MenuButton(image: "puzzlepiece", text: "Custom Position")
                         }
                     } else {
@@ -48,6 +45,12 @@ struct MenuView: View {
                         }) {
                             MenuButton(image: "puzzlepiece", text: "Custom Position")
                         }
+                    }
+
+                    NavigationLink {
+                        SavedGamesView()
+                    } label: {
+                        MenuButton(image: "clock.arrow.circlepath", text: "Saved Games")
                     }
                     
                     HStack(spacing:20) {
@@ -73,7 +76,6 @@ struct MenuView: View {
             }
             .navigationBarHidden(true)
         }
-        .navigationViewStyle(StackNavigationViewStyle())
         .sheet(isPresented: $showingSettings) {
             SettingsView()
         }

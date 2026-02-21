@@ -22,14 +22,18 @@ class StoreManager: NSObject, ObservableObject {
     }
     func purchaseProVersion() {
         #if DEBUG
-        UserDefaults.standard.set(true, forKey: "pro")
+        Task { @MainActor in
+            AppEnvironment.shared.settings.proEnabled = true
+        }
         self.transactionState = .purchased
         #endif
         SwiftyStoreKit.purchaseProduct("io.github.exerhythm.Chess.Pro", quantity: 1, atomically: true) { [weak self] result in
             switch result {
             case .success(let purchase):
                 print("Purchase Success: \(purchase.productId)")
-                UserDefaults.standard.set(true, forKey: "pro")
+                Task { @MainActor in
+                    AppEnvironment.shared.settings.proEnabled = true
+                }
                 self?.transactionState = .purchased
             case .error, .deferred: break
             }
@@ -42,7 +46,9 @@ class StoreManager: NSObject, ObservableObject {
             }
             else if results.restoredPurchases.count > 0 {
                 print("Restore Success: \(results.restoredPurchases)")
-                UserDefaults.standard.set(true, forKey: "pro")
+                Task { @MainActor in
+                    AppEnvironment.shared.settings.proEnabled = true
+                }
                 self.transactionState = .restored
             }
             else {

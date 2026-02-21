@@ -6,31 +6,22 @@
 //
 
 import SwiftUI
-import SwiftyStoreKit
+import Darwin
 
 @main
 struct ChessApp: App {
+    @StateObject private var environment = AppEnvironment.shared
+
     var body: some Scene {
         WindowGroup {
             MenuView()
+                .environmentObject(environment.settings)
         }
     }
     
     init() {
-        SwiftyStoreKit.completeTransactions(atomically: true) { purchases in
-            for purchase in purchases {
-                switch purchase.transaction.transactionState {
-                case .purchased, .restored:
-                    if purchase.needsFinishTransaction {
-                        SwiftyStoreKit.finishTransaction(purchase.transaction)
-                    }
-                case .failed, .purchasing, .deferred:
-                    break
-                @unknown default:
-                    fatalError()
-                }
-            }
-        }
+        signal(SIGPIPE, SIG_IGN)
+        AppEnvironment.shared.purchaseService.configureTransactions()
         UIApplication.shared.isIdleTimerDisabled = true
     }
 }
