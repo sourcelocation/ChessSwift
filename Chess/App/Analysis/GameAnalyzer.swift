@@ -3,6 +3,28 @@ import ChessKitEngine
 
 @MainActor
 final class GameAnalyzer: ObservableObject {
+    enum RunState: Equatable {
+        case idle
+        case starting
+        case analyzing
+        case stopping
+        case failed(String)
+    }
+
+    struct Snapshot: Equatable {
+        let requestID: Int
+        let fen: String
+        let lines: [AnalysisLine]
+        let bestMove: MoveInfo?
+        let isAnalyzing: Bool
+        let runState: RunState
+    }
+
+    struct AnalysisRequest: Equatable {
+        let id: Int
+        let fen: String
+    }
+
     struct AnalysisScore: Equatable {
         let cp: Double?
         let mate: Int?
@@ -53,6 +75,8 @@ final class GameAnalyzer: ObservableObject {
     @Published private(set) var lines: [AnalysisLine] = []
     @Published private(set) var bestMove: MoveInfo?
     @Published private(set) var isAnalyzing = false
+    @Published private(set) var runState: RunState = .idle
+    @Published private(set) var snapshot: Snapshot?
 
     private let engine = Engine(type: .stockfish)
     private let multiPV: Int
@@ -64,6 +88,7 @@ final class GameAnalyzer: ObservableObject {
     private var isShuttingDown = false
     private var lineByIndex: [Int: AnalysisLine] = [:]
     private var modelOptions: ModelOptions?
+    private var activeRequest: AnalysisRequest?
 
     init(multiPV: Int = 3, depth: Int = 14) {
         self.multiPV = max(1, multiPV)
@@ -78,14 +103,19 @@ final class GameAnalyzer: ObservableObject {
         }
     }
 
-    func analyze(fen: String?) {
+    func analyze(fen: String?, requestID: Int) {
         guard let fen, !fen.isEmpty, !isShuttingDown else { return }
+        let request = AnalysisRequest(id: requestID, fen: fen)
+        activeRequest = request
         resetInFlightResult()
         analyzeTask?.cancel()
 
         analyzeTask = Task { [weak self] in
             guard let self else { return }
             guard !self.isShuttingDown else { return }
+            await MainActor.run {
+                self.runState = .starting
+            }
             await self.ensureStarted()
             guard self.started, !self.isShuttingDown else { return }
             await self.engine.send(command: .stop)
@@ -93,6 +123,8 @@ final class GameAnalyzer: ObservableObject {
             await self.engine.send(command: .position(.fen(fen)))
             await MainActor.run {
                 self.isAnalyzing = true
+                self.runState = .analyzing
+                self.publishSnapshotIfPossible()
             }
             guard !self.isShuttingDown else { return }
             await self.engine.send(command: .go(depth: self.depth))
@@ -101,10 +133,12 @@ final class GameAnalyzer: ObservableObject {
 
     func stopAnalysis() {
         analyzeTask?.cancel()
+        runState = .stopping
         analyzeTask = Task { [weak self] in
             guard let self else { return }
             await self.engine.send(command: .stop)
         }
+        activeRequest = nil
         resetInFlightResult()
     }
 
@@ -119,6 +153,7 @@ final class GameAnalyzer: ObservableObject {
         streamTask = nil
         await engine.stop()
         started = false
+        activeRequest = nil
         resetInFlightResult()
         isShuttingDown = false
     }
@@ -163,9 +198,11 @@ final class GameAnalyzer: ObservableObject {
         switch response {
         case let .info(info):
             guard isAnalyzing,
+                  let request = activeRequest,
                   let pv = info.pv,
                   let firstMove = pv.first,
-                  let move = Self.moveInfo(from: firstMove)
+                  let move = Self.moveInfo(from: firstMove),
+                  Self.isMoveConsistentWithPosition(move, fen: request.fen)
             else { return }
 
             let index = max(1, info.multipv ?? 1)
@@ -179,10 +216,19 @@ final class GameAnalyzer: ObservableObject {
 
             lineByIndex[index] = line
             lines = lineByIndex.values.sorted(by: { $0.index < $1.index })
+            publishSnapshotIfPossible()
 
         case let .bestmove(move, _):
-            bestMove = Self.moveInfo(from: move)
+            if let request = activeRequest,
+               let parsedMove = Self.moveInfo(from: move),
+               Self.isMoveConsistentWithPosition(parsedMove, fen: request.fen) {
+                bestMove = parsedMove
+            } else {
+                bestMove = nil
+            }
             isAnalyzing = false
+            runState = .idle
+            publishSnapshotIfPossible()
 
         default:
             break
@@ -194,6 +240,27 @@ final class GameAnalyzer: ObservableObject {
         bestMove = nil
         lines = []
         lineByIndex = [:]
+        if case .failed = runState {
+            // Keep explicit failure until the next analyze() call overrides it.
+        } else {
+            runState = .idle
+        }
+        publishSnapshotIfPossible()
+    }
+
+    private func publishSnapshotIfPossible() {
+        guard let activeRequest else {
+            snapshot = nil
+            return
+        }
+        snapshot = Snapshot(
+            requestID: activeRequest.id,
+            fen: activeRequest.fen,
+            lines: lines,
+            bestMove: bestMove,
+            isAnalyzing: isAnalyzing,
+            runState: runState
+        )
     }
 
     nonisolated private static func score(from score: EngineResponse.Info.Score?) -> AnalysisScore {
@@ -251,5 +318,42 @@ final class GameAnalyzer: ObservableObject {
 
     nonisolated private static func coordinateString(for pos: Pos) -> String {
         ["a", "b", "c", "d", "e", "f", "g", "h"][pos.x] + String(8 - pos.y)
+    }
+
+    nonisolated private static func isMoveConsistentWithPosition(_ move: MoveInfo, fen: String) -> Bool {
+        guard let sideToMove = sideToMove(from: fen),
+              let pieceColor = pieceColor(at: move.from, fen: fen)
+        else {
+            return false
+        }
+        return sideToMove == pieceColor
+    }
+
+    nonisolated private static func sideToMove(from fen: String) -> ChessPieceColor? {
+        let parts = fen.split(separator: " ")
+        guard parts.count >= 2 else { return nil }
+        return parts[1] == "w" ? .white : (parts[1] == "b" ? .black : nil)
+    }
+
+    nonisolated private static func pieceColor(at pos: Pos, fen: String) -> ChessPieceColor? {
+        let parts = fen.split(separator: " ")
+        guard let boardPart = parts.first else { return nil }
+        let ranks = boardPart.split(separator: "/")
+        guard ranks.count == 8, (0..<8).contains(pos.y) else { return nil }
+
+        let rank = ranks[pos.y]
+        var file = 0
+        for char in rank {
+            if let skip = char.wholeNumberValue {
+                file += skip
+                continue
+            }
+            guard file < 8 else { return nil }
+            if file == pos.x {
+                return char.isUppercase ? .white : .black
+            }
+            file += 1
+        }
+        return nil
     }
 }

@@ -7,6 +7,15 @@
 
 import SwiftUI
 
+enum PremiumPalette {
+    static let appBackground = Color(.init(rgb: 0xF4EDE3))
+    static let cardBackground = Color(.init(rgb: 0xE9D7C8))
+    static let iconBackground = Color(.init(rgb: 0xDCC6B3))
+    static let accent = Color(.init(rgb: 0x8A6348))
+    static let border = Color(.init(rgb: 0x6D4A34))
+    static let textPrimary = Color(.init(rgb: 0x2C2016))
+    static let textSecondary = Color(.init(rgb: 0x4B3729))
+}
 
 struct PremiumView: View {
     @StateObject var storeManager = StoreManager()
@@ -15,7 +24,7 @@ struct PremiumView: View {
     
     var body: some View {
         ZStack {
-            Color(#colorLiteral(red: 0.9137254902, green: 0.8980392157, blue: 0.8705882353, alpha: 1))
+            PremiumPalette.appBackground
                 .edgesIgnoringSafeArea(.all)
             HStack {
                 VStack {
@@ -26,7 +35,7 @@ struct PremiumView: View {
                             .resizable()
                             .frame(width: 24, height: 24, alignment: .center)
                             .padding()
-                            .foregroundColor(.accentColor)
+                            .foregroundColor(PremiumPalette.accent)
                     }
                     Spacer()
                 }
@@ -49,6 +58,7 @@ struct PremiumView: View {
                         Text("Restore purchase".localized)
                             .padding(8)
                             .font(.subheadline)
+                            .foregroundColor(PremiumPalette.textSecondary)
                             .padding(.bottom, 16)
                     }
                 }
@@ -67,6 +77,7 @@ struct PremiumView: View {
                                 Text("Restore purchase".localized)
                                     .padding(8)
                                     .font(.subheadline)
+                                    .foregroundColor(PremiumPalette.textSecondary)
                                     .padding(.bottom, 16)
                             }
                         }
@@ -84,56 +95,88 @@ struct PremiumView: View {
                 }
             }
         }
-        .foregroundColor(.black)
+        .foregroundColor(PremiumPalette.textPrimary)
     }
 }
 
 @available(iOS 13.0, *)
 struct Header: View {
     var body: some View {
-        VStack {
+        VStack(spacing: 2) {
             HStack {
                 Image(systemName: "crown")
                 Image(systemName: "checkerboard.rectangle")
             }
             .font(.system(size: 36))
-            .foregroundColor(Color(#colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 1)))
-            .padding(.top, 24)
+            .foregroundColor(PremiumPalette.accent)
             Text("Pro version".localized)
                 .font(.largeTitle)
                 .bold()
-                .padding(2)
+                .padding(.top, 8)
             Text("Chess: 2 Players".localized)
+                .foregroundColor(PremiumPalette.textSecondary)
         }
+        .padding(.vertical, 24)
     }
 }
 
 
 struct PremiumList: View {
     var items: [Feature] = [
-        Feature(title: "No undo limits".localized, image: "arrow.uturn.left"),
-        Feature(title: "Chess clock".localized, image: "clock"),
-        Feature(title: "Puzzle configurator".localized, image: "puzzlepiece"),
-        Feature(title: "Draggable pieces".localized, image: "hand.draw"),
-        Feature(title: "More settings".localized, image: "gearshape"),
+        Feature(
+            title: "No undo limits".localized,
+            description: "Unlimited takebacks".localized,
+            image: "arrow.uturn.left"
+        ),
+        Feature(
+            title: "Chess clock".localized,
+            description: "Play timed games with configurable clock control.".localized,
+            image: "clock"
+        ),
+        Feature(
+            title: "Puzzle configurator".localized,
+            description: "Set up custom puzzle positions for training.".localized,
+            image: "puzzlepiece"
+        ),
+        Feature(
+            title: "Draggable pieces".localized,
+            description: "Move pieces with fluid drag-and-drop interactions.".localized,
+            image: "hand.draw"
+        ),
+        Feature(
+            title: "More settings".localized,
+            description: "Unlock additional board and gameplay preferences.".localized,
+            image: "gearshape"
+        ),
     ]
     var body: some View {
-        Text("Features")
-            .font(.title2)
-            .bold()
-            .padding(.bottom, 4)
-        
-        VStack(alignment: .leading, spacing: 0, content: {
+        VStack(alignment: .leading, spacing: 10, content: {
+            Text("Features")
+                .font(.title2)
+                .bold()
+                .foregroundColor(PremiumPalette.textPrimary)
+                .padding(.bottom, 2)
+
             ForEach(items) { item in
-                FeatureListItem(title: item.title, image: item.image)
+                FeatureListItem(title: item.title, description: item.description, image: item.image)
             }
-            .padding(10)
         })
+        .padding(14)
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(PremiumPalette.iconBackground.opacity(0.25))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(PremiumPalette.border.opacity(0.2), lineWidth: 1)
+        )
+        .padding(.horizontal, 10)
     }
     
     struct Feature: Identifiable {
         var id = UUID()
         var title: String
+        var description: String
         var image: String
     }
 }

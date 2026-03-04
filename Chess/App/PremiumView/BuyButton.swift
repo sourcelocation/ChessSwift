@@ -13,21 +13,25 @@ struct BuyButton: View {
     @ObservedObject private var settings = AppEnvironment.shared.settings
     
     var body: some View {
+        let isPurchased = settings.proEnabled
         Button(action: {
             storeManager.purchaseProVersion()
         }) {
-            Text(!settings.proEnabled ? "Buy for".localized + " " + "\(storeManager.proVersionProduct?.localizedPrice ?? "$1.99")" : "Purchased. Thanks!".localized)
+            Text(!isPurchased ? "Buy for".localized + " " + "\(storeManager.proVersionProduct?.localizedPrice ?? "$1.99")" : "Purchased. Thanks!".localized)
                 .font(.headline)
                 .padding(12)
                 .frame(maxWidth: .infinity)
-                .disabled(settings.proEnabled)
-                .foregroundColor(.white)
+                .foregroundColor(!isPurchased ? .white : PremiumPalette.textPrimary)
         }
-        .background(Color(#colorLiteral(red: 0.4086923003, green: 0.2684660256, blue: 0.1772648394, alpha: 0.7340561224)).clipShape(Capsule()))
+        .background((!isPurchased ? PremiumPalette.accent : PremiumPalette.iconBackground).clipShape(Capsule()))
+        .overlay(
+            Capsule()
+                .stroke((!isPurchased ? PremiumPalette.border.opacity(0.28) : PremiumPalette.border.opacity(0.18)), lineWidth: 1)
+        )
         .onAppear(perform: {
             storeManager.getProVersion()
         })
-        .disabled(settings.proEnabled)
+        .disabled(isPurchased)
     }
 }
 

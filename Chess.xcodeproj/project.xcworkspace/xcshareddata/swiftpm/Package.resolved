@@ -1,5 +1,5 @@
 {
-  "originHash" : "394c457e5d4550df63a64213447fa9d3f9cb0429ed8ca8059b8d8f40effa1411",
+  "originHash" : "906969310060c9bb1ea6293ae83814efba761dd345a4cd22f4eed72a53f78d0d",
   "pins" : [
     {
       "identity" : "chesskit-engine",
@@ -8,24 +8,6 @@
       "state" : {
         "revision" : "a2b47697e5f90418623a1e06c58fd36cd3289fca",
         "version" : "0.7.0"
-      }
-    },
-    {
-      "identity" : "starscream",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/daltoniam/Starscream",
-      "state" : {
-        "revision" : "df8d82047f6654d8e4b655d1b1525c64e1059d21",
-        "version" : "4.0.4"
-      }
-    },
-    {
-      "identity" : "swiftmessages",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/SwiftKickMobile/SwiftMessages",
-      "state" : {
-        "revision" : "b29dd21090b708aa0ae9ecbaf6e2d0487028dc3f",
-        "version" : "9.0.6"
       }
     },
     {

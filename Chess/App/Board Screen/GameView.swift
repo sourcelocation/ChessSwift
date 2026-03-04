@@ -3,6 +3,7 @@ import SpriteKit
 
 struct GameView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(\.colorScheme) private var colorScheme
 
     @Binding var shown: Bool
 
@@ -11,12 +12,14 @@ struct GameView: View {
     let persistCurrentGame: Bool
     let archiveOnExit: Bool
     let screenTitle: String
+    let forceShowAnalysisPanel: Bool
 
     @ObservedObject private var settings: AppSettings
     @StateObject private var session: GameSessionStore
     @State private var displayedLines: [GameAnalyzer.AnalysisLine] = []
     @State private var displayedBestMove: GameAnalyzer.MoveInfo?
     @State private var measuredBoardSide: CGFloat = 0
+    @State private var enjoymentPromptVisible = false
 
     private enum LayoutMode {
         case regularPortrait
@@ -36,6 +39,7 @@ struct GameView: View {
     private struct LayoutConstants {
         let horizontalPadding: CGFloat = 12
         let verticalPadding: CGFloat = 8
+        let portraitTopClearanceWhenAnalysisVisible: CGFloat = 48
         let compactSpacing: CGFloat = 10
         let regularSpacing: CGFloat = 12
         let controlsPortraitHeight: CGFloat = 64
@@ -55,7 +59,7 @@ struct GameView: View {
     }
 
     private var showsAnalysisPanel: Bool {
-        session.analysisAvailable && (session.analysisEnabled || session.analysisPreparing || session.analysisPreparationMessage != nil)
+        forceShowAnalysisPanel || (session.analysisAvailable && (session.analysisEnabled || session.analysisPreparing || session.analysisPreparationMessage != nil))
     }
 
     init(
@@ -64,7 +68,8 @@ struct GameView: View {
         loadedHistory: StoredGameHistory? = nil,
         persistCurrentGame: Bool = true,
         archiveOnExit: Bool = true,
-        screenTitle: String = "Game"
+        screenTitle: String = "Game",
+        forceShowAnalysisPanel: Bool = false
     ) {
         self._shown = shown
         self.gameType = gameType
@@ -72,6 +77,7 @@ struct GameView: View {
         self.persistCurrentGame = persistCurrentGame
         self.archiveOnExit = archiveOnExit
         self.screenTitle = screenTitle
+        self.forceShowAnalysisPanel = forceShowAnalysisPanel
 
         let env = AppEnvironment.shared
         _settings = ObservedObject(wrappedValue: env.settings)
@@ -126,10 +132,11 @@ struct GameView: View {
             SettingsView()
         }
         .onReceive(session.analyzer.$lines) { lines in
-            let moves = lines.map { NormalMove(from: $0.move.from, to: $0.move.to) }
+            let filteredLines = lines.filter { session.isRenderableAnalysisLine($0) }
+            let moves = filteredLines.map { NormalMove(from: $0.move.from, to: $0.move.to) }
             session.board.displayMoveArrows(moves: moves)
-            if !lines.isEmpty {
-                displayedLines = lines
+            if !filteredLines.isEmpty {
+                displayedLines = filteredLines
             } else if !session.analysisEnabled {
                 displayedLines = []
             }
@@ -156,11 +163,12 @@ struct GameView: View {
             ZStack(alignment: .bottom) {
                 Color.black.opacity(0.35)
                     .ignoresSafeArea()
+                    .opacity(enjoymentPromptVisible ? 1 : 0)
                     .onTapGesture {
                         session.dismissEnjoymentPrompt(markReviewed: false)
                     }
 
-                VStack(spacing: 12) {
+                VStack(spacing: 4) {
                     Text("Hey there! 🤙")
                         .font(.headline)
                         .foregroundStyle(Color(.init(rgb: 0x2C2016)))
@@ -168,7 +176,7 @@ struct GameView: View {
                     Text("Are you enjoying this app?")
                         .font(.subheadline)
                         .foregroundStyle(Color(.init(rgb: 0x4B3729)))
-
+                    
                     HStack(spacing: 10) {
                         Button(action: {
                             session.dismissEnjoymentPrompt(markReviewed: true)
@@ -176,7 +184,7 @@ struct GameView: View {
                             Text("Not really")
                                 .font(.system(size: 16, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .padding(.vertical, 4)
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color(.init(rgb: 0xCDB6A2)))
@@ -187,11 +195,12 @@ struct GameView: View {
                             Text("Yes")
                                 .font(.system(size: 16, weight: .semibold))
                                 .frame(maxWidth: .infinity)
-                                .padding(.vertical, 10)
+                                .padding(.vertical, 4)
                         }
                         .buttonStyle(.borderedProminent)
                         .tint(Color(.init(rgb: 0x8A6348)))
                     }
+                    .padding(.top, 8)
                 }
                 .padding(16)
                 .frame(maxWidth: 420)
@@ -205,10 +214,21 @@ struct GameView: View {
                 )
                 .padding(.horizontal, 16)
                 .padding(.bottom, 20)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .opacity(enjoymentPromptVisible ? 1 : 0)
+                .scaleEffect(enjoymentPromptVisible ? 1 : 0.94, anchor: .bottom)
+                .offset(y: enjoymentPromptVisible ? 0 : 10)
+                .onAppear {
+                    enjoymentPromptVisible = false
+                    withAnimation(.spring(response: 0.26, dampingFraction: 0.86)) {
+                        enjoymentPromptVisible = true
+                    }
+                }
+                .onDisappear {
+                    enjoymentPromptVisible = false
+                }
             }
             .zIndex(10)
-            .animation(.easeInOut(duration: 0.2), value: session.showingEnjoymentPrompt)
+            .transition(.opacity)
         }
     }
 
@@ -237,6 +257,7 @@ struct GameView: View {
     @ViewBuilder
     private func regularPortraitLayout(metrics: LayoutMetrics) -> some View {
         let constants = LayoutConstants()
+        let topPadding = constants.verticalPadding + constants.portraitTopClearanceWhenAnalysisVisible
         VStack(spacing: constants.compactSpacing) {
             Spacer()
             if metrics.showsClock {
@@ -253,16 +274,17 @@ struct GameView: View {
             controls(isLandscape: false)
                 .frame(height: constants.controlsPortraitHeight)
 
-            Spacer()
-
             if !metrics.showsClock && showsAnalysisPanel {
                 analysisPanel(isLandscape: false)
-                    .padding(.horizontal, constants.horizontalPadding)
+                    .frame(maxHeight: .infinity, alignment: .top)
+                    .padding(.horizontal, 8)
+            } else {
+                Spacer(minLength: 0)
             }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, constants.horizontalPadding)
-        .padding(.top, constants.verticalPadding)
+        .padding(.top, topPadding)
         .padding(.bottom, constants.verticalPadding)
     }
 
@@ -316,12 +338,13 @@ struct GameView: View {
     @ViewBuilder
     private func replayPortraitLayout(metrics: LayoutMetrics) -> some View {
         let constants = LayoutConstants()
+        let topPadding = constants.verticalPadding + constants.portraitTopClearanceWhenAnalysisVisible
         VStack(spacing: constants.compactSpacing) {
             boardSurface()
                 .layoutPriority(1)
 
             replayAnalysisPanel(isLandscape: false)
-                .frame(minHeight: 180, idealHeight: constants.replayAnalyzerPortraitHeight, maxHeight: 260)
+                .frame(maxHeight: .infinity, alignment: .top)
                 .padding(.horizontal, constants.horizontalPadding)
 
             controls(isLandscape: false)
@@ -329,7 +352,7 @@ struct GameView: View {
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
         .padding(.horizontal, constants.horizontalPadding)
-        .padding(.top, constants.verticalPadding)
+        .padding(.top, topPadding)
         .padding(.bottom, constants.verticalPadding)
     }
 
@@ -370,9 +393,13 @@ struct GameView: View {
         Color.clear
             .aspectRatio(1, contentMode: .fit)
             .overlay {
-                SpriteView(scene: session.board, options: [.allowsTransparency])
+                SpriteView(scene: session.board)
                     .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
             }
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(Color(.init(rgb: 0xDCC6B3)))
+            )
             .background {
                 GeometryReader { proxy in
                     Color.clear
@@ -418,15 +445,15 @@ struct GameView: View {
             }
             .disabled(session.analysisPreparing)
         }
-        .padding(20)
+        .padding(12)
         .frame(maxWidth: isLandscape ? 340 : .infinity, maxHeight: .infinity)
-        .background(
-            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .fill(.ultraThinMaterial)
-        )
+//        .background(
+//            RoundedRectangle(cornerRadius: 12, style: .continuous)
+//                .fill(Color(.init(rgb: 0xE9D7C8)))
+//        )
         .overlay {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
-                .stroke(Color.black.opacity(0.08), lineWidth: 1)
+                .stroke(Color(.init(rgb: 0x6D4A34)).opacity(0.18), lineWidth: 1)
         }
     }
 
@@ -462,9 +489,15 @@ struct GameView: View {
     }
 
     private func controlButton(_ systemName: String, action: @escaping () -> Void, enabled: Bool = true) -> some View {
-        Button(action: action) {
+        let activeColor = Color(.init(rgb: 0x6D4A34))
+        let disabledColor = colorScheme == .dark
+            ? Color(.init(rgb: 0x6D4A34)).opacity(0.45)
+            : Color(.init(rgb: 0x6D4A34)).opacity(0.30)
+
+        return Button(action: action) {
             Image(systemName: systemName)
                 .padding(12)
+                .foregroundStyle(enabled ? activeColor : disabledColor)
         }
         .disabled(!enabled)
     }
@@ -508,8 +541,15 @@ struct GameView: View {
             }
         }
         .padding(10)
-        .frame(maxWidth: isLandscape ? 340 : .infinity, alignment: .top)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        .frame(maxWidth: isLandscape ? 340 : .infinity, maxHeight: isLandscape ? nil : .infinity, alignment: .top)
+//        .background(
+//            RoundedRectangle(cornerRadius: 12, style: .continuous)
+//                .fill(Color(.init(rgb: 0xE9D7C8)))
+//        )
+//        .overlay {
+//            RoundedRectangle(cornerRadius: 12, style: .continuous)
+//                .stroke(Color(.init(rgb: 0x6D4A34)).opacity(0.18), lineWidth: 1)
+//        }
     }
 
     private var portraitTopClockCard: some View {
@@ -805,4 +845,12 @@ private struct DraggableChessPiece: View {
 
 #Preview("iPad") {
     GameView(shown: .constant(true), gameType: .overTheBoard)
+}
+
+#Preview("Analysis") {
+    GameView(
+        shown: .constant(true),
+        gameType: .overTheBoard,
+        forceShowAnalysisPanel: true
+    )
 }

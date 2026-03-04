@@ -20,6 +20,7 @@ class BoardScene: SKScene {
 
     private static var didStartLoadingSounds = false
     private static let sfxLoadQueue = DispatchQueue(label: "BoardScene.SFXLoad", qos: .userInitiated)
+    private static let sceneBackgroundColor = SKColor(red: 0.956, green: 0.929, blue: 0.890, alpha: 1.0)
     
     public var game = ChessGame()
     
@@ -90,7 +91,7 @@ class BoardScene: SKScene {
     
     override init(size: CGSize) {
         super.init(size: size)
-        backgroundColor = .clear
+        backgroundColor = Self.sceneBackgroundColor
         print("reinit board with size \(size)")
     }
     
@@ -99,7 +100,7 @@ class BoardScene: SKScene {
     }
     
     override func didMove(to view: SKView) {
-        backgroundColor = .clear
+        backgroundColor = Self.sceneBackgroundColor
         preloadSoundsIfNeeded()
 
         game.delegate = self

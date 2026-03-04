@@ -33,19 +33,19 @@ struct MenuView: View {
                     } label: {
                         MenuButton(image: "ipad", text: "Play")
                     }
-                    if settings.proEnabled {
-                        NavigationLink {
-                            GameView(shown: .constant(true), gameType: .puzzle)
-                        } label: {
-                            MenuButton(image: "puzzlepiece", text: "Custom Position")
-                        }
-                    } else {
-                        Button(action: {
-                            showingPremium = true
-                        }) {
-                            MenuButton(image: "puzzlepiece", text: "Custom Position")
-                        }
-                    }
+                    // if settings.proEnabled {
+                    //     NavigationLink {
+                    //         GameView(shown: .constant(true), gameType: .puzzle)
+                    //     } label: {
+                    //         MenuButton(image: "puzzlepiece", text: "Custom Position")
+                    //     }
+                    // } else {
+                    //     Button(action: {
+                    //         showingPremium = true
+                    //     }) {
+                    //         MenuButton(image: "puzzlepiece", text: "Custom Position")
+                    //     }
+                    // }
 
                     NavigationLink {
                         SavedGamesView()

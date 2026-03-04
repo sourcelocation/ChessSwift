@@ -20,14 +20,9 @@
 		CE103A9726AF038D00064D42 /* PremiumView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE103A9626AF038D00064D42 /* PremiumView.swift */; };
 		CE10E02B2704984300F5BF52 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE10E02A2704984300F5BF52 /* MenuView.swift */; };
 		CE1BE5542765232000E0BE9C /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE1BE5532765232000E0BE9C /* SettingsView.swift */; };
-		CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */; };
-		CE3042D32770E0420068EBC0 /* Starscream in Frameworks */ = {isa = PBXBuildFile; productRef = CE3042D22770E0420068EBC0 /* Starscream */; };
-		CE3042DE27720CE00068EBC0 /* SwiftMessages in Frameworks */ = {isa = PBXBuildFile; productRef = CE3042DD27720CE00068EBC0 /* SwiftMessages */; };
 		CE30D8CA269F8E170005B343 /* BoardScene.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE30D8C9269F8E170005B343 /* BoardScene.swift */; };
 		CE3ADB2F277CB55700835BBC /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = CE3ADB31277CB55700835BBC /* Localizable.strings */; };
 		CE3D04E6277CF2880003A237 /* Localization.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE3D04E5277CF2880003A237 /* Localization.swift */; };
-		CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F627073E4C00385F73 /* ChessAPIModels.swift */; };
-		CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5831F827073E8400385F73 /* ChessAPI.swift */; };
 		CE5F186126C5787300983603 /* PGNParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE5F186026C5787300983603 /* PGNParser.swift */; };
 		CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE60B5F6276749B500D719C8 /* Extensions.swift */; };
 		CE61EE8E26B0544200531FBF /* BuyButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CE61EE8D26B0544200531FBF /* BuyButton.swift */; };
@@ -102,13 +97,10 @@
 		CE103A9626AF038D00064D42 /* PremiumView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PremiumView.swift; sourceTree = "<group>"; };
 		CE10E02A2704984300F5BF52 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		CE1BE5532765232000E0BE9C /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
-		CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessWebsocket.swift; sourceTree = "<group>"; };
 		CE30D8C9269F8E170005B343 /* BoardScene.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoardScene.swift; sourceTree = "<group>"; wrapsLines = 1; };
 		CE3ADB30277CB55700835BBC /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		CE3D04E5277CF2880003A237 /* Localization.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Localization.swift; sourceTree = "<group>"; };
 		CE3D04E8277CF7DE0003A237 /* hi */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = hi; path = hi.lproj/Localizable.strings; sourceTree = "<group>"; };
-		CE5831F627073E4C00385F73 /* ChessAPIModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPIModels.swift; sourceTree = "<group>"; };
-		CE5831F827073E8400385F73 /* ChessAPI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChessAPI.swift; sourceTree = "<group>"; };
 		CE5F186026C5787300983603 /* PGNParser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PGNParser.swift; sourceTree = "<group>"; };
 		CE60B5F6276749B500D719C8 /* Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		CE61EE8D26B0544200531FBF /* BuyButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BuyButton.swift; sourceTree = "<group>"; };
@@ -168,8 +160,6 @@
 			files = (
 				CEBD758426B06C200027FB09 /* SwiftyStoreKit in Frameworks */,
 				CEBD758926B0843F0027FB09 /* StoreKit.framework in Frameworks */,
-				CE3042D32770E0420068EBC0 /* Starscream in Frameworks */,
-				CE3042DE27720CE00068EBC0 /* SwiftMessages in Frameworks */,
 				CAB25930B77788187A7A1E39 /* ChessKitEngine in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -185,14 +175,6 @@
 				2185736F2AF97D3D00DDB9AE /* Alert++.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		93E04E232A11302B0009BCE3 /* UIKit Old */ = {
-			isa = PBXGroup;
-			children = (
-				CEEFF16A269DF9E60011A674 /* Board */,
-			);
-			path = "UIKit Old";
 			sourceTree = "<group>";
 		};
 		CE0774762781B5FF00E321FB /* ChessTests */ = {
@@ -220,16 +202,6 @@
 				CED29C152705E032000F4518 /* MenuButton.swift */,
 			);
 			path = "Menu Screen";
-			sourceTree = "<group>";
-		};
-		CE5831F527073E3D00385F73 /* ChessAPI */ = {
-			isa = PBXGroup;
-			children = (
-				CE5831F627073E4C00385F73 /* ChessAPIModels.swift */,
-				CE5831F827073E8400385F73 /* ChessAPI.swift */,
-				CE3042CF2770E00B0068EBC0 /* ChessWebsocket.swift */,
-			);
-			path = ChessAPI;
 			sourceTree = "<group>";
 		};
 		CE5831FC27073F2200385F73 /* App */ = {
@@ -364,23 +336,22 @@
 				CE103A9826AF0A7900064D42 /* PremiumView */,
 				2114AA042A0C167900627BFA /* Extensions */,
 				CE5831FC27073F2200385F73 /* App */,
-				CE5831F527073E3D00385F73 /* ChessAPI */,
 				CEEFF167269DF9BC0011A674 /* ChessLogic */,
 				CEBD758A26B084870027FB09 /* iAP */,
 				CEF7A8F2277A326A00DBDB77 /* Other */,
-				93E04E232A11302B0009BCE3 /* UIKit Old */,
+				CEEFF16A269DF9E60011A674 /* Board Runtime */,
 			);
 			path = App;
 			sourceTree = "<group>";
 		};
-		CEEFF16A269DF9E60011A674 /* Board */ = {
+		CEEFF16A269DF9E60011A674 /* Board Runtime */ = {
 			isa = PBXGroup;
 			children = (
 				CEA71E4F261A039F00FD02F5 /* BoardScene.sks */,
 				CE30D8C9269F8E170005B343 /* BoardScene.swift */,
 				214BB43A2AFA63FD00B9992E /* ChessPiece.swift */,
 			);
-			path = Board;
+			path = "Board Runtime";
 			sourceTree = "<group>";
 		};
 		CEF7A8F2277A326A00DBDB77 /* Other */ = {
@@ -428,8 +399,6 @@
 			name = Chess;
 			packageProductDependencies = (
 				CEBD758326B06C200027FB09 /* SwiftyStoreKit */,
-				CE3042D22770E0420068EBC0 /* Starscream */,
-				CE3042DD27720CE00068EBC0 /* SwiftMessages */,
 				FD7494D9DD34C76A1AF40844 /* ChessKitEngine */,
 			);
 			productName = Chess;
@@ -468,8 +437,6 @@
 			mainGroup = CEA71E41261A039E00FD02F5;
 			packageReferences = (
 				CEBD758226B06C200027FB09 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
-				CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */,
-				CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */,
 				EC47DAAB341BE5A18F2A1FAC /* XCRemoteSwiftPackageReference "chesskit-engine" */,
 			);
 			productRefGroup = CEA71E4B261A039E00FD02F5 /* Products */;
@@ -529,8 +496,6 @@
 				CE60B5F7276749B500D719C8 /* Extensions.swift in Sources */,
 				CED60C52287C422E00F0969A /* Logger.swift in Sources */,
 				CE706E06287480A200288A62 /* SavedChessGame.swift in Sources */,
-				CE5831F727073E4C00385F73 /* ChessAPIModels.swift in Sources */,
-				CE3042D02770E00C0068EBC0 /* ChessWebsocket.swift in Sources */,
 				CE966AA4276255DE00965991 /* GameView.swift in Sources */,
 				2133542B29E31095000A78A2 /* ChessApp.swift in Sources */,
 				CEF7A8F4277A327A00DBDB77 /* ThemeColoredView.swift in Sources */,
@@ -564,7 +529,6 @@
 				CEF6D519269B892E0071B40A /* SceneDelegate.swift in Sources */,
 				CED60C5F287C422E00F0969A /* CGPath+ForEach.swift in Sources */,
 				CED60C55287C422E00F0969A /* MSKCameraNode.swift in Sources */,
-				CE5831F927073E8400385F73 /* ChessAPI.swift in Sources */,
 				E14B04B655F64920D122E127 /* GameAnalyzer.swift in Sources */,
 				0DCDA3E931E9151F4223D9C6 /* StockfishModelDownloader.swift in Sources */,
 				61D51B00DD7E3849BB297F71 /* AppEnvironment.swift in Sources */,
@@ -860,22 +824,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/daltoniam/Starscream";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 4.0.0;
-			};
-		};
-		CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftKickMobile/SwiftMessages";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
-			};
-		};
 		CEBD758226B06C200027FB09 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/bizz84/SwiftyStoreKit.git";
@@ -895,16 +843,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		CE3042D22770E0420068EBC0 /* Starscream */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = CE3042D12770E0420068EBC0 /* XCRemoteSwiftPackageReference "Starscream" */;
-			productName = Starscream;
-		};
-		CE3042DD27720CE00068EBC0 /* SwiftMessages */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = CE3042DC27720CE00068EBC0 /* XCRemoteSwiftPackageReference "SwiftMessages" */;
-			productName = SwiftMessages;
-		};
 		CEBD758326B06C200027FB09 /* SwiftyStoreKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = CEBD758226B06C200027FB09 /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */;
