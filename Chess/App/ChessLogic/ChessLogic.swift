@@ -8,18 +8,43 @@
 import Foundation
 
 class ChessLogic {
-    
-    var game: ChessGame!
-    
+
     var whiteCanCastle = true
     var blackCanCastle = true
     
     var isWhiteInCheck = false
     var isBlackInCheck = false
+
+    private func slidingMoves(
+        from pos: Pos,
+        color: ChessPieceColor,
+        with board: [[GamePieceSnapshot?]],
+        directions: [(Int, Int)]
+    ) -> [NormalMove] {
+        var moves: [NormalMove] = []
+
+        for (dx, dy) in directions {
+            var x = pos.x + dx
+            var y = pos.y + dy
+            while (0..<8).contains(x), (0..<8).contains(y) {
+                if let piece = board[y][x] {
+                    if piece.pieceColor != color {
+                        moves.append(NormalMove(from: pos, to: Pos(x: x, y: y)))
+                    }
+                    break
+                }
+                moves.append(NormalMove(from: pos, to: Pos(x: x, y: y)))
+                x += dx
+                y += dy
+            }
+        }
+
+        return moves
+    }
     
     
     // MARK: Get moves for x and y without checking for "Check"
-    private func movesFor(pos: Pos, lastMove:NormalMove?, with board: [[ChessPiece?]]) -> [NormalMove] {
+    private func movesFor(pos: Pos, lastMove:NormalMove?, with board: [[GamePieceSnapshot?]]) -> [NormalMove] {
         let x = pos.x
         let y = pos.y
         
@@ -124,153 +149,36 @@ class ChessLogic {
                 }
             }
         } else if type == .rook { //MARK: - Rook -
-            var xToCheck = x
-            var yToCheck = y
-            
-            while xToCheck <= 7 {
-                // MARK: Right
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                xToCheck += 1
-            }
-            xToCheck = x
-            while xToCheck >= 0 {
-                // MARK: Left
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                xToCheck -= 1
-            }
-            xToCheck = x
-            while yToCheck >= 0 {
-                //MARK: Down
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                yToCheck -= 1
-            }
-            yToCheck = y
-            while yToCheck <= 7 {
-                // MARK: Up
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                yToCheck += 1
-            }
+            moves += slidingMoves(
+                from: pos,
+                color: color,
+                with: board,
+                directions: [(1, 0), (-1, 0), (0, 1), (0, -1)]
+            )
         } else if type == .bishop { // MARK: - Bishop -
-            var xToCheck = x
-            var yToCheck = y
-            
-            while xToCheck <= 7,yToCheck >= 0 {
-                // MARK: Right up
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color  {
-                    break
-                }
-                xToCheck += 1
-                yToCheck -= 1
-            }
-            xToCheck = x
-            yToCheck = y
-            while xToCheck >= 0, yToCheck >= 0 {
-                // MARK: Left up
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                xToCheck -= 1
-                yToCheck -= 1
-            }
-            xToCheck = x
-            yToCheck = y
-            while xToCheck <= 7, yToCheck <= 7 {
-                // MARK: Down right
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                yToCheck += 1
-                xToCheck += 1
-            }
-            xToCheck = x
-            yToCheck = y
-            while xToCheck >= 0, yToCheck <= 7 {
-                // MARK: Down left
-                if board[yToCheck][xToCheck]?.pieceColor == color {
-                    if xToCheck != x || yToCheck != y {
-                        break
-                    }
-                } else {
-                    moves.append(NormalMove(from: pos, to: Pos(x: xToCheck, y: yToCheck)))
-                }
-                if board[yToCheck][xToCheck] != nil, board[yToCheck][xToCheck]?.pieceColor != color {
-                    break
-                }
-                xToCheck -= 1
-                yToCheck += 1
-            }
+            moves += slidingMoves(
+                from: pos,
+                color: color,
+                with: board,
+                directions: [(1, -1), (-1, -1), (1, 1), (-1, 1)]
+            )
         } else if type == .queen { // MARK: - Queen -
-            // Combination of rook and bishop
-            board[y][x]!.pieceType = .rook
-            moves += movesFor(pos: pos, lastMove: lastMove, with: board)
-            board[y][x]!.pieceType = .bishop
-            moves += movesFor(pos: pos, lastMove: lastMove, with: board)
-            // Change back to queen
-            board[y][x]!.pieceType = .queen
+            moves += slidingMoves(
+                from: pos,
+                color: color,
+                with: board,
+                directions: [
+                    (1, 0), (-1, 0), (0, 1), (0, -1),
+                    (1, -1), (-1, -1), (1, 1), (-1, 1)
+                ]
+            )
         }
         
         
         return moves
     }
     
-    func checkCheck(board:[[ChessPiece?]]) {
+    func checkCheck(board:[[GamePieceSnapshot?]]) {
         if checkCheck(for: .white, board: board) {
             isWhiteInCheck = true
         }
@@ -280,7 +188,7 @@ class ChessLogic {
     }
     
     // MARK: Moves with checking for "Checks"
-    func getMoves(pos: Pos, lastMove: NormalMove?, board: [[ChessPiece?]]) -> [NormalMove] {
+    func getMoves(pos: Pos, lastMove: NormalMove?, board: [[GamePieceSnapshot?]]) -> [NormalMove] {
         checkCheck(board: board)
         let nonCheckedMoves = movesFor(pos: pos, lastMove: lastMove, with: board)
         var moves:[NormalMove] = []
@@ -305,7 +213,7 @@ class ChessLogic {
     }
     
     // MARK: Function to check "Checks"
-    func checkCheck(for color: ChessPieceColor, board: [[ChessPiece?]]) -> Bool {
+    func checkCheck(for color: ChessPieceColor, board: [[GamePieceSnapshot?]]) -> Bool {
         guard let kingPos = kingPos(color: color, board: board) else { return true }
         let oppositeKingPos = self.kingPos(color: color.inverted, board: board)
         
@@ -330,7 +238,7 @@ class ChessLogic {
         return false
     }
     // MARK: Checkmate check
-    func checkCheckmate(for color: ChessPieceColor, lastMove: NormalMove?, board: [[ChessPiece?]]) -> Bool {
+    func checkCheckmate(for color: ChessPieceColor, lastMove: NormalMove?, board: [[GamePieceSnapshot?]]) -> Bool {
         for (y,row) in board.enumerated() {
             for (x,_) in row.enumerated() {
                 if board[y][x]?.pieceColor == color {
@@ -343,7 +251,7 @@ class ChessLogic {
         }
         return true
     }
-    func checkCheckIfChessPiece(willMoveFrom pos1: Pos, to pos2: Pos, board: [[ChessPiece?]]) -> Bool {
+    func checkCheckIfChessPiece(willMoveFrom pos1: Pos, to pos2: Pos, board: [[GamePieceSnapshot?]]) -> Bool {
         var testBoard = board
         let piece = testBoard[pos1.y][pos1.x]
         testBoard[pos1.y][pos1.x] = nil
@@ -353,7 +261,7 @@ class ChessLogic {
         return checkCheck(for: piece!.pieceColor, board: testBoard)
     }
     
-    func kingPos(color: ChessPieceColor, board: [[ChessPiece?]]) -> Pos? {
+    func kingPos(color: ChessPieceColor, board: [[GamePieceSnapshot?]]) -> Pos? {
         for y in 0...7 {
             for x in 0...7 {
                 if board[y][x]?.pieceType == .king, board[y][x]!.pieceColor == color {
@@ -364,7 +272,7 @@ class ChessLogic {
         return nil
     }
     
-    func printBoard(_ board: [[ChessPiece?]]) {
+    func printBoard(_ board: [[GamePieceSnapshot?]]) {
         board.forEach { row in
             print(row.map { piece -> String in
                 guard let piece = piece else { return "None".localized }

@@ -1,8 +1,24 @@
 import SwiftUI
 import UIKit
+import Combine
 
 @MainActor
 final class GameSessionStore: ObservableObject {
+    enum RemoteGameEvent {
+        case opponentMove(NormalMove)
+        case remoteStateSync(fen: String)
+        case opponentResigned
+        case drawOffered
+    }
+
+    protocol OnlineSessionPort {
+        func sendLocalMove(_ move: NormalMove) async
+    }
+
+    struct NullOnlineSessionPort: OnlineSessionPort {
+        func sendLocalMove(_ move: NormalMove) async {}
+    }
+
     enum SessionMode: Equatable {
         case localTwoPlayers
         case replay
@@ -20,6 +36,11 @@ final class GameSessionStore: ObservableObject {
         case preparing
         case running(requestID: Int, fen: String)
         case failed(String)
+    }
+
+    enum AnalysisTerminalState: Equatable {
+        case checkmate(winner: ChessPieceColor)
+        case stalemate
     }
 
     enum Intent {
@@ -95,6 +116,10 @@ final class GameSessionStore: ObservableObject {
     @Published private(set) var sessionMode: SessionMode = .localTwoPlayers
     @Published private(set) var lifecycleState: LifecycleState = .idle
     @Published private(set) var analysisState: AnalysisState = .idle
+    @Published private(set) var analysisLines: [GameAnalyzer.AnalysisLine] = []
+    @Published private(set) var analysisBestMove: GameAnalyzer.MoveInfo?
+    @Published private(set) var analysisTerminalState: AnalysisTerminalState?
+    @Published private(set) var gameSnapshot: GameSnapshot?
 
     let analyzer: GameAnalyzer
 
@@ -104,6 +129,7 @@ final class GameSessionStore: ObservableObject {
     private let stockfishModelDownloader: StockfishModelDownloader
     private let notation = NotationGateway()
     private let persistence: PersistenceGateway
+    private let onlinePort: OnlineSessionPort
     
     var analysisAvailable: Bool {
         config.gameType == .overTheBoard
@@ -115,12 +141,14 @@ final class GameSessionStore: ObservableObject {
 
     private var timerWhite: Timer?
     private var timerBlack: Timer?
+    private var isGameOver = false
 
     private var didRunExitFlow = false
     private var lastArchivedMoveCount = 0
     private var currentGameID = UUID()
     private let startTime = Date()
     private var analysisRequestVersion = 0
+    private var cancellables: Set<AnyCancellable> = []
 
     init(
         config: Config,
@@ -134,6 +162,7 @@ final class GameSessionStore: ObservableObject {
         self.reviewPrompt = reviewPrompt
         self.stockfishModelDownloader = stockfishModelDownloader
         self.persistence = PersistenceGateway(repository: repository)
+        self.onlinePort = NullOnlineSessionPort()
         self.analyzer = GameAnalyzer(multiPV: 3, depth: 14)
         self.board = BoardScene(size: UIScreen.main.bounds.size)
 
@@ -150,8 +179,13 @@ final class GameSessionStore: ObservableObject {
         }
 
         board.checkmateCallback = { [weak self] color in
+            self?.isGameOver = true
+            self?.pauseTimer()
             self?.showCheckmateAlert(for: color)
         }
+
+        bindAnalyzer()
+        updateGameSnapshot()
     }
 
     func onAppear(boardSide: CGFloat) {
@@ -187,6 +221,26 @@ final class GameSessionStore: ObservableObject {
         dispatch(.startAnalysis)
     }
 
+    func tryAddingPieceFromPalette(type: ChessPieceType, color: ChessPieceColor, point: CGPoint) {
+        board.tryAddingPieceAtDroppedPoint(type: type, color: color, point: point)
+        updateGameSnapshot()
+    }
+
+    func ingestRemoteEvent(_ event: RemoteGameEvent) {
+        switch event {
+        case let .opponentMove(move):
+            guard gameModeSupportsRemoteIngestion else { return }
+            board.game.perform(move: move, addToHistory: true, uiMove: true, noRules: false)
+            movedPiece()
+        case .remoteStateSync:
+            // Wire full remote-state hydration when online transport is enabled.
+            break
+        case .opponentResigned, .drawOffered:
+            // UI-level handling will be added with online session UX.
+            break
+        }
+    }
+
     private func dispatch(_ intent: Intent) {
         switch intent {
         case let .appear(boardSide):
@@ -212,6 +266,10 @@ final class GameSessionStore: ObservableObject {
         }
     }
 
+    private var gameModeSupportsRemoteIngestion: Bool {
+        config.gameType == .online
+    }
+
     private func handleAppear(boardSide: CGFloat) {
         configureBoardScene(boardSide: boardSide)
         if isReplaySession {
@@ -225,6 +283,7 @@ final class GameSessionStore: ObservableObject {
             analyzer.stopAnalysis()
             clearAnalysisArrows()
         }
+        updateGameSnapshot()
     }
 
     private func handleBoardSideChanged(_ boardSide: CGFloat) {
@@ -242,12 +301,14 @@ final class GameSessionStore: ObservableObject {
 
     private func handleUndo() {
         pauseTimer()
+        isGameOver = false
         if settings.undosUsed < 4 || settings.proEnabled {
             board.undo(noRulesEnabled: config.gameType == .puzzle)
             settings.undosUsed += 1
             analyzeCurrentPosition()
             persistAutosaveIfNeeded()
             updateUndoRedoState()
+            updateGameSnapshot()
         } else {
             showingProView = true
         }
@@ -255,12 +316,14 @@ final class GameSessionStore: ObservableObject {
 
     private func handleRedo() {
         pauseTimer()
+        isGameOver = false
         if settings.undosUsed < 4 || settings.proEnabled {
             board.redo(noRulesEnabled: config.gameType == .puzzle)
             settings.undosUsed += 1
             analyzeCurrentPosition()
             persistAutosaveIfNeeded()
             updateUndoRedoState()
+            updateGameSnapshot()
         } else {
             showingProView = true
         }
@@ -269,12 +332,14 @@ final class GameSessionStore: ObservableObject {
     private func handleRestart() {
         archiveCurrentGameIfNeeded()
         resetBoardToSelectedMode()
+        isGameOver = false
         settings.undosUsed = 0
         lastArchivedMoveCount = 0
 
         persistAutosaveIfNeeded()
         analyzeCurrentPosition()
         updateUndoRedoState()
+        updateGameSnapshot()
 
         presentEnjoymentPromptIfNeeded()
     }
@@ -311,6 +376,7 @@ final class GameSessionStore: ObservableObject {
         let fen = notation.fen(for: board)
         analysisRequestVersion += 1
         analysisState = .running(requestID: analysisRequestVersion, fen: fen)
+        analysisTerminalState = nil
         analyzer.analyze(fen: fen, requestID: analysisRequestVersion)
     }
 
@@ -321,6 +387,7 @@ final class GameSessionStore: ObservableObject {
 
     func resetTimer() {
         pauseTimer()
+        isGameOver = false
         whiteTimerRemaining = Double(settings.chessClockMinutes) * 60
         blackTimerRemaining = Double(settings.chessClockMinutes) * 60
     }
@@ -354,6 +421,7 @@ final class GameSessionStore: ObservableObject {
         board.size = CGSize(width: boardSide, height: boardSide)
         board.scaleMode = .aspectFill
         board.anchorPoint = CGPoint(x: 0.5, y: 0.5)
+        isGameOver = false
 
         switch config.gameType {
         case .overTheBoard:
@@ -371,9 +439,9 @@ final class GameSessionStore: ObservableObject {
 
         case .puzzle:
             board.shouldRotatePieces = false
-            var emptyBoardPieces: [[ChessPiece?]] = Array(repeating: Array(repeating: nil, count: 8), count: 8)
-            emptyBoardPieces[0][0] = .init(pieceColor: .black, pieceType: .king)
-            emptyBoardPieces[7][7] = .init(pieceColor: .white, pieceType: .king)
+            var emptyBoardPieces: [[GamePieceSnapshot?]] = Array(repeating: Array(repeating: nil, count: 8), count: 8)
+            emptyBoardPieces[0][0] = .init(type: .king, color: .black)
+            emptyBoardPieces[7][7] = .init(type: .king, color: .white)
             board.resetBoardAndGame(customBoard: emptyBoardPieces)
 
         case .online, .engine:
@@ -384,10 +452,20 @@ final class GameSessionStore: ObservableObject {
     }
 
     private func movedPiece() {
-        resumeTimer()
+        if config.gameType == .online, let lastMove = board.game.history.last {
+            Task { [onlinePort] in
+                await onlinePort.sendLocalMove(lastMove)
+            }
+        }
+        if isGameOver {
+            pauseTimer()
+        } else {
+            resumeTimer()
+        }
         persistAutosaveIfNeeded()
         analyzeCurrentPosition()
         updateUndoRedoState()
+        updateGameSnapshot()
     }
 
     private func prepareAndStartAnalysis() async {
@@ -426,6 +504,9 @@ final class GameSessionStore: ObservableObject {
     private func clearAnalysisArrows() {
         board.displayMoveArrows(moves: [])
         board.setHighlightFirstArrow(false)
+        analysisLines = []
+        analysisBestMove = nil
+        analysisTerminalState = nil
     }
 
     private func archiveCurrentGameIfNeeded() {
@@ -437,10 +518,11 @@ final class GameSessionStore: ObservableObject {
             return
         }
 
-        let finalBoard = board.game.board.map { row in
+        let currentSnapshot = board.game.snapshot()
+        let finalBoard = currentSnapshot.board.map { row in
             row.map { piece -> SavedChessGame.Piece? in
                 guard let piece else { return nil }
-                return SavedChessGame.Piece(type: piece.pieceType, color: piece.pieceColor)
+                return SavedChessGame.Piece(type: piece.type, color: piece.color)
             }
         }
 
@@ -455,9 +537,9 @@ final class GameSessionStore: ObservableObject {
         case .overTheBoard:
             board.resetBoardAndGame()
         case .puzzle:
-            var emptyBoardPieces: [[ChessPiece?]] = Array(repeating: Array(repeating: nil, count: 8), count: 8)
-            emptyBoardPieces[0][0] = .init(pieceColor: .black, pieceType: .king)
-            emptyBoardPieces[7][7] = .init(pieceColor: .white, pieceType: .king)
+            var emptyBoardPieces: [[GamePieceSnapshot?]] = Array(repeating: Array(repeating: nil, count: 8), count: 8)
+            emptyBoardPieces[0][0] = .init(type: .king, color: .black)
+            emptyBoardPieces[7][7] = .init(type: .king, color: .white)
             board.shouldRotatePieces = false
             board.resetBoardAndGame(customBoard: emptyBoardPieces)
         case .online, .engine:
@@ -466,13 +548,25 @@ final class GameSessionStore: ObservableObject {
     }
 
     private func showCheckmateAlert(for color: ChessPieceColor?) {
-        guard !analysisEnabled else { return }
+        guard !shouldSuppressCheckmateAlert else { return }
         UIApplication.shared.alert(
             title: color == nil
             ? "Stalemate! (Draw)".localized
             : ((color == .black) ? "Black wins! (Checkmate)".localized : "White wins! (Checkmate)".localized),
             body: ""
         )
+    }
+
+    private var shouldSuppressCheckmateAlert: Bool {
+        if isReplaySession || analysisEnabled || analysisPreparing {
+            return true
+        }
+        switch analysisState {
+        case .preparing, .running:
+            return true
+        case .idle, .failed:
+            return false
+        }
     }
 
     func confirmEnjoymentPrompt() {
@@ -488,8 +582,8 @@ final class GameSessionStore: ObservableObject {
     }
 
     private func presentEnjoymentPromptIfNeeded() {
-//        guard startTime.timeIntervalSinceNow < -60 else { return }
-//        guard !settings.hasReviewed else { return }
+       guard startTime.timeIntervalSinceNow < -60 else { return }
+       guard !settings.hasReviewed else { return }
         showingEnjoymentPrompt = true
     }
 
@@ -500,6 +594,7 @@ final class GameSessionStore: ObservableObject {
                     guard let self else { return }
                     self.whiteTimerRemaining -= 0.1
                     if self.whiteTimerRemaining <= 0 {
+                        self.isGameOver = true
                         self.showingWhiteRanOutOfTime = true
                         self.pauseTimer()
                     }
@@ -515,6 +610,7 @@ final class GameSessionStore: ObservableObject {
                     guard let self else { return }
                     self.blackTimerRemaining -= 0.1
                     if self.blackTimerRemaining <= 0 {
+                        self.isGameOver = true
                         self.showingBlackRanOutOfTime = true
                         self.pauseTimer()
                     }
@@ -540,15 +636,95 @@ final class GameSessionStore: ObservableObject {
             return false
         }
 
-        guard let piece = board.game.board[from.y][from.x] else {
+        guard let piece = gameSnapshot?.piece(at: from) else {
             return false
         }
 
-        guard piece.pieceColor == board.game.turnOf else {
+        guard piece.color == (gameSnapshot?.turnOf ?? board.game.turnOf) else {
             return false
         }
 
         let legalTargets = board.game.moves(for: from).map(\.toPos)
         return legalTargets.contains(where: { $0 == to })
+    }
+
+    func pieceImageName(for move: GameAnalyzer.MoveInfo) -> String? {
+        if let piece = gameSnapshot?.piece(at: move.from) {
+            return "\(piece.type.rawValue)-\(piece.color.rawValue)"
+        }
+        if let promotion = move.promotion, let turn = gameSnapshot?.turnOf {
+            return "\(promotion.rawValue)-\(turn.rawValue)"
+        }
+        return nil
+    }
+
+    private func bindAnalyzer() {
+        analyzer.$snapshot
+            .receive(on: DispatchQueue.main)
+            .sink { [weak self] snapshot in
+                guard let self else { return }
+                self.consumeAnalysisSnapshot(snapshot)
+            }
+            .store(in: &cancellables)
+    }
+
+    private func consumeAnalysisSnapshot(_ snapshot: GameAnalyzer.Snapshot?) {
+        guard let snapshot else {
+            analysisLines = []
+            analysisBestMove = nil
+            clearAnalysisArrows()
+            return
+        }
+
+        guard case let .running(requestID, _) = analysisState, requestID == snapshot.requestID else {
+            return
+        }
+
+        let filteredLines = snapshot.lines.filter { isRenderableAnalysisLine($0) }
+        analysisLines = filteredLines
+        if filteredLines.isEmpty, !snapshot.isAnalyzing {
+            analysisTerminalState = terminalStateForCurrentPosition()
+        } else {
+            analysisTerminalState = nil
+        }
+
+        if let bestMove = snapshot.bestMove {
+            let bestAsLine = GameAnalyzer.AnalysisLine(
+                id: 0,
+                index: 0,
+                move: bestMove,
+                score: .init(cp: nil, mate: nil),
+                depth: nil
+            )
+            analysisBestMove = isRenderableAnalysisLine(bestAsLine) ? bestMove : nil
+        } else {
+            analysisBestMove = nil
+        }
+
+        let arrowMoves = filteredLines.map { NormalMove(from: $0.move.from, to: $0.move.to) }
+        board.displayMoveArrows(moves: arrowMoves)
+        board.setHighlightFirstArrow(analysisBestMove != nil)
+        updateGameSnapshot()
+    }
+
+    private func terminalStateForCurrentPosition() -> AnalysisTerminalState? {
+        let currentSnapshot = board.game.snapshot()
+        let sideToMove = currentSnapshot.turnOf
+        let isTerminal = board.game.logic.checkCheckmate(
+            for: sideToMove,
+            lastMove: board.game.slicedHistory.last,
+            board: currentSnapshot.board
+        )
+
+        guard isTerminal else { return nil }
+        let isInCheck = board.game.logic.checkCheck(for: sideToMove, board: currentSnapshot.board)
+        if isInCheck {
+            return .checkmate(winner: sideToMove.inverted)
+        }
+        return .stalemate
+    }
+
+    private func updateGameSnapshot() {
+        gameSnapshot = board.game.snapshot()
     }
 }

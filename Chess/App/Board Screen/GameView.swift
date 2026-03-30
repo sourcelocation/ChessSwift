@@ -131,18 +131,14 @@ struct GameView: View {
         .sheet(isPresented: $session.showingSettings) {
             SettingsView()
         }
-        .onReceive(session.analyzer.$lines) { lines in
-            let filteredLines = lines.filter { session.isRenderableAnalysisLine($0) }
-            let moves = filteredLines.map { NormalMove(from: $0.move.from, to: $0.move.to) }
-            session.board.displayMoveArrows(moves: moves)
-            if !filteredLines.isEmpty {
-                displayedLines = filteredLines
+        .onReceive(session.$analysisLines) { lines in
+            if !lines.isEmpty {
+                displayedLines = lines
             } else if !session.analysisEnabled {
                 displayedLines = []
             }
         }
-        .onReceive(session.analyzer.$bestMove) { bestMove in
-            session.board.setHighlightFirstArrow(bestMove != nil)
+        .onReceive(session.$analysisBestMove) { bestMove in
             displayedBestMove = bestMove
         }
         .onChange(of: session.analysisEnabled) { enabled in
@@ -516,7 +512,9 @@ struct GameView: View {
 
             evaluationBar
 
-            if displayedLines.isEmpty && !session.analysisPreparing {
+            if let terminalState = session.analysisTerminalState {
+                analysisTerminalRow(terminalState)
+            } else if displayedLines.isEmpty && !session.analysisPreparing {
                 Text("No lines yet")
                     .font(.footnote)
                     .foregroundColor(.secondary)
@@ -646,6 +644,44 @@ struct GameView: View {
         .background(isBest(line: line) ? Color.brown.opacity(0.16) : Color.clear, in: RoundedRectangle(cornerRadius: 8, style: .continuous))
     }
 
+    private func analysisTerminalRow(_ state: GameSessionStore.AnalysisTerminalState) -> some View {
+        let line1: String
+        let line2: String?
+
+        switch state {
+        case let .checkmate(winner):
+            line1 = "Checkmate!"
+            line2 = winner == .white ? "White wins!" : "Black wins!"
+        case .stalemate:
+            line1 = "Stalemate!"
+            line2 = nil
+        }
+
+        return HStack(spacing: 10) {
+            Image("king-white")
+                .resizable()
+                .aspectRatio(contentMode: .fit)
+                .frame(width: 22, height: 22)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(line1)
+                    .font(.subheadline)
+                    .lineLimit(1)
+                if let line2 {
+                    Text(line2)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .lineLimit(1)
+                }
+            }
+
+            Spacer(minLength: 8)
+        }
+        .padding(.horizontal, 8)
+        .padding(.vertical, 6)
+        .background(Color.brown.opacity(0.10), in: RoundedRectangle(cornerRadius: 8, style: .continuous))
+    }
+
     @ViewBuilder
     private var evaluationBar: some View {
         let score = displayedLines.first?.score
@@ -699,14 +735,7 @@ struct GameView: View {
     }
 
     private func pieceImageName(for move: GameAnalyzer.MoveInfo) -> String? {
-        guard (0..<8).contains(move.from.y), (0..<8).contains(move.from.x) else { return nil }
-        if let piece = session.board.game.board[move.from.y][move.from.x] {
-            return "\(piece.pieceType.rawValue)-\(piece.pieceColor.rawValue)"
-        }
-        if let promotion = move.promotion {
-            return "\(promotion.rawValue)-\(session.board.game.turnOf.rawValue)"
-        }
-        return nil
+        session.pieceImageName(for: move)
     }
 
     @ViewBuilder
@@ -777,7 +806,7 @@ struct GameView: View {
                 VStack {
                     ForEach([ChessPieceType.pawn, .knight, .bishop, .rook, .queen], id: \.self) { type in
                         DraggableChessPiece { point in
-                            session.board.tryAddingPieceAtDroppedPoint(type: type, color: color, point: point)
+                            session.tryAddingPieceFromPalette(type: type, color: color, point: point)
                         } chessPieceType: {
                             type
                         } chessPieceColor: {

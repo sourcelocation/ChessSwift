@@ -332,6 +332,26 @@ struct StoredGameHistory: Codable, Equatable {
     }
 }
 
+struct GamePieceSnapshot: Codable, Equatable {
+    var type: ChessPieceType
+    var color: ChessPieceColor
+
+    var pieceType: ChessPieceType { type }
+    var pieceColor: ChessPieceColor { color }
+}
+
+struct GameSnapshot: Codable, Equatable {
+    let board: [[GamePieceSnapshot?]]
+    let turnOf: ChessPieceColor
+    let fen: String
+    let historyCursor: Int?
+
+    func piece(at pos: Pos) -> GamePieceSnapshot? {
+        guard (0..<8).contains(pos.y), (0..<8).contains(pos.x) else { return nil }
+        return board[pos.y][pos.x]
+    }
+}
+
 private extension StoredPly {
     init(_ move: NormalMove) {
         self.init(
@@ -350,4 +370,3 @@ private extension StoredPly {
         return promotionType(in: move.additionalMove)
     }
 }
-

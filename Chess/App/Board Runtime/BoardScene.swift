@@ -107,9 +107,6 @@ class BoardScene: SKScene {
         
         setUpSizes()
         createBoardImage()
-        game.logic.game = game
-        
-        
     }
 
     private func preloadSoundsIfNeeded() {
@@ -142,7 +139,7 @@ class BoardScene: SKScene {
         player.play()
     }
     
-    func resetBoardAndGame(customBoard: [[ChessPiece?]]? = nil) {
+    func resetBoardAndGame(customBoard: [[GamePieceSnapshot?]]? = nil) {
         game.history = []
         game.currentMoveIHistory = nil
         resetMoveHints()
@@ -262,11 +259,6 @@ class BoardScene: SKScene {
                     }
                 }
             }
-        } else if let draggedPieceFromEditor = draggedPieceFromEditor {
-//            draggedPieceFromEditor.removeFromParent()
-//            perform(move: NormalMove(from: pos, to: pos, additionalMove: CreateMove(pos: pos, pieceType: draggedPieceFromEditor.pieceType, pieceColor: draggedPieceFromEditor.pieceColor), doublePawnMove: false))
-//            self.draggedPieceFromEditor = nil
-//            game.checkChecks(ui: true)
         }
     }
     
@@ -326,6 +318,8 @@ class BoardScene: SKScene {
         for y in 0...7 {
             for x in 0...7 {
                 if let piece = game.piece(at: Pos(x: x, y: y)) {
+                    // Ensure visual state always matches model state (e.g. restored promotions).
+                    piece.texture = SKTexture(imageNamed: "\(piece.pieceType.rawValue)-\(piece.pieceColor.rawValue)")
                     if piece.pieceColor == .black && (settingsProvider.flipBlackPieces() && shouldRotatePieces) {
                         piece.run(.rotate(toAngle: .pi, duration: 0))
                     } else {

@@ -63,8 +63,8 @@ final class GameAnalyzer: ObservableObject {
         let promotion: ChessPieceType?
 
         var description: String {
-            let fromText = GameAnalyzer.coordinateString(for: from)
-            let toText = GameAnalyzer.coordinateString(for: to)
+            let fromText = AnalyzerNotation.coordinateString(for: from)
+            let toText = AnalyzerNotation.coordinateString(for: to)
             if let promotion {
                 return "\(fromText) -> \(toText)=\(promotion.rawValue.prefix(1).uppercased())"
             }
@@ -95,6 +95,8 @@ final class GameAnalyzer: ObservableObject {
         self.depth = max(1, depth)
     }
 
+    // MARK: Public API
+
     func configureModels(evalFile: String, evalFileSmall: String) {
         modelOptions = .init(evalFile: evalFile, evalFileSmall: evalFileSmall)
         guard started, !isShuttingDown else { return }
@@ -106,29 +108,8 @@ final class GameAnalyzer: ObservableObject {
     func analyze(fen: String?, requestID: Int) {
         guard let fen, !fen.isEmpty, !isShuttingDown else { return }
         let request = AnalysisRequest(id: requestID, fen: fen)
-        activeRequest = request
-        resetInFlightResult()
-        analyzeTask?.cancel()
-
-        analyzeTask = Task { [weak self] in
-            guard let self else { return }
-            guard !self.isShuttingDown else { return }
-            await MainActor.run {
-                self.runState = .starting
-            }
-            await self.ensureStarted()
-            guard self.started, !self.isShuttingDown else { return }
-            await self.engine.send(command: .stop)
-            await self.engine.send(command: .setoption(id: "MultiPV", value: "\(self.multiPV)"))
-            await self.engine.send(command: .position(.fen(fen)))
-            await MainActor.run {
-                self.isAnalyzing = true
-                self.runState = .analyzing
-                self.publishSnapshotIfPossible()
-            }
-            guard !self.isShuttingDown else { return }
-            await self.engine.send(command: .go(depth: self.depth))
-        }
+        begin(request: request)
+        startAnalyzeTask(for: request)
     }
 
     func stopAnalysis() {
@@ -158,33 +139,90 @@ final class GameAnalyzer: ObservableObject {
         isShuttingDown = false
     }
 
+    // MARK: Analyze Pipeline
+
+    private func begin(request: AnalysisRequest) {
+        activeRequest = request
+        resetInFlightResult()
+    }
+
+    private func startAnalyzeTask(for request: AnalysisRequest) {
+        analyzeTask?.cancel()
+        analyzeTask = Task { [weak self] in
+            guard let self else { return }
+            guard self.isRequestCurrent(request) else { return }
+            self.runState = .starting
+            guard await self.prepareEngine(for: request) else { return }
+            guard await self.applyPosition(for: request) else { return }
+            self.setAnalyzingIfCurrent(request)
+            guard self.isRequestCurrent(request) else { return }
+            await self.engine.send(command: .go(depth: self.depth))
+        }
+    }
+
+    private func prepareEngine(for request: AnalysisRequest) async -> Bool {
+        await ensureStarted()
+        return started && isRequestCurrent(request)
+    }
+
+    private func applyPosition(for request: AnalysisRequest) async -> Bool {
+        guard isRequestCurrent(request) else { return false }
+        await engine.send(command: .stop)
+        guard isRequestCurrent(request) else { return false }
+        await engine.send(command: .setoption(id: "MultiPV", value: "\(multiPV)"))
+        guard isRequestCurrent(request) else { return false }
+        await engine.send(command: .position(.fen(request.fen)))
+        return isRequestCurrent(request)
+    }
+
+    private func setAnalyzingIfCurrent(_ request: AnalysisRequest) {
+        guard isRequestCurrent(request) else { return }
+        isAnalyzing = true
+        runState = .analyzing
+        publishSnapshotIfPossible()
+    }
+
+    // MARK: Engine Lifecycle
+
     private func ensureStarted() async {
-        guard !started, !isShuttingDown else { return }
+        guard !isShuttingDown, !Task.isCancelled else { return }
 
-        await engine.start(coreCount: ProcessInfo.processInfo.activeProcessorCount, multipv: multiPV)
+        if !started {
+            await engine.start(coreCount: ProcessInfo.processInfo.activeProcessorCount, multipv: multiPV)
 
-        var attempts = 0
-        while await !engine.isRunning, attempts < 80 {
-            attempts += 1
-            try? await Task.sleep(nanoseconds: 50_000_000)
-        }
-
-        guard await engine.isRunning, !isShuttingDown else {
-            started = false
-            return
-        }
-        started = true
-
-        if streamTask == nil, let stream = await engine.responseStream {
-            streamTask = Task { [weak self] in
-                for await response in stream {
-                    await self?.consume(response: response)
-                }
+            var attempts = 0
+            while await !engine.isRunning, attempts < 80, !Task.isCancelled, !isShuttingDown {
+                attempts += 1
+                try? await Task.sleep(nanoseconds: 50_000_000)
             }
         }
 
+        let running = await engine.isRunning
+        guard running, !isShuttingDown else {
+            started = false
+            return
+        }
+        guard !Task.isCancelled else { return }
+
+        started = true
+        await ensureResponseStreamAttached()
+
+        guard !Task.isCancelled, !isShuttingDown else { return }
         await engine.send(command: .setoption(id: "UCI_AnalyseMode", value: "true"))
         await applyModelOptions()
+    }
+
+    private func isRequestCurrent(_ request: AnalysisRequest) -> Bool {
+        !isShuttingDown && !Task.isCancelled && activeRequest == request
+    }
+
+    private func ensureResponseStreamAttached() async {
+        guard streamTask == nil, let stream = await engine.responseStream else { return }
+        streamTask = Task { [weak self] in
+            for await response in stream {
+                await self?.consume(response: response)
+            }
+        }
     }
 
     private func applyModelOptions() async {
@@ -193,47 +231,59 @@ final class GameAnalyzer: ObservableObject {
         await engine.send(command: .setoption(id: "EvalFileSmall", value: modelOptions.evalFileSmall))
     }
 
+    // MARK: Engine Responses
+
     private func consume(response: EngineResponse) async {
         guard !isShuttingDown else { return }
         switch response {
         case let .info(info):
-            guard isAnalyzing,
-                  let request = activeRequest,
-                  let pv = info.pv,
-                  let firstMove = pv.first,
-                  let move = Self.moveInfo(from: firstMove),
-                  Self.isMoveConsistentWithPosition(move, fen: request.fen)
-            else { return }
-
-            let index = max(1, info.multipv ?? 1)
-            let line = AnalysisLine(
-                id: index,
-                index: index,
-                move: move,
-                score: Self.score(from: info.score),
-                depth: info.depth
-            )
-
-            lineByIndex[index] = line
-            lines = lineByIndex.values.sorted(by: { $0.index < $1.index })
-            publishSnapshotIfPossible()
-
+            consumeInfo(info)
         case let .bestmove(move, _):
-            if let request = activeRequest,
-               let parsedMove = Self.moveInfo(from: move),
-               Self.isMoveConsistentWithPosition(parsedMove, fen: request.fen) {
-                bestMove = parsedMove
-            } else {
-                bestMove = nil
-            }
-            isAnalyzing = false
-            runState = .idle
-            publishSnapshotIfPossible()
-
+            consumeBestMove(move)
         default:
             break
         }
     }
+
+    private func consumeInfo(_ info: EngineResponse.Info) {
+        guard isAnalyzing,
+              let request = activeRequest,
+              let pv = info.pv,
+              let firstMove = pv.first,
+              let move = AnalyzerNotation.moveInfo(from: firstMove),
+              AnalyzerNotation.isMoveConsistentWithPosition(move, fen: request.fen)
+        else {
+            return
+        }
+
+        let index = max(1, info.multipv ?? 1)
+        let line = AnalysisLine(
+            id: index,
+            index: index,
+            move: move,
+            score: AnalyzerNotation.score(from: info.score, fen: request.fen),
+            depth: info.depth
+        )
+
+        lineByIndex[index] = line
+        lines = lineByIndex.values.sorted(by: { $0.index < $1.index })
+        publishSnapshotIfPossible()
+    }
+
+    private func consumeBestMove(_ uciMove: String) {
+        if let request = activeRequest,
+           let parsedMove = AnalyzerNotation.moveInfo(from: uciMove),
+           AnalyzerNotation.isMoveConsistentWithPosition(parsedMove, fen: request.fen) {
+            bestMove = parsedMove
+        } else {
+            bestMove = nil
+        }
+        isAnalyzing = false
+        runState = .idle
+        publishSnapshotIfPossible()
+    }
+
+    // MARK: Snapshot + State
 
     private func resetInFlightResult() {
         isAnalyzing = false
@@ -262,13 +312,22 @@ final class GameAnalyzer: ObservableObject {
             runState: runState
         )
     }
+}
 
-    nonisolated private static func score(from score: EngineResponse.Info.Score?) -> AnalysisScore {
-        guard let score else { return AnalysisScore(cp: nil, mate: nil) }
-        return AnalysisScore(cp: score.cp, mate: score.mate)
+private enum AnalyzerNotation {
+    nonisolated static func score(from score: EngineResponse.Info.Score?, fen: String) -> GameAnalyzer.AnalysisScore {
+        guard let score else { return GameAnalyzer.AnalysisScore(cp: nil, mate: nil) }
+        guard let sideToMove = sideToMove(from: fen) else {
+            return GameAnalyzer.AnalysisScore(cp: score.cp, mate: score.mate)
+        }
+
+        let multiplier = sideToMove == .white ? 1.0 : -1.0
+        let normalizedCP = score.cp.map { $0 * multiplier }
+        let normalizedMate = score.mate.map { Int(Double($0) * multiplier) }
+        return GameAnalyzer.AnalysisScore(cp: normalizedCP, mate: normalizedMate)
     }
 
-    nonisolated private static func moveInfo(from uciMove: String) -> MoveInfo? {
+    nonisolated static func moveInfo(from uciMove: String) -> GameAnalyzer.MoveInfo? {
         guard uciMove.count >= 4 else { return nil }
         let fromPart = String(uciMove.prefix(2))
         let toPart = String(uciMove.dropFirst(2).prefix(2))
@@ -285,10 +344,23 @@ final class GameAnalyzer: ObservableObject {
             promotion = pieceType(fromPromotionChar: promoChar)
         }
 
-        return MoveInfo(from: from, to: to, promotion: promotion)
+        return GameAnalyzer.MoveInfo(from: from, to: to, promotion: promotion)
     }
 
-    nonisolated private static func pieceType(fromPromotionChar value: String) -> ChessPieceType? {
+    nonisolated static func coordinateString(for pos: Pos) -> String {
+        ["a", "b", "c", "d", "e", "f", "g", "h"][pos.x] + String(8 - pos.y)
+    }
+
+    nonisolated static func isMoveConsistentWithPosition(_ move: GameAnalyzer.MoveInfo, fen: String) -> Bool {
+        guard let sideToMove = sideToMove(from: fen),
+              let pieceColor = pieceColor(at: move.from, fen: fen)
+        else {
+            return false
+        }
+        return sideToMove == pieceColor
+    }
+
+    private nonisolated static func pieceType(fromPromotionChar value: String) -> ChessPieceType? {
         switch value {
         case "q": return .queen
         case "r": return .rook
@@ -298,7 +370,7 @@ final class GameAnalyzer: ObservableObject {
         }
     }
 
-    nonisolated private static func position(from coordinate: String) -> Pos? {
+    private nonisolated static func position(from coordinate: String) -> Pos? {
         guard coordinate.count == 2 else { return nil }
         let chars = Array(coordinate)
         let file = chars[0]
@@ -316,26 +388,13 @@ final class GameAnalyzer: ObservableObject {
         return Pos(x: fileIndex, y: 8 - rankValue)
     }
 
-    nonisolated private static func coordinateString(for pos: Pos) -> String {
-        ["a", "b", "c", "d", "e", "f", "g", "h"][pos.x] + String(8 - pos.y)
-    }
-
-    nonisolated private static func isMoveConsistentWithPosition(_ move: MoveInfo, fen: String) -> Bool {
-        guard let sideToMove = sideToMove(from: fen),
-              let pieceColor = pieceColor(at: move.from, fen: fen)
-        else {
-            return false
-        }
-        return sideToMove == pieceColor
-    }
-
-    nonisolated private static func sideToMove(from fen: String) -> ChessPieceColor? {
+    private nonisolated static func sideToMove(from fen: String) -> ChessPieceColor? {
         let parts = fen.split(separator: " ")
         guard parts.count >= 2 else { return nil }
         return parts[1] == "w" ? .white : (parts[1] == "b" ? .black : nil)
     }
 
-    nonisolated private static func pieceColor(at pos: Pos, fen: String) -> ChessPieceColor? {
+    private nonisolated static func pieceColor(at pos: Pos, fen: String) -> ChessPieceColor? {
         let parts = fen.split(separator: " ")
         guard let boardPart = parts.first else { return nil }
         let ranks = boardPart.split(separator: "/")

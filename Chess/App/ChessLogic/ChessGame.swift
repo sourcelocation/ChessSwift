@@ -17,52 +17,62 @@ class ChessGame {
         var type: ChessPieceType
     }
 
-    var board: [[ChessPiece?]] = []
+    private static func fenLetter(for piece: GamePieceSnapshot) -> String {
+        let lower: String
+        switch piece.type {
+        case .pawn: lower = "p"
+        case .knight: lower = "n"
+        case .bishop: lower = "b"
+        case .rook: lower = "r"
+        case .queen: lower = "q"
+        case .king: lower = "k"
+        }
+        return piece.color == .black ? lower : lower.uppercased()
+    }
+
+    private(set) var board: [[ChessPiece?]] = []
+    private var stateBoard: [[GamePieceSnapshot?]] = []
     var history: [NormalMove] = []
     var slicedHistory: [NormalMove] {
         currentMoveIHistory != nil ? Array(history.prefix(upTo: currentMoveIHistory! + 1)) : []
     }
-    var onlineTurnOf: ChessPieceColor? // todo
-    var turnOf: ChessPieceColor {
-        if onlineTurnOf == nil {
-            if let lastMove = slicedHistory.last {
-                let piece = piece(at: lastMove.toPos)
-                return piece?.pieceColor.inverted ?? .white
-            } else {
-                return .white
-            }
-        } else {
-            return onlineTurnOf!
-        }
-    }
+    var turnOf: ChessPieceColor = .white
     var currentMoveIHistory: Int?
     var logic = ChessLogic()
     
-    static let initialBoard: [[ChessPiece?]] = [
-        [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
-        [.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),],
+    static let initialBoard: [[GamePieceSnapshot?]] = [
+        [.init(type: .rook, color: .black),.init(type: .knight, color: .black),.init(type: .bishop, color: .black),.init(type: .queen, color: .black),.init(type: .king, color: .black),.init(type: .bishop, color: .black),.init(type: .knight, color: .black),.init(type: .rook, color: .black)],
+        [.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),.init(type: .pawn, color: .black),],
         [nil,nil,nil,nil,nil,nil,nil,nil],
         [nil,nil,nil,nil,nil,nil,nil,nil],
         [nil,nil,nil,nil,nil,nil,nil,nil],
         [nil,nil,nil,nil,nil,nil,nil,nil],
-        [.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn)],
-        [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
+        [.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white),.init(type: .pawn, color: .white)],
+        [.init(type: .rook, color: .white),.init(type: .knight, color: .white),.init(type: .bishop, color: .white),.init(type: .queen, color: .white),.init(type: .king, color: .white),.init(type: .bishop, color: .white),.init(type: .knight, color: .white),.init(type: .rook, color: .white)]
     ]
     
     var delegate: ChessGameDelegate?
-    
-    
+
+    init() {
+        resetBoard()
+    }
+
     func piece(at pos: Pos) -> ChessPiece? {
+        guard (0..<8).contains(pos.y), (0..<8).contains(pos.x), board.count == 8 else { return nil }
         return board[pos.y][pos.x]
     }
+    func statePiece(at pos: Pos) -> GamePieceSnapshot? {
+        guard (0..<8).contains(pos.y), (0..<8).contains(pos.x), stateBoard.count == 8 else { return nil }
+        return stateBoard[pos.y][pos.x]
+    }
     func moves(for pos: Pos) -> [NormalMove] {
-        return logic.getMoves(pos: pos, lastMove: history.last, board: board)
+        return logic.getMoves(pos: pos, lastMove: history.last, board: stateBoard)
     }
     
     func kingPos(color: ChessPieceColor) -> Pos {
         for y in 0...7 {
             for x in 0...7 {
-                if board[y][x]?.pieceType == .king, board[y][x]!.pieceColor == color {
+                if stateBoard[y][x]?.pieceType == .king, stateBoard[y][x]!.pieceColor == color {
                     return Pos(x: x, y: y)
                 }
             }
@@ -70,10 +80,14 @@ class ChessGame {
         fatalError("Unable to find the king...")
     }
     
-    func perform(move: Move, addToHistory: Bool, uiMove: Bool, noRules: Bool) {
+    func perform(move: Move, addToHistory: Bool, uiMove: Bool, noRules: Bool, togglesTurn: Bool = true) {
         if let move = move as? NormalMove, move.toPos != move.fromPos {
             let piece = piece(at: move.fromPos)
+            let pieceState = statePiece(at: move.fromPos)
             delegate?.removePiece(self.piece(at: move.toPos))
+            stateBoard[move.toPos.y][move.toPos.x] = nil
+            stateBoard[move.fromPos.y][move.fromPos.x] = nil
+            stateBoard[move.toPos.y][move.toPos.x] = pieceState
             board[move.toPos.y][move.toPos.x] = nil
             board[move.fromPos.y][move.fromPos.x] = nil
             board[move.toPos.y][move.toPos.x] = piece
@@ -82,6 +96,7 @@ class ChessGame {
                 if move.toPos.y == (piece?.pieceColor == .white ? 0 : 7), uiMove, !(move.additionalMove is PawnToQueenMove) {
                     delegate?.pawnReachedEnd(color: piece!.pieceColor, completion: { [weak self] type in
                         guard let self = self else { return }
+                        self.stateBoard[move.toPos.y][move.toPos.x]?.type = type
                         self.board[move.toPos.y][move.toPos.x]?.pieceType = type
                         self.checkChecks(ui: uiMove)
                         self.delegate?.changePieceType(piece: self.piece(at: move.toPos), at: move.toPos, to: type)
@@ -95,15 +110,18 @@ class ChessGame {
             }
         } else if let move = move as? DestroyMove {
             delegate?.removePiece(self.piece(at: move.pos))
+            stateBoard[move.pos.y][move.pos.x] = nil
             board[move.pos.y][move.pos.x] = nil
         } else if let move = move as? CreateMove {
             self.piece(at: move.pos)?.removeFromParent()
+            stateBoard[move.pos.y][move.pos.x] = .init(type: move.pieceType, color: move.pieceColor)
             board[move.pos.y][move.pos.x] = ChessPiece(pieceColor: move.pieceColor, pieceType: move.pieceType)
             if uiMove {
                 delegate?.createPiece(self.piece(at: move.pos), pos: move.pos)
             }
             
         } else if let move = move as? PawnToQueenMove {
+            stateBoard[move.pos.y][move.pos.x]?.type = move.turnedTo
             delegate?.changePieceType(piece: self.piece(at: move.pos), at: move.pos, to: move.turnedTo)
             board[move.pos.y][move.pos.x]?.pieceType = move.turnedTo
         }
@@ -130,10 +148,13 @@ class ChessGame {
                     logic.blackCanCastle = false
                 }
             }
-            perform(move: additionalMove, addToHistory: false, uiMove: uiMove, noRules: noRules)
+            perform(move: additionalMove, addToHistory: false, uiMove: uiMove, noRules: noRules, togglesTurn: false)
         } else {
             logic.isWhiteInCheck = false
             logic.isBlackInCheck = false
+        }
+        if togglesTurn, let move = move as? NormalMove, move.fromPos != move.toPos {
+            turnOf = turnOf.inverted
         }
         if let move = move as? NormalMove, move.fromPos != move.toPos {
             if uiMove {
@@ -146,11 +167,11 @@ class ChessGame {
     }
     
     func checkCheck(forPieceColor: ChessPieceColor, ui: Bool) -> Bool {
-        logic.checkCheck(board: board)
+        logic.checkCheck(board: stateBoard)
         
-        let checkmate = logic.checkCheckmate(for: forPieceColor, lastMove: slicedHistory.last, board: board)
+        let checkmate = logic.checkCheckmate(for: forPieceColor, lastMove: slicedHistory.last, board: stateBoard)
         if !checkmate {
-            let check = logic.checkCheck(for: forPieceColor, board: board)
+            let check = logic.checkCheck(for: forPieceColor, board: stateBoard)
             if check {
                 if ui {
                     delegate?.check(kingPos: kingPos(color: forPieceColor))
@@ -189,9 +210,9 @@ class ChessGame {
         
         delegate?.removePieces()
         if noRulesEnabled {
-            var emptyBoardPieces: [[ChessPiece?]] = Array(repeating:Array(repeating: nil, count: 8),count:8)
-            emptyBoardPieces[0][0] = .init(pieceColor: .black, pieceType: .king)
-            emptyBoardPieces[7][7] = .init(pieceColor: .white, pieceType: .king)
+            var emptyBoardPieces: [[GamePieceSnapshot?]] = Array(repeating:Array(repeating: nil, count: 8),count:8)
+            emptyBoardPieces[0][0] = .init(type: .king, color: .black)
+            emptyBoardPieces[7][7] = .init(type: .king, color: .white)
             
             resetBoard(customBoard: emptyBoardPieces)
         } else {
@@ -226,21 +247,19 @@ class ChessGame {
 //        checkChecks(ui: true)
     }
     
-    func resetBoard(customBoard: [[ChessPiece?]]? = nil) {
-        board = customBoard ?? [
-            [.init(pieceColor: .black, pieceType: .rook),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .queen),.init(pieceColor: .black, pieceType: .king),.init(pieceColor: .black, pieceType: .bishop),.init(pieceColor: .black, pieceType: .knight),.init(pieceColor: .black, pieceType: .rook)],
-            [.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),.init(pieceColor: .black, pieceType: .pawn),],
-            [nil,nil,nil,nil,nil,nil,nil,nil],
-            [nil,nil,nil,nil,nil,nil,nil,nil],
-            [nil,nil,nil,nil,nil,nil,nil,nil],
-            [nil,nil,nil,nil,nil,nil,nil,nil],
-            [.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn),.init(pieceColor: .white, pieceType: .pawn)],
-            [.init(pieceColor: .white, pieceType: .rook),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .queen),.init(pieceColor: .white, pieceType: .king),.init(pieceColor: .white, pieceType: .bishop),.init(pieceColor: .white, pieceType: .knight),.init(pieceColor: .white, pieceType: .rook)]
-        ]
+    func resetBoard(customBoard: [[GamePieceSnapshot?]]? = nil) {
+        stateBoard = customBoard ?? ChessGame.initialBoard
+        board = stateBoard.map { row in
+            row.map { piece in
+                guard let piece else { return nil }
+                return ChessPiece(pieceColor: piece.color, pieceType: piece.type)
+            }
+        }
         logic.isWhiteInCheck = false
         logic.isBlackInCheck = false
         logic.whiteCanCastle = true
         logic.blackCanCastle = true
+        turnOf = .white
     }
     func getFen() -> String {
         var s = ""
@@ -248,7 +267,7 @@ class ChessGame {
 
         for i in (0 ..< 64) {
             let pos = Pos(x: i % 8, y: i / 8)
-            let piece = piece(at: pos)
+            let piece = statePiece(at: pos)
             if piece == nil {
                 e += 1
             } else {
@@ -256,7 +275,7 @@ class ChessGame {
                     s += String(e)
                     e = 0
                 }
-                s += piece!.letterFenRepresentation()
+                s += Self.fenLetter(for: piece!)
             }
             
             if i % 8 == 7 {
@@ -307,8 +326,8 @@ class ChessGame {
         let kingPos = Pos(x: 4, y: color == .white ? 7 : 0)
         let rookPos = Pos(x: 7, y: color == .white ? 7 : 0)
         
-        guard let king = piece(at: kingPos),
-              let rook = piece(at: rookPos),
+        guard let king = statePiece(at: kingPos),
+              let rook = statePiece(at: rookPos),
               king.pieceType == .king,
               rook.pieceType == .rook,
               king.pieceColor == color,
@@ -324,8 +343,8 @@ class ChessGame {
         let kingPos = Pos(x: 4, y: color == .white ? 7 : 0)
         let rookPos = Pos(x: 0, y: color == .white ? 7 : 0)
         
-        guard let king = piece(at: kingPos),
-              let rook = piece(at: rookPos),
+        guard let king = statePiece(at: kingPos),
+              let rook = statePiece(at: rookPos),
               king.pieceType == .king,
               rook.pieceType == .rook,
               king.pieceColor == color,
@@ -428,7 +447,7 @@ class ChessGame {
         return ["a","b","c","d","e","f","g","h"][pos.x] + String(8 - pos.y)
     }
     func printBoard() {
-        for row in board {
+        for row in stateBoard {
             print(row.map({
                 if $0 != nil {
                     var res = ""
@@ -450,8 +469,17 @@ class ChessGame {
                 } else {
                     return "."
                 }
-            } as (ChessPiece?) -> String).joined(separator: " "))
+            } as (GamePieceSnapshot?) -> String).joined(separator: " "))
         }
+    }
+
+    func snapshot() -> GameSnapshot {
+        return GameSnapshot(
+            board: stateBoard,
+            turnOf: turnOf,
+            fen: getFen(),
+            historyCursor: currentMoveIHistory
+        )
     }
 }
 
